@@ -1,0 +1,406 @@
+---
+title: "LS"
+author: "Melissa Taane"
+date: "21 February 2019"
+output:
+  word_document: default
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,cache = TRUE, fig.align = "centre")
+library(xlsx)
+library(ggplot2)
+library(gplots)
+library(gridExtra)
+library(corrplot)
+library(dplyr)
+library(png)
+library(grid)
+```
+
+
+### F1 Layout and Height Diagrams
+
+<centre>
+
+!["Map of F1 Trees"](Blocks.png) 
+
+</centre>
+
+<centre>
+
+!["Diagram of leaf collection levels"](Tree.png)
+
+</centre>
+
+
+### Import and Arrange Data
+
+
+```{r}
+Data <-read.xlsx("Full.xlsx", sheetName ="Full")
+Dup <-read.xlsx("Full.xlsx", sheetName ="Dup")
+CG = Data[c(1:11),]
+head(CG)
+EC201 = Data[c(12:21),]
+head(EC201)
+EC103 = Data[c(22:33),]
+head(EC103)
+F1 = Data[c(34:1825),]
+head(F1)
+```
+
+```{r}
+F1G <-group_by(F1,Tree.ID)
+SF1G<- summarise(F1G,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T))
+
+FChl <-mean(F1G$Chl)
+SD<-sd(F1G$Chl)
+SD2 = SD*2
+SD3 = (0-SD)
+
+VG <- var(F1G$Chl)
+VG2<- var(SF1G$Chl)
+p1<-ggplot(F1G[c(1:136),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p1
+
+p2<-ggplot(F1G[c(137:345),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p2
+
+p3<-ggplot(F1G[c(346:448),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p3
+
+p4<-ggplot(F1G[c(449:650),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p4
+
+p5<-ggplot(F1G[c(449:649),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p5
+
+p6<-ggplot(F1G[c(650:825),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p6
+
+```
+
+### Checking Similarity of Replicates
+
+
+```{r replicate comparison}
+R <-group_by(Data,Rep.)
+SR <-summarise(R,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T))
+
+RC = mean(SR$Chl);RC
+RN = mean(SR$NBI);RN
+RA = mean(SR$Anth);RA
+RF = mean(SR$Flav);RF
+
+#Plots of Replicate Groups
+plot<- ggplot(Dup) + aes(x = Rep., y = Chl ) + geom_boxplot()+geom_hline(yintercept = RC)
+plot2<- ggplot(Dup) + aes(x = Rep., y = NBI ) + geom_boxplot()+geom_hline(yintercept = RN)
+plot3<- ggplot(Dup) + aes(x = Rep., y = Anth ) + geom_boxplot()+geom_hline(yintercept = RA)
+plot4<- ggplot(Dup) + aes(x = Rep., y = Flav ) + geom_boxplot()+geom_hline(yintercept = RF)
+
+grid.arrange(plot,plot2,plot3,plot4, ncol = 4)
+
+#Comparing Chlorophyll Replicates
+mod <-lm(Dup$Chl ~ Dup$Rep.)
+anova(mod)
+#Comparing Flavanol Replicates
+mod2 <-lm(Dup$Flav ~ Dup$Rep.)
+anova(mod2)
+#Comparing Anthocyanin Replicates
+mod3 <-lm(Dup$Anth ~ Dup$Rep.)
+anova(mod3)
+#Comparing Nitrogen Replicates
+mod4 <-lm(Dup$NBI ~ Dup$Rep.)
+anova(mod4)
+```
+
+#### Compare Boxplots for Each Allocation
+
+```{r Allocation}
+Al <-group_by(Data,Allocation)
+SAL <-summarise(Al,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T))
+
+AlC = mean(SAL$Chl);AlC
+AlN = mean(SAL$NBI);AlN
+AlF = mean(SAL$Flav);AlF
+AlA = mean(SAL$Anth);AlA
+
+plot5<- ggplot(Data) + aes(x = Allocation, y = Chl) + geom_boxplot()+geom_hline(yintercept = AlC)
+plot6<- ggplot(Data) + aes(x = Allocation, y = NBI) + geom_boxplot()+geom_hline(yintercept = AlN)
+plot7<- ggplot(Data) + aes(x = Allocation, y = Flav) + geom_boxplot()+geom_hline(yintercept = AlF)
+plot8<- ggplot(Data) + aes(x = Allocation, y = Anth) + geom_boxplot()+geom_hline(yintercept = AlA)
+
+grid.arrange(plot5,plot6,plot7,plot8, ncol=2)
+
+#Chlorophyll
+mod5 <-lm(Data$Chl ~ Data$Allocation)
+anova(mod5)
+#Nitrogen
+mod6 <-lm(Data$NBI ~ Data$Allocation)
+anova(mod5)
+#Flavanol
+mod7 <-lm(Data$Flav ~ Data$Allocation)
+anova(mod7)
+#Anthocyanin
+mod8 <-lm(Data$Anth ~ Data$Allocation)
+anova(mod8)
+```
+
+## F1 Trees
+
+
+```{r F1}
+O <-group_by(F1,Tree.ID)
+SO <-summarise(O,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T))
+```
+
+### Chlorophyll
+
+
+```{r Chl}
+OC <- mean(SO$Chl);OC
+
+plot15<-ggplot(O) + aes(x = Tree.ID, y = Chl, group_by(Tree.ID)) + geom_boxplot() +geom_hline(yintercept = OC)
+plot16<-ggplot(O) + aes(x = Chl) + geom_histogram()
+grid.arrange(plot15,plot16)
+
+ModChl <- lm(O$Chl ~ O$Tree.ID)
+anova(ModChl)
+```
+
+## Flavanol Index in F1 Trees
+
+
+```{r Flavanol Index}
+OF <- mean(SO$Flav);OF
+
+plot17<-ggplot(O) + aes(x = Tree.ID, y = Flav) + geom_boxplot() +geom_hline(yintercept = OF)
+plot18 <-ggplot(O) + aes(x = Flav) + geom_histogram()
+grid.arrange(plot17,plot18)
+
+ModFlav <- lm(O$Flav ~ O$Tree.ID)
+anova(ModFlav)
+```
+
+## Anthocyanin
+
+
+```{r}
+OA <- mean(SO$Anth);OA
+
+plot19<-ggplot(O) + aes(x = Tree.ID, y = Anth) + geom_boxplot() +geom_hline(yintercept = OA)
+plot20<-ggplot(O) + aes(x = Anth) + geom_histogram()
+grid.arrange(plot19,plot20)
+
+ModAnth <- lm(O$Anth ~ O$Tree.ID)
+anova(ModAnth)
+```
+
+## Nitrogen Status
+
+
+```{r Nitro}
+ON <- mean(SO$NBI);ON
+
+plot21<-ggplot(O) + aes(x = Tree.ID, y = NBI) + geom_boxplot() +geom_hline(yintercept = ON)
+plot22<-ggplot(O) + aes(x = NBI) + geom_histogram()
+grid.arrange(plot21,plot22)
+
+ModNBI <- lm(O$NBI ~ O$Tree.ID)
+anova(ModNBI)
+```
+
+#### Leaf Height Comparison
+
+
+```{r height variability}
+Hgt <- group_by(F1, Height)
+SHgt=summarise(Hgt, count = n(), Chl = mean(Chl,na.rm=T), NBI = mean(NBI, na.rm = T), Anth = mean(Anth, na.rm = T), Flav = mean(Flav, na.rm = T))
+
+HC = mean(SHgt$Chl);HC
+HN = mean(SHgt$NBI);HN
+HA = mean(SHgt$Anth);HA
+HF = mean(SHgt$Flav);HF
+
+plot23<-ggplot(Hgt) + aes(x = Height, y = NBI) + geom_boxplot()+geom_hline(yintercept = HN)
+plot24<-ggplot(Hgt) + aes(x = Height, y = Chl) + geom_boxplot()+geom_hline(yintercept = HC)
+plot25<-ggplot(Hgt) + aes(x = Height, y = Flav) + geom_boxplot()+geom_hline(yintercept = HF)
+plot26<-ggplot(Hgt) + aes(x = Height, y = Anth) + geom_boxplot()+geom_hline(yintercept = HA)
+grid.arrange(plot23,plot24,plot25,plot26,ncol=2)
+
+FitH <- lm(Hgt$Chl ~ Hgt$Height)
+anova(FitH)
+FitH2 <- lm(Hgt$NBI ~ Hgt$Height)
+anova(FitH2)
+FitH3 <- lm(Hgt$Flav ~ Hgt$Height)
+anova(FitH3)
+FitH4 <- lm(Hgt$Anth ~ Hgt$Height)
+anova(FitH4)
+```
+
+
+#### Correlations Between Measures
+
+
+```{r compare}
+Data2 = Data[c(12:15)]
+cor(Data2)
+
+plot9 <-ggplot(F1) + aes(x = Chl, y = Anth) + geom_point()
+plot10 <-ggplot(F1) + aes(x = NBI, y = Anth) + geom_point()
+plot11<-ggplot(F1) + aes(x = Flav, y = Anth) + geom_point()
+plot12<-ggplot(F1) + aes(x = NBI, y = Chl) + geom_point()
+plot13<-ggplot(F1) + aes(x = Flav, y = Chl) + geom_point()
+plot14<-ggplot(F1) + aes(x = Flav, y = NBI) + geom_point()
+grid.arrange(plot9,plot10,plot11,plot12,plot13,plot14)
+
+comp <-lm(Flav ~ Anth, data = F1)
+anova(comp)
+
+comp2 <-lm(NBI ~ Anth, data = F1)
+anova(comp2)
+
+comp3 <-lm(Flav ~ NBI, data = F1)
+anova(comp3)
+
+comp4 <-lm(Flav ~ Anth+NBI, data = F1)
+anova(comp4)
+
+comp5 <-lm(Anth ~ Flav + NBI, data = F1)
+anova(comp5)
+
+comp6 <-lm(NBI ~ Flav + Anth, data = F1)
+anova(comp6)
+```
+
+#### Column Block Effects
+
+
+```{r Column}
+Cmn <- group_by(F1, Column)
+SCmn <- summarise(Cmn, count =n(),Chl = mean(Chl,na.rm=T), NBI = mean(NBI, ra.nm = T), Anth = mean(Anth, na.rm=T),Flav = mean(Flav,na.rm =T))
+
+CA = mean(SCmn$Anth);CA
+CC = mean(SCmn$Chl);CC
+CN = mean(SCmn$NBI);CN
+CF = mean(SCmn$Flav);CF
+
+
+plot27<-ggplot(F1) + aes(x = Column, y = Anth,group = Column) + geom_boxplot()+geom_hline(yintercept = CA)
+
+plot28<-ggplot(F1) + aes(x = Column, y = Flav,group = Column) + geom_boxplot() +geom_hline(yintercept = CF)
+
+plot29<-ggplot(F1) + aes(x = Column, y = NBI,group = Column) + geom_boxplot() +geom_hline(yintercept = CN)
+
+plot30<-ggplot(F1) + aes(x = Column, y = Chl,group = Column) + geom_boxplot() +geom_hline(yintercept = CC)
+
+grid.arrange(plot27,plot28,plot29,plot30)
+
+Col <- lm(Cmn$Anth ~ Cmn$Column)
+anova(Col)
+
+Col2 <- lm(Cmn$Flav ~ Cmn$Column)
+anova(Col2)
+
+Col3 <- lm(Cmn$NBI ~ Cmn$Column)
+anova(Col3)
+
+Col4 <- lm(Cmn$Chl ~ Cmn$Column)
+anova(Col4)
+```
+
+#### Row Block Effects
+
+
+```{r Row}
+Rw <-group_by(F1, Row)
+SRw =summarise(Rw, count = n(), Chl = mean(Chl, na.rm=T),NBI = mean(NBI, na.rm=T), Flav = mean(Flav, na.rm = T), Anth = mean(Anth, na.rm=T))
+
+RwC = mean(SRw$Chl);RwC
+RwA = mean(SRw$Anth);RwA
+RwF = mean(SRw$Flav);RwF
+RwN = mean(SRw$NBI);RwN
+
+plot31<-ggplot(Rw) + aes(x = Row, y = Chl, group = Row) + geom_boxplot()  +geom_hline(yintercept = RwC);plot31
+plot32<-ggplot(Rw) + aes(x = Row, y = Anth, group = Row) + geom_boxplot() +geom_hline(yintercept = RwA);plot32
+plot33<-ggplot(Rw) + aes(x = Row, y = Flav,group = Row) + geom_boxplot() +geom_hline(yintercept = RwF);plot33
+plot34<-ggplot(Rw) + aes(x = Row, y = NBI, group = Row) + geom_boxplot() +geom_hline(yintercept = RwN);plot34
+
+Ro <- lm(Rw$Anth ~ Rw$Row)
+anova(Ro)
+
+Ro2 <- lm(Rw$NBI ~ Rw$Row)
+anova(Ro2)
+
+Ro3 <- lm(Rw$Flav ~ Rw$Row)
+anova(Ro3)
+
+Ro4 <- lm(Rw$Chl ~ Rw$Row)
+anova(Ro4)
+```
+#### Block Effects
+
+```{r Block}
+BK <-group_by(F1, Block)
+
+BKS<-summarise(BK, count = n(), Chl = mean(Chl, na.rm=T),NBI = mean(NBI, na.rm=T), Flav = mean(Flav, na.rm = T), Anth = mean(Anth, na.rm=T))
+
+BChl<-mean(BKS$Chl)
+BN <-mean(BKS$NBI)
+BFl <-mean(BKS$Flav)
+BA <-mean(BKS$Anth)
+
+plot35 <- ggplot(BK) + aes(x = Block, y = Chl, group = Block) + geom_boxplot() +geom_hline(yintercept = BChl);plot35
+
+plot36 <- ggplot(BK) + aes(x = Block, y = Flav, group = Block) + geom_boxplot() +geom_hline(yintercept = BFl);plot36
+
+plot37 <- ggplot(BK) + aes(x = Block, y = Anth, group = Block) + geom_boxplot() +geom_hline(yintercept = BA);plot37
+
+plot38 <- ggplot(BK) + aes(x = Block, y = NBI, group = Block) + geom_boxplot() +geom_hline(yintercept = BN);plot38
+
+MBChl <- lm(BK$Chl ~ BK$Block)
+anova(MBChl)
+
+MBF <- lm(BK$Flav ~ BK$Block)
+anova(MBF)
+
+MBN <- lm(BK$NBI ~ BK$Block)
+anova(MBN)
+
+MBA <- lm(F1$Anth ~ F1$Block)
+anova(MBA)
+```
+
+### Block and Height
+
+```{r}
+BHC <-lm(F1$Chl ~ F1$Block+F1$Height)
+anova(BHC)
+
+BHF<-lm(F1$Flav ~ F1$Block+F1$Height)
+anova(BHF)
+
+BHA<-lm(F1$Anth ~ F1$Block+F1$Height)
+anova(BHA)
+
+BHN<-lm(F1$NBI ~ F1$Block+F1$Height)
+anova(BHN)
+```
+
+
+
+#### Compare Parents
+
+
+```{r}
+Parent <- rbind(EC201,EC103)
+t.test(Parent$Chl ~ Parent$Tree.ID)
+P1 <- lm(Parent$Chl ~ Parent$Tree.ID)
+anova(P1)
+t.test(Parent$Flav ~ Parent$Tree.ID)
+P2 <-lm(Parent$Flav ~ Parent$Tree.ID)
+anova(P2)
+t.test(Parent$NBI ~ Parent$Tree.ID)
+P3<- lm(Parent$NBI ~ Parent$Tree.ID)
+anova(P3)
+t.test(Parent$NBI ~ Parent$Tree.ID)
+P4 <-lm(Parent$NBI ~ Parent$Tree.ID)
+anova(P4)
+```
