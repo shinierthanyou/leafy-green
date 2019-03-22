@@ -3,9 +3,9 @@ title: "LS"
 author: "Melissa Taane"
 date: "21 February 2019"
 output:
-  word_document: default
-  pdf_document: default
   html_document: default
+  pdf_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -18,78 +18,75 @@ library(corrplot)
 library(dplyr)
 library(png)
 library(grid)
+library(heatmaply)
 ```
 
 
-### F1 Layout and Height Diagrams
+### F1 Layout
 
-<centre>
+Map indicates the layout of the F1 generation resulting from a cross between EC201 and EC103 parents.
 
 !["Map of F1 Trees"](Blocks.png) 
 
-</centre>
 
-<centre>
+### Height Diagram
+
+Diagram indicates the areas of leaf collection regarding height.
+Each Tree had 10 leaves collected, 3 from Low, 4 from Mid and 3 from High. The first leaf sampled was measured twice for replication comparison.
 
 !["Diagram of leaf collection levels"](Tree.png)
 
-</centre>
-
 
 ### Import and Arrange Data
-
+"Full.xlsx" contains measurement information from sampling. 
+Sheet "Dup" contains only the repeated leaf measures
 
 ```{r}
+# Import Data Measures
 Data <-read.xlsx("Full.xlsx", sheetName ="Full")
+head(Data)
+
+# Import Replicate Data
 Dup <-read.xlsx("Full.xlsx", sheetName ="Dup")
+head(Data)
+
+#Isolate Crimson Glory Outgroup
 CG = Data[c(1:11),]
 head(CG)
+
+#Isolate East Cape 201 Parent
 EC201 = Data[c(12:21),]
 head(EC201)
+
+#Isolate East Cape 103 Parent
 EC103 = Data[c(22:33),]
 head(EC103)
+
+#Isolate Offspring from Parental Cross
 F1 = Data[c(34:1825),]
 head(F1)
 ```
 
-```{r}
-F1G <-group_by(F1,Tree.ID)
-SF1G<- summarise(F1G,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T))
-
-FChl <-mean(F1G$Chl)
-SD<-sd(F1G$Chl)
-SD2 = SD*2
-SD3 = (0-SD)
-
-VG <- var(F1G$Chl)
-VG2<- var(SF1G$Chl)
-p1<-ggplot(F1G[c(1:136),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p1
-
-p2<-ggplot(F1G[c(137:345),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p2
-
-p3<-ggplot(F1G[c(346:448),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p3
-
-p4<-ggplot(F1G[c(449:650),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p4
-
-p5<-ggplot(F1G[c(449:649),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p5
-
-p6<-ggplot(F1G[c(650:825),]) + aes(x = Tree.ID, y = Chl,interaction(TRUE) ) + geom_boxplot()+geom_hline(yintercept = FChl)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD)+geom_hline(yintercept = SD3);p6
-
-```
-
 ### Checking Similarity of Replicates
+
+Replicates were taken by measuring the first leaf sample of a tree twice, in order to establish consistency and reliability of measurements
 
 
 ```{r replicate comparison}
 R <-group_by(Data,Rep.)
 SR <-summarise(R,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T))
 
+#Mean Calculations Across All Replicate Measures
+#Chlorophyll
 RC = mean(SR$Chl);RC
+#Nitrogen Index
 RN = mean(SR$NBI);RN
+#Anthocyanin
 RA = mean(SR$Anth);RA
+#Flavanoids
 RF = mean(SR$Flav);RF
 
-#Plots of Replicate Groups
+#Plots of Replicate Group Medians and Distributions
 plot<- ggplot(Dup) + aes(x = Rep., y = Chl ) + geom_boxplot()+geom_hline(yintercept = RC)
 plot2<- ggplot(Dup) + aes(x = Rep., y = NBI ) + geom_boxplot()+geom_hline(yintercept = RN)
 plot3<- ggplot(Dup) + aes(x = Rep., y = Anth ) + geom_boxplot()+geom_hline(yintercept = RA)
@@ -97,31 +94,40 @@ plot4<- ggplot(Dup) + aes(x = Rep., y = Flav ) + geom_boxplot()+geom_hline(yinte
 
 grid.arrange(plot,plot2,plot3,plot4, ncol = 4)
 
-#Comparing Chlorophyll Replicates
+#ANOVA
+#Chlorophyll
 mod <-lm(Dup$Chl ~ Dup$Rep.)
 anova(mod)
-#Comparing Flavanol Replicates
+#Flavanol
 mod2 <-lm(Dup$Flav ~ Dup$Rep.)
 anova(mod2)
-#Comparing Anthocyanin Replicates
+#Anthocyanin
 mod3 <-lm(Dup$Anth ~ Dup$Rep.)
 anova(mod3)
-#Comparing Nitrogen Replicates
+#Nitrogen
 mod4 <-lm(Dup$NBI ~ Dup$Rep.)
 anova(mod4)
 ```
 
-#### Compare Boxplots for Each Allocation
+#### Comparing Allocations
+
+Allocation refers to which group measurements were taken from, i.e. Parental Tree (EC103, EC201), Outgroup Tree (CG), F1 Cross offspring
 
 ```{r Allocation}
 Al <-group_by(Data,Allocation)
 SAL <-summarise(Al,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T))
 
+#Mean Calculations Across all Allocations
+#Chlorophyll
 AlC = mean(SAL$Chl);AlC
+#Nitrogen
 AlN = mean(SAL$NBI);AlN
+#Flavanoids
 AlF = mean(SAL$Flav);AlF
+#Anthocyanin
 AlA = mean(SAL$Anth);AlA
 
+#Boxplot comparing medians and measurement distributions
 plot5<- ggplot(Data) + aes(x = Allocation, y = Chl) + geom_boxplot()+geom_hline(yintercept = AlC)
 plot6<- ggplot(Data) + aes(x = Allocation, y = NBI) + geom_boxplot()+geom_hline(yintercept = AlN)
 plot7<- ggplot(Data) + aes(x = Allocation, y = Flav) + geom_boxplot()+geom_hline(yintercept = AlF)
@@ -129,6 +135,7 @@ plot8<- ggplot(Data) + aes(x = Allocation, y = Anth) + geom_boxplot()+geom_hline
 
 grid.arrange(plot5,plot6,plot7,plot8, ncol=2)
 
+#ANOVAs
 #Chlorophyll
 mod5 <-lm(Data$Chl ~ Data$Allocation)
 anova(mod5)
@@ -145,27 +152,33 @@ anova(mod8)
 
 ## F1 Trees
 
+Investigating measures across the F1 cross population
 
 ```{r F1}
 O <-group_by(F1,Tree.ID)
-SO <-summarise(O,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T))
+SO <-summarise(O,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T));SO
 ```
 
 ### Chlorophyll
 
 
 ```{r Chl}
+#Mean
 OC <- mean(SO$Chl);OC
 
+#Individual Tree Measures
 plot15<-ggplot(O) + aes(x = Tree.ID, y = Chl, group_by(Tree.ID)) + geom_boxplot() +geom_hline(yintercept = OC)
+
+#Measure Distribution
 plot16<-ggplot(O) + aes(x = Chl) + geom_histogram()
 grid.arrange(plot15,plot16)
 
+#ANOVA
 ModChl <- lm(O$Chl ~ O$Tree.ID)
 anova(ModChl)
 ```
 
-## Flavanol Index in F1 Trees
+## Flavanol
 
 
 ```{r Flavanol Index}
@@ -197,6 +210,7 @@ anova(ModAnth)
 
 
 ```{r Nitro}
+#Mean
 ON <- mean(SO$NBI);ON
 
 plot21<-ggplot(O) + aes(x = Tree.ID, y = NBI) + geom_boxplot() +geom_hline(yintercept = ON)
@@ -207,37 +221,55 @@ ModNBI <- lm(O$NBI ~ O$Tree.ID)
 anova(ModNBI)
 ```
 
-#### Leaf Height Comparison
+#### Comparing Measures from the 3 height categories
 
 
 ```{r height variability}
 Hgt <- group_by(F1, Height)
 SHgt=summarise(Hgt, count = n(), Chl = mean(Chl,na.rm=T), NBI = mean(NBI, na.rm = T), Anth = mean(Anth, na.rm = T), Flav = mean(Flav, na.rm = T))
 
+#Overall means across all heights
+#Chlorophyll
 HC = mean(SHgt$Chl);HC
+#Nitrogen
 HN = mean(SHgt$NBI);HN
+#Anthocyanin
 HA = mean(SHgt$Anth);HA
+#Flavanoids
 HF = mean(SHgt$Flav);HF
 
+#Boxplots visualising height comparisons
 plot23<-ggplot(Hgt) + aes(x = Height, y = NBI) + geom_boxplot()+geom_hline(yintercept = HN)
 plot24<-ggplot(Hgt) + aes(x = Height, y = Chl) + geom_boxplot()+geom_hline(yintercept = HC)
 plot25<-ggplot(Hgt) + aes(x = Height, y = Flav) + geom_boxplot()+geom_hline(yintercept = HF)
 plot26<-ggplot(Hgt) + aes(x = Height, y = Anth) + geom_boxplot()+geom_hline(yintercept = HA)
 grid.arrange(plot23,plot24,plot25,plot26,ncol=2)
 
+#Visualising Measurement Distributions
+plot231<-ggplot(Hgt) + aes(x = Chl) + geom_histogram()
+plot241<-ggplot(Hgt) + aes(x = NBI) + geom_histogram()
+plot251<-ggplot(Hgt) + aes(x = Flav) + geom_histogram()
+plot261<-ggplot(Hgt) + aes(x = Anth) + geom_histogram()
+grid.arrange(plot231,plot241,plot251,plot261)
+
+#ANOVA
+#Chlorophyll
 FitH <- lm(Hgt$Chl ~ Hgt$Height)
 anova(FitH)
+#Nitrogen
 FitH2 <- lm(Hgt$NBI ~ Hgt$Height)
 anova(FitH2)
+#Flavanoids
 FitH3 <- lm(Hgt$Flav ~ Hgt$Height)
 anova(FitH3)
+#Anthocyanin
 FitH4 <- lm(Hgt$Anth ~ Hgt$Height)
 anova(FitH4)
 ```
 
 
 #### Correlations Between Measures
-
+Comparing correlations between the various measures
 
 ```{r compare}
 Data2 = Data[c(12:15)]
@@ -308,64 +340,68 @@ anova(Col4)
 
 #### Row Block Effects
 
-
 ```{r Row}
 Rw <-group_by(F1, Row)
 SRw =summarise(Rw, count = n(), Chl = mean(Chl, na.rm=T),NBI = mean(NBI, na.rm=T), Flav = mean(Flav, na.rm = T), Anth = mean(Anth, na.rm=T))
 
+#Means
+#Chlorophyll
 RwC = mean(SRw$Chl);RwC
+#Anthocyanin
 RwA = mean(SRw$Anth);RwA
+#Flavanoid
 RwF = mean(SRw$Flav);RwF
+#Nitrogen
 RwN = mean(SRw$NBI);RwN
 
+#Comparing Tree Measures
 plot31<-ggplot(Rw) + aes(x = Row, y = Chl, group = Row) + geom_boxplot()  +geom_hline(yintercept = RwC);plot31
 plot32<-ggplot(Rw) + aes(x = Row, y = Anth, group = Row) + geom_boxplot() +geom_hline(yintercept = RwA);plot32
 plot33<-ggplot(Rw) + aes(x = Row, y = Flav,group = Row) + geom_boxplot() +geom_hline(yintercept = RwF);plot33
 plot34<-ggplot(Rw) + aes(x = Row, y = NBI, group = Row) + geom_boxplot() +geom_hline(yintercept = RwN);plot34
 
+#ANOVA
+#Anthocyanin
 Ro <- lm(Rw$Anth ~ Rw$Row)
 anova(Ro)
 
+#Nitrogen
 Ro2 <- lm(Rw$NBI ~ Rw$Row)
 anova(Ro2)
 
+#Flavanoids
 Ro3 <- lm(Rw$Flav ~ Rw$Row)
 anova(Ro3)
 
+#Chlorophyll
 Ro4 <- lm(Rw$Chl ~ Rw$Row)
 anova(Ro4)
 ```
-#### Block Effects
+
+#### Block Effects, Combining Row and Columns. 
 
 ```{r Block}
-BK <-group_by(F1, Block)
+CRC <-lm(F1$Chl ~ F1$Row + F1$Column)
+anova(CRC)
 
-BKS<-summarise(BK, count = n(), Chl = mean(Chl, na.rm=T),NBI = mean(NBI, na.rm=T), Flav = mean(Flav, na.rm = T), Anth = mean(Anth, na.rm=T))
+Z = group_by(F1, Tree.ID,Row,Column)
+Z1<- summarise(Z, count = n(), Chl = mean(Chl, na.rm=T),NBI = mean(NBI, na.rm=T), Flav = mean(Flav, na.rm = T), Anth = mean(Anth, na.rm=T))
 
-BChl<-mean(BKS$Chl)
-BN <-mean(BKS$NBI)
-BFl <-mean(BKS$Flav)
-BA <-mean(BKS$Anth)
+ZChl = Z1[c(2,3,5)]
+write.xlsx(as.data.frame(ZChl), file = "Chl.xlsx", sheetName ="Chl",col.names = T, row.names = F)
 
-plot35 <- ggplot(BK) + aes(x = Block, y = Chl, group = Block) + geom_boxplot() +geom_hline(yintercept = BChl);plot35
+ZNBI = Z1[c(2,3,6)]
+write.xlsx(as.data.frame(ZNBI), file = "NBI.xlsx", sheetName ="NBI",col.names = T, row.names = F)
 
-plot36 <- ggplot(BK) + aes(x = Block, y = Flav, group = Block) + geom_boxplot() +geom_hline(yintercept = BFl);plot36
+ZFlav = Z1[c(2,3,7)]
+write.xlsx(as.data.frame(ZFlav), file = "Flav.xlsx", sheetName ="Flav",col.names = T, row.names = F)
 
-plot37 <- ggplot(BK) + aes(x = Block, y = Anth, group = Block) + geom_boxplot() +geom_hline(yintercept = BA);plot37
+ZAnth = Z1[c(2,3,8)]
+write.xlsx(as.data.frame(ZAnth), file = "Anth.xlsx", sheetName ="Anth",col.names = T, row.names = F)
 
-plot38 <- ggplot(BK) + aes(x = Block, y = NBI, group = Block) + geom_boxplot() +geom_hline(yintercept = BN);plot38
+#heatmaply(Z1C)
 
-MBChl <- lm(BK$Chl ~ BK$Block)
-anova(MBChl)
 
-MBF <- lm(BK$Flav ~ BK$Block)
-anova(MBF)
-
-MBN <- lm(BK$NBI ~ BK$Block)
-anova(MBN)
-
-MBA <- lm(F1$Anth ~ F1$Block)
-anova(MBA)
 ```
 
 ### Block and Height
