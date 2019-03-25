@@ -381,26 +381,56 @@ anova(Ro4)
 #### Block Effects, Combining Row and Columns. 
 
 ```{r Block}
-CRC <-lm(F1$Chl ~ F1$Row + F1$Column)
-anova(CRC)
-
 Z = group_by(F1, Tree.ID,Row,Column)
 Z1<- summarise(Z, count = n(), Chl = mean(Chl, na.rm=T),NBI = mean(NBI, na.rm=T), Flav = mean(Flav, na.rm = T), Anth = mean(Anth, na.rm=T))
 
+```
+
 ZChl = Z1[c(2,3,5)]
+MChl = mean(ZChl$Chl);MChl
+ZChl$Mean = ZChl$Chl-MChl
+ZChl = ZChl[-c(3)]
 write.xlsx(as.data.frame(ZChl), file = "Chl.xlsx", sheetName ="Chl",col.names = T, row.names = F)
 
 ZNBI = Z1[c(2,3,6)]
+MNBI = mean(ZNBI$NBI);MNBI
+ZNBI$Mean = ZNBI$NBI-MNBI
+ZNBI = ZNBI[-c(3)]
 write.xlsx(as.data.frame(ZNBI), file = "NBI.xlsx", sheetName ="NBI",col.names = T, row.names = F)
 
 ZFlav = Z1[c(2,3,7)]
+MFlav = mean(ZFlav$Flav);MFlav
+ZFlav$Mean = ZFlav$Flav-MFlav
+ZFlav = ZFlav[-c(3)]
 write.xlsx(as.data.frame(ZFlav), file = "Flav.xlsx", sheetName ="Flav",col.names = T, row.names = F)
 
 ZAnth = Z1[c(2,3,8)]
+MAnth = mean(ZAnth$Anth);MAnth
+ZAnth$Mean = ZAnth$Anth-MAnth
+ZAnth = ZAnth[-c(3)]
 write.xlsx(as.data.frame(ZAnth), file = "Anth.xlsx", sheetName ="Anth",col.names = T, row.names = F)
 
-#heatmaply(Z1C)
+```{r}
 
+AnthDoc <-read.xlsx("Anth.xlsx", sheetName = "Anth")
+heatmaply(AnthDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
+ARC <-lm(F1$Anth ~ F1$Row + F1$Column)
+anova(ARC)
+
+ChlDoc<-read.xlsx("Chl.xlsx", sheetName = "Chl")
+heatmaply(ChlDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
+CRC <-lm(F1$Chl ~ F1$Row + F1$Column)
+anova(CRC)
+
+NBIDoc<-read.xlsx("NBI.xlsx", sheetName = "NBI")
+heatmaply(NBIDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
+NRC <-lm(F1$NBI ~ F1$Row + F1$Column)
+anova(NRC)
+
+FlavDoc<-read.xlsx("Flav.xlsx", sheetName = "Flav")
+heatmaply(FlavDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
+FRC <-lm(F1$Flav ~ F1$Row + F1$Column)
+anova(FRC)
 
 ```
 
