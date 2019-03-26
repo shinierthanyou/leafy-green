@@ -9,7 +9,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,cache = TRUE, fig.align = "centre")
+knitr::opts_chunk$set(echo = TRUE,cache = TRUE)
 library(xlsx)
 library(ggplot2)
 library(gplots)
@@ -272,7 +272,7 @@ anova(FitH4)
 Comparing correlations between the various measures
 
 ```{r compare}
-Data2 = Data[c(12:15)]
+Data2 = Data[c(13:16)]
 cor(Data2)
 
 plot9 <-ggplot(F1) + aes(x = Chl, y = Anth) + geom_point()
@@ -469,4 +469,28 @@ anova(P3)
 t.test(Parent$NBI ~ Parent$Tree.ID)
 P4 <-lm(Parent$NBI ~ Parent$Tree.ID)
 anova(P4)
+```
+
+
+#### Flowering
+
+```{r}
+plot35<- ggplot(F1) + aes(x = Flower, y = Chl) + geom_boxplot()
+plot36<- ggplot(F1) + aes(x = Flower, y = NBI) + geom_boxplot()
+plot37<- ggplot(F1) + aes(x = Flower, y = Flav) + geom_boxplot()
+plot38<- ggplot(F1) + aes(x = Flower, y = Anth) + geom_boxplot()
+
+grid.arrange(plot35,plot36,plot37,plot38)
+
+CF<- lm(F1$Chl ~ F1$Flower)
+anova(CF)
+
+NF<- lm(F1$NBI ~ F1$Flower)
+anova(NF)
+
+FF<- lm(F1$Flav ~ F1$Flower)
+anova(FF)
+
+AF<- lm(F1$Anth ~ F1$Flower)
+anova(AF)
 ```
