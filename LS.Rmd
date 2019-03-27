@@ -1,5 +1,5 @@
 ---
-title: "LS"
+title: "Manuka Leaf Chemistry"
 author: "Melissa Taane"
 date: "21 February 2019"
 output:
@@ -24,7 +24,7 @@ library(heatmaply)
 
 ### F1 Layout
 
-Map indicates the layout of the F1 generation resulting from a cross between EC201 and EC103 parents.
+Map indicates the layout of the F1 generation resulting from a cross between EC201 and EC103 parents. Column 1 is approximately lengthways facing north.
 
 !["Map of F1 Trees"](Blocks.png) 
 
@@ -38,8 +38,21 @@ Each Tree had 10 leaves collected, 3 from Low, 4 from Mid and 3 from High. The f
 
 
 ### Import and Arrange Data
-"Full.xlsx" contains measurement information from sampling. 
-Sheet "Dup" contains only the repeated leaf measures
+
+"Full.xlsx" contains measurement information from sampling with the Dualex (https://www.force-a.com/en/capteurs-optiques-optical-sensors/dualex-scientific-chlorophyll-meter/), including;
+
++ Surface content of chlorophyll in µg/cm² (Chl) 
+
++ The index of epidermal flavanols (Flav) 
+
++ Nitrogen Balance Index status (NBI)
+
++ Epidermal Anthocyanins (Anth). 
+
+It also contains information about the block position, the leaf height information, and presense or absence of flowering
+
+
+Sheet "Dup" contains only the samples that were replicated.
 
 ```{r}
 # Import Data Measures
@@ -48,7 +61,7 @@ head(Data)
 
 # Import Replicate Data
 Dup <-read.xlsx("Full.xlsx", sheetName ="Dup")
-head(Data)
+head(Dup)
 
 #Isolate Crimson Glory Outgroup
 CG = Data[c(1:11),]
@@ -62,39 +75,49 @@ head(EC201)
 EC103 = Data[c(22:33),]
 head(EC103)
 
-#Isolate Offspring from Parental Cross
+#Isolate Offspring from the Parental Cross
 F1 = Data[c(34:1825),]
 head(F1)
 ```
 
 ### Checking Similarity of Replicates
 
-Replicates were taken by measuring the first leaf sample of a tree twice, in order to establish consistency and reliability of measurements
+Replicates were taken by measuring a leaf sample of each tree twice, in order to establish consistency and reliability of measurements with the Dualex.
 
 
 ```{r replicate comparison}
 R <-group_by(Data,Rep.)
-SR <-summarise(R,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T))
+```
 
-#Mean Calculations Across All Replicate Measures
+#### Replicate Means
+
+```{r}
 #Chlorophyll
-RC = mean(SR$Chl);RC
+RC = mean(R$Chl);RC
 #Nitrogen Index
-RN = mean(SR$NBI);RN
+RN = mean(R$NBI);RN
 #Anthocyanin
-RA = mean(SR$Anth);RA
+RA = mean(R$Anth);RA
 #Flavanoids
-RF = mean(SR$Flav);RF
+RF = mean(R$Flav);RF
+```
 
-#Plots of Replicate Group Medians and Distributions
-plot<- ggplot(Dup) + aes(x = Rep., y = Chl ) + geom_boxplot()+geom_hline(yintercept = RC)
+
+#### Replicate Plots
+
+```{r}
+plot<- ggplot(Dup) + aes(x = Rep., y = Chl) + geom_boxplot()+geom_hline(yintercept = RC)
 plot2<- ggplot(Dup) + aes(x = Rep., y = NBI ) + geom_boxplot()+geom_hline(yintercept = RN)
 plot3<- ggplot(Dup) + aes(x = Rep., y = Anth ) + geom_boxplot()+geom_hline(yintercept = RA)
 plot4<- ggplot(Dup) + aes(x = Rep., y = Flav ) + geom_boxplot()+geom_hline(yintercept = RF)
 
 grid.arrange(plot,plot2,plot3,plot4, ncol = 4)
+```
 
-#ANOVA
+
+#### ANOVA of Replicates
+
+```{r}
 #Chlorophyll
 mod <-lm(Dup$Chl ~ Dup$Rep.)
 anova(mod)
@@ -109,33 +132,48 @@ mod4 <-lm(Dup$NBI ~ Dup$Rep.)
 anova(mod4)
 ```
 
-#### Comparing Allocations
+The absence of statistically significant results indicates that our replicates are likely to be consistent.
 
-Allocation refers to which group measurements were taken from, i.e. Parental Tree (EC103, EC201), Outgroup Tree (CG), F1 Cross offspring
+
+
+### Comparing Allocations
+
+Allocation refers to which group measurements were taken from, i.e. A Parental Tree (EC103, EC201), Outgroup Tree (CG), F1 Cross offspring
 
 ```{r Allocation}
-Al <-group_by(Data,Allocation)
-SAL <-summarise(Al,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T))
+AL <-group_by(Data,Allocation)
+```
 
-#Mean Calculations Across all Allocations
+#### Measurement Means
+
+
+```{r}
 #Chlorophyll
-AlC = mean(SAL$Chl);AlC
+AlC = mean(AL$Chl);AlC
 #Nitrogen
-AlN = mean(SAL$NBI);AlN
+AlN = mean(AL$NBI);AlN
 #Flavanoids
-AlF = mean(SAL$Flav);AlF
+AlF = mean(AL$Flav);AlF
 #Anthocyanin
-AlA = mean(SAL$Anth);AlA
+AlA = mean(AL$Anth);AlA
+```
 
-#Boxplot comparing medians and measurement distributions
+
+#### Boxplot comparing medians and measurement distributions
+
+```{r}
 plot5<- ggplot(Data) + aes(x = Allocation, y = Chl) + geom_boxplot()+geom_hline(yintercept = AlC)
 plot6<- ggplot(Data) + aes(x = Allocation, y = NBI) + geom_boxplot()+geom_hline(yintercept = AlN)
 plot7<- ggplot(Data) + aes(x = Allocation, y = Flav) + geom_boxplot()+geom_hline(yintercept = AlF)
 plot8<- ggplot(Data) + aes(x = Allocation, y = Anth) + geom_boxplot()+geom_hline(yintercept = AlA)
 
 grid.arrange(plot5,plot6,plot7,plot8, ncol=2)
+```
 
-#ANOVAs
+
+#### ANOVAs
+
+```{r}
 #Chlorophyll
 mod5 <-lm(Data$Chl ~ Data$Allocation)
 anova(mod5)
@@ -150,7 +188,7 @@ mod8 <-lm(Data$Anth ~ Data$Allocation)
 anova(mod8)
 ```
 
-## F1 Trees
+### Parental Cross Analysis (F1 Generation)
 
 Investigating measures across the F1 cross population
 
@@ -159,7 +197,7 @@ O <-group_by(F1,Tree.ID)
 SO <-summarise(O,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T));SO
 ```
 
-### Chlorophyll
+### Surface Content of Chlorophyll (µg/cm²)
 
 
 ```{r Chl}
@@ -178,7 +216,7 @@ ModChl <- lm(O$Chl ~ O$Tree.ID)
 anova(ModChl)
 ```
 
-## Flavanol
+#### Index of Epidermal Flavnols
 
 
 ```{r Flavanol Index}
@@ -192,7 +230,7 @@ ModFlav <- lm(O$Flav ~ O$Tree.ID)
 anova(ModFlav)
 ```
 
-## Anthocyanin
+#### Epidermal Anthocyanin
 
 
 ```{r}
@@ -206,7 +244,7 @@ ModAnth <- lm(O$Anth ~ O$Tree.ID)
 anova(ModAnth)
 ```
 
-## Nitrogen Status
+#### Nitrogen Balance Index Status
 
 
 ```{r Nitro}
@@ -222,6 +260,8 @@ anova(ModNBI)
 ```
 
 #### Comparing Measures from the 3 height categories
+
+Comparisons of measures between Low, Mid and High locations on trees.
 
 
 ```{r height variability}
@@ -269,11 +309,11 @@ anova(FitH4)
 
 
 #### Correlations Between Measures
-Comparing correlations between the various measures
+
+Comparing correlations between the 4 dualex measures
 
 ```{r compare}
-Data2 = Data[c(13:16)]
-cor(Data2)
+cor(Data[c(13:16)])
 
 plot9 <-ggplot(F1) + aes(x = Chl, y = Anth) + geom_point()
 plot10 <-ggplot(F1) + aes(x = NBI, y = Anth) + geom_point()
@@ -437,16 +477,16 @@ anova(FRC)
 ### Block and Height
 
 ```{r}
-BHC <-lm(F1$Chl ~ F1$Block+F1$Height)
+BHC <-lm(F1$Chl ~ F1$Row+F1$Column+F1$Height)
 anova(BHC)
 
-BHF<-lm(F1$Flav ~ F1$Block+F1$Height)
+BHF<-lm(F1$Flav ~ F1$Row+F1$Column+F1$Height)
 anova(BHF)
 
-BHA<-lm(F1$Anth ~ F1$Block+F1$Height)
+BHA<-lm(F1$Anth ~ F1$Row+F1$Column+F1$Height)
 anova(BHA)
 
-BHN<-lm(F1$NBI ~ F1$Block+F1$Height)
+BHN<-lm(F1$NBI ~ F1$Row+F1$Column+F1$Height)
 anova(BHN)
 ```
 
@@ -493,4 +533,5 @@ anova(FF)
 
 AF<- lm(F1$Anth ~ F1$Flower)
 anova(AF)
+
 ```
