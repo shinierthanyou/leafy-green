@@ -9,7 +9,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,cache = TRUE)
+knitr::opts_chunk$set(echo = TRUE,cache = F)
 library(xlsx)
 library(ggplot2)
 library(gplots)
@@ -332,13 +332,13 @@ anova(comp2)
 comp3 <-lm(Flav ~ NBI, data = F1)
 anova(comp3)
 
-comp4 <-lm(Flav ~ Anth+NBI, data = F1)
+comp4 <-lm(Flav ~ Anth*NBI, data = F1)
 anova(comp4)
 
-comp5 <-lm(Anth ~ Flav + NBI, data = F1)
+comp5 <-lm(Anth ~ Flav*NBI, data = F1)
 anova(comp5)
 
-comp6 <-lm(NBI ~ Flav + Anth, data = F1)
+comp6 <-lm(NBI ~ Flav*Anth, data = F1)
 anova(comp6)
 ```
 
@@ -364,6 +364,9 @@ plot29<-ggplot(F1) + aes(x = Column, y = NBI,group = Column) + geom_boxplot() +g
 plot30<-ggplot(F1) + aes(x = Column, y = Chl,group = Column) + geom_boxplot() +geom_hline(yintercept = CC)
 
 grid.arrange(plot27,plot28,plot29,plot30)
+
+
+Cmn$Column = as.factor(Cmn$Column)
 
 Col <- lm(Cmn$Anth ~ Cmn$Column)
 anova(Col)
@@ -452,26 +455,39 @@ write.xlsx(as.data.frame(ZAnth), file = "Anth.xlsx", sheetName ="Anth",col.names
 
 ```{r}
 
+F1$Column = as.factor(F1$Column)
+
 AnthDoc <-read.xlsx("Anth.xlsx", sheetName = "Anth")
 heatmaply(AnthDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
 ARC <-lm(F1$Anth ~ F1$Row + F1$Column)
 anova(ARC)
+
+ARC2 <- lm(F1$Anth ~ F1$Row*F1$Column)
+anova(ARC2)
 
 ChlDoc<-read.xlsx("Chl.xlsx", sheetName = "Chl")
 heatmaply(ChlDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
 CRC <-lm(F1$Chl ~ F1$Row + F1$Column)
 anova(CRC)
 
+CRC2 <- lm(F1$Chl ~ F1$Row*F1$Column)
+anova(CRC2)
+
 NBIDoc<-read.xlsx("NBI.xlsx", sheetName = "NBI")
 heatmaply(NBIDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
 NRC <-lm(F1$NBI ~ F1$Row + F1$Column)
 anova(NRC)
+
+NRC2 <- lm(F1$NBI ~ F1$Row*F1$Column)
+anova(NRC2)
 
 FlavDoc<-read.xlsx("Flav.xlsx", sheetName = "Flav")
 heatmaply(FlavDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
 FRC <-lm(F1$Flav ~ F1$Row + F1$Column)
 anova(FRC)
 
+FRC2 <- lm(F1$Flav ~ F1$Row*F1$Column)
+anova(FRC2)
 ```
 
 ### Block and Height
