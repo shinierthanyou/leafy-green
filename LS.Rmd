@@ -9,7 +9,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,cache = F)
+knitr::opts_chunk$set(echo = TRUE,cache = TRUE)
 library(xlsx)
 library(ggplot2)
 library(gplots)
@@ -101,7 +101,6 @@ RA = mean(R$Anth);RA
 #Flavanoids
 RF = mean(R$Flav);RF
 ```
-
 
 #### Replicate Plots
 
@@ -203,12 +202,13 @@ SO <-summarise(O,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T)
 ```{r Chl}
 #Mean
 OC <- mean(SO$Chl);OC
-
+summary(SO$Chl)
+summary(F1$Chl)
 #Individual Tree Measures
-plot15<-ggplot(O) + aes(x = Tree.ID, y = Chl, group_by(Tree.ID)) + geom_boxplot() +geom_hline(yintercept = OC)
+plot15<-ggplot(SO) + aes(x = Tree.ID, y = Chl, group_by(Tree.ID)) + geom_boxplot() +geom_hline(yintercept = OC)
 
 #Measure Distribution
-plot16<-ggplot(O) + aes(x = Chl) + geom_histogram()
+plot16<-ggplot(SO) + aes(x = Chl) + geom_histogram(binwidth = 1);plot16
 grid.arrange(plot15,plot16)
 
 #ANOVA
@@ -222,8 +222,8 @@ anova(ModChl)
 ```{r Flavanol Index}
 OF <- mean(SO$Flav);OF
 
-plot17<-ggplot(O) + aes(x = Tree.ID, y = Flav) + geom_boxplot() +geom_hline(yintercept = OF)
-plot18 <-ggplot(O) + aes(x = Flav) + geom_histogram()
+plot17<-ggplot(O) + aes(x = Tree.ID, y = Flav, xlab = "Tree") + geom_boxplot() +geom_hline(yintercept = OF);plot17
+plot18 <-ggplot(O) + aes(x = Flav) + geom_histogram();plot18
 grid.arrange(plot17,plot18)
 
 ModFlav <- lm(O$Flav ~ O$Tree.ID)
@@ -496,14 +496,26 @@ anova(FRC2)
 BHC <-lm(F1$Chl ~ F1$Row+F1$Column+F1$Height)
 anova(BHC)
 
+BHC2 <-lm(F1$Chl ~ F1$Row*F1$Column*F1$Height)
+anova(BHC2)
+
 BHF<-lm(F1$Flav ~ F1$Row+F1$Column+F1$Height)
 anova(BHF)
+
+BHF2 <-lm(F1$Flav ~ F1$Row*F1$Column*F1$Height)
+anova(BHF2)
 
 BHA<-lm(F1$Anth ~ F1$Row+F1$Column+F1$Height)
 anova(BHA)
 
+BHA2 <-lm(F1$Anth ~ F1$Row*F1$Column*F1$Height)
+anova(BHA2)
+
 BHN<-lm(F1$NBI ~ F1$Row+F1$Column+F1$Height)
 anova(BHN)
+
+BHN2 <-lm(F1$NBI ~ F1$Row*F1$Column*F1$Height)
+anova(BHN2)
 ```
 
 
@@ -550,4 +562,29 @@ anova(FF)
 AF<- lm(F1$Anth ~ F1$Flower)
 anova(AF)
 
+CRF <- lm(F1$Anth ~ F1$Height*F1$Row*F1$Column)
+anova(CRF)
+```
+
+```{r}
+Hdat <- read.xlsx("HeightData.xlsx", sheetName = "Phenotypes April 2018")
+summary(Hdat$Height)
+TH = (Hdat[c(1,4)])
+
+Mrg <-group_by(F1,Tree.ID,Row,Column)
+Mrg$Row = as.numeric(Mrg$Row)
+summary(Mrg$Row)
+
+Mrg <-summarise(Mrg,count = n(),Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T))
+View(Mrg)
+
+TH$ID = TH$NA.
+Mrg$ID = Mrg$Tree.ID
+
+TH  = TH[-c(1)]
+Mrg = Mrg[-c(1)]
+View(Mrg)
+
+EZ <- merge(TH,Mrg, all = FALSE)
+View(EZ)
 ```
