@@ -566,7 +566,7 @@ CRF <- lm(F1$Anth ~ F1$Height*F1$Row*F1$Column)
 anova(CRF)
 ```
 
-```{r}
+#```{r}
 Hdat <- read.xlsx("HeightData.xlsx", sheetName = "Phenotypes April 2018")
 summary(Hdat$Height)
 TH = (Hdat[c(1,4)])
@@ -587,4 +587,183 @@ View(Mrg)
 
 EZ <- merge(TH,Mrg, all = FALSE)
 View(EZ)
+```
+
+
+
+```{r}
+Col <-group_by(F1,Tree.ID,Column)
+Col <-summarise(Col, count = n(), Chl = mean(Chl,na.rm = T), Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T))
+
+View(Col)
+summary(Col)
+Col$Column = as.factor(Col$Column)
+ggplot(Col) + aes(x = Column, y = Chl) + geom_point()
+```
+
+###Accounting for Row, Column and Height means. 
+
+```{r Environmental effects}
+#Grouping F1 Data
+CMean <-group_by(F1,Tree.ID,Column,Row,Height)
+#Means
+CMean <-summarise(CMean, Chl = mean(Chl,na.rm = T), Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T), Anth = mean(Anth,na.rm = T))
+```
+####Chlorophyll
+
+####Comparing means between rows with 3 columns and 4 columns
+
+```{r}
+Dat <-read.xlsx("Z.xlsx", sheetName = "Sheet4")
+View(Dat)
+lmDat <-lm(Dat$Chl ~ Dat$Column.No.)
+anova(lmDat)
+```
+
+```{r EChlorophyll}
+ChlTab = CMean[c(1:4)]
+
+#write.xlsx(as.data.frame(ChlTab), file = "ChlTab.xlsx", sheetName = "Chl", col.names = T)
+ChlM2 <- read.xlsx("Z.xlsx", sheetName = "Row")
+
+#Before Controlling for environmental effects
+
+lm1<- lm(CMean$Chl ~ CMean$Column*CMean$Row*CMean$Height)
+anova(lm1)
+
+lm2 <- lm(CMean$Chl ~ CMean$Column)
+anova(lm2)
+
+lm2 <- lm(CMean$Chl ~ CMean$Row)
+anova(lm2)
+
+lm3 <- lm(CMean$Chl ~ CMean$Height)
+anova(lm3)
+
+#After controlling for row effects
+lm2 <-lm(ChlM2$Chl ~ ChlM2$Row)
+anova(lm2)
+
+lm3 <-lm(ChlM2$Chl ~ ChlM2$Row*ChlM2$Column)
+anova(lm3)
+
+#Controlling Column effects
+ChlM3 <- read.xlsx("Z.xlsx", sheetName = "Col")
+
+lm4 <- lm(ChlM3$Chl ~ ChlM3$Column)
+anova(lm4)
+
+lm5 <-lm(ChlM3$Chl ~ ChlM3$Row)
+anova(lm5)
+
+lm6 <-lm(ChlM3$Chl ~ ChlM3$Column*ChlM3$Row)
+anova(lm6)
+```
+
+
+```{r}
+Dat <-read.xlsx("Z.xlsx", sheetName = "Sheet4")
+View(Dat)
+lmDat <-lm(Dat$Chl ~ Dat$Column.No.)
+anova(lmDat)
+```
+
+####Anthocyanin
+
+```{r EAnthocyanin}
+AnthTab = CMean[c(1:4,8)]
+
+#write.xlsx(as.data.frame(AnthTab), file = "AnthTab.xlsx", sheetName = "Anth", col.names = T)
+AnthM2 <- read.xlsx("Z.xlsx", sheetName = "Row")
+
+#Before Controlling for environmental effects
+
+Anthlm1<- lm(CMean$Anth ~ CMean$Column*CMean$Row*CMean$Height)
+anova(Anthlm1)
+
+lm2 <- lm(CMean$Chl ~ CMean$Column)
+anova(lm2)
+
+lm2 <- lm(CMean$Chl ~ CMean$Row)
+anova(lm2)
+
+lm3 <- lm(CMean$Chl ~ CMean$Height)
+anova(lm3)
+
+#After controlling for Height effects
+AnthM2 <- read.xlsx("MAnth.xlsx", sheetName = "Height")
+
+Anthlm2 <-lm(AnthM2$Anth ~ AnthM2$Height)
+anova(Anthlm2)
+
+CAnth <-group_by(CMean,Tree.ID,Column,Row)
+CAnth <-summarise(CMean, Chl = mean(Chl,na.rm = T), Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T), Anth = mean(Anth,na.rm = T))
+
+write.xlsx(as.data.frame(CAnth), file = "AnthT.xlsx", sheetName = "Anth", col.names = T)
+
+#Controlling Row effects
+AnthM2 <- read.xlsx("MAnth.xlsx", sheetName = "Row")
+
+Anthlm4 <- lm(AnthM2$Anth ~ AnthM2$Row)
+anova(Anthlm4)
+
+Anthlm5 <-lm(AnthM2$Anth ~ AnthM2$Row*AnthM2$Column)
+anova(Anthlm5)
+
+#Controlling Column effects
+AnthM4 <- read.xlsx("MAnth.xlsx", sheetName = "Col")
+Anthlm6 <-lm(AnthM4$Anth ~ AnthM4$Column)
+anova(Anthlm6)
+
+Anth7 <-lm(AnthM4$Anth ~ AnthM4$Column*AnthM4$Row)
+anova(Anth7)
+```
+
+```{r EFlavanol}
+AnthTab = CMean[c(1:4,8)]
+
+write.xlsx(as.data.frame(FlavTab), file = "AnthTab.xlsx", sheetName = "Anth", col.names = T)
+AnthM2 <- read.xlsx("Z.xlsx", sheetName = "Row")
+
+#Before Controlling for environmental effects
+
+Anthlm1<- lm(CMean$Anth ~ CMean$Column*CMean$Row*CMean$Height)
+anova(Anthlm1)
+
+lm2 <- lm(CMean$Chl ~ CMean$Column)
+anova(lm2)
+
+lm2 <- lm(CMean$Chl ~ CMean$Row)
+anova(lm2)
+
+lm3 <- lm(CMean$Chl ~ CMean$Height)
+anova(lm3)
+
+#After controlling for Height effects
+AnthM2 <- read.xlsx("MAnth.xlsx", sheetName = "Height")
+
+Anthlm2 <-lm(AnthM2$Anth ~ AnthM2$Height)
+anova(Anthlm2)
+
+CAnth <-group_by(CMean,Tree.ID,Column,Row)
+CAnth <-summarise(CMean, Chl = mean(Chl,na.rm = T), Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T), Anth = mean(Anth,na.rm = T))
+
+write.xlsx(as.data.frame(CAnth), file = "AnthT.xlsx", sheetName = "Anth", col.names = T)
+
+#Controlling Row effects
+AnthM2 <- read.xlsx("MAnth.xlsx", sheetName = "Row")
+
+Anthlm4 <- lm(AnthM2$Anth ~ AnthM2$Row)
+anova(Anthlm4)
+
+Anthlm5 <-lm(AnthM2$Anth ~ AnthM2$Row*AnthM2$Column)
+anova(Anthlm5)
+
+#Controlling Column effects
+AnthM4 <- read.xlsx("MAnth.xlsx", sheetName = "Col")
+Anthlm6 <-lm(AnthM4$Anth ~ AnthM4$Column)
+anova(Anthlm6)
+
+Anth7 <-lm(AnthM4$Anth ~ AnthM4$Column*AnthM4$Row)
+anova(Anth7)
 ```
