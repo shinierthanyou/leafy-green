@@ -22,14 +22,14 @@ library(heatmaply)
 ```
 
 
-### F1 Layout
+#### F1 Layout
 
 Map indicates the layout of the F1 generation resulting from a cross between EC201 and EC103 parents. Column 1 is approximately lengthways facing north.
 
-!["Map of F1 Trees"](Blocks.png) 
+!["Map of F1 Trees"](Capture.png) 
 
 
-### Height Diagram
+#### Height Diagram
 
 Diagram indicates the areas of leaf collection regarding height.
 Each Tree had 10 leaves collected, 3 from Low, 4 from Mid and 3 from High. The first leaf sampled was measured twice for replication comparison.
@@ -37,11 +37,11 @@ Each Tree had 10 leaves collected, 3 from Low, 4 from Mid and 3 from High. The f
 !["Diagram of leaf collection levels"](Tree.png)
 
 
-### Import and Arrange Data
+#### Import and Arrange Data
 
 "Full.xlsx" contains measurement information from sampling with the Dualex (https://www.force-a.com/en/capteurs-optiques-optical-sensors/dualex-scientific-chlorophyll-meter/), including;
 
-+ Surface content of chlorophyll in µg/cm² (Chl) 
++ Surface content of chlorophyll in ?g/cm? (Chl) 
 
 + The index of epidermal flavanols (Flav) 
 
@@ -80,53 +80,58 @@ F1 = Data[c(34:1825),]
 head(F1)
 ```
 
-### Checking Similarity of Replicates
+#### Replicate Analysis
 
 Replicates were taken by measuring a leaf sample of each tree twice, in order to establish consistency and reliability of measurements with the Dualex.
 
+```{r replicate means}
 
-```{r replicate comparison}
-R <-group_by(Data,Rep.)
+#Anthocyanin Mean
+AMR = mean(Dup$Anth);AMR
+
+#Chlorophyll Mean
+CMR = mean(Dup$Chl);CMR
+
+#Flavanoid Mean
+FMR = mean(Dup$Flav);FMR
+
+#NBI Mean
+NMR = mean(Dup$NBI);NMR
 ```
 
-#### Replicate Means
+##### Replicate Plots
 
-```{r}
-#Chlorophyll
-RC = mean(R$Chl);RC
-#Nitrogen Index
-RN = mean(R$NBI);RN
-#Anthocyanin
-RA = mean(R$Anth);RA
-#Flavanoids
-RF = mean(R$Flav);RF
-```
+```{r replicate plots}
+#Boxplot Anthocyanin Replicates
+RAnth <- ggplot(Dup) + aes(x = Rep., y = Anth) + geom_boxplot() +geom_hline(yintercept = AMR, color = "purple4") + ylab("Anthocyanin Content") + xlab("Leaf Replicate Number") + ggtitle("Anthocyanin Measurements of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
-#### Replicate Plots
+#Boxplot Chlorophyll Replicates
+RChl<- ggplot(Dup) + aes(x = Rep., y = Chl) + geom_boxplot(colour = "darkorchid", fill = "plum") +geom_hline(yintercept = CMR, color = "darkorchid") + ylab("Chlorophyll g/cm") + xlab("Replicate Number") + ggtitle("Comparison of Chlorophyll levels of two replicate groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
-```{r}
-plot<- ggplot(Dup) + aes(x = Rep., y = Chl) + geom_boxplot()+geom_hline(yintercept = RC)
-plot2<- ggplot(Dup) + aes(x = Rep., y = NBI ) + geom_boxplot()+geom_hline(yintercept = RN)
-plot3<- ggplot(Dup) + aes(x = Rep., y = Anth ) + geom_boxplot()+geom_hline(yintercept = RA)
-plot4<- ggplot(Dup) + aes(x = Rep., y = Flav ) + geom_boxplot()+geom_hline(yintercept = RF)
+#Boxplot Flavnol Replicates
+RFlav <- ggplot(Dup) + aes(x = Rep., y = Flav) + geom_boxplot() +geom_hline(yintercept = FMR, color = "purple4") + ylab("Flavanold Content") + xlab("Leaf Replicate Number") + ggtitle("Flavonoid Measurements of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
+  
+#Boxplot NBI Replicates
+RNBI <- ggplot(Dup) + aes(x = Rep., y = NBI) + geom_boxplot() +geom_hline(yintercept = NMR, color = "purple4") + ylab("Nitrogen Balance Index") + xlab("Leaf Replicate Number") + ggtitle("Nitrogen Balance Index of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
-grid.arrange(plot,plot2,plot3,plot4, ncol = 4)
+#Display Boxplots
+grid.arrange(RChl,RNBI,RAnth,RFlav, ncol = 2)
 ```
 
 
-#### ANOVA of Replicates
+##### ANOVA of Replicates
 
 ```{r}
-#Chlorophyll
+#Chlorophyll Anova
 mod <-lm(Dup$Chl ~ Dup$Rep.)
 anova(mod)
-#Flavanol
+#Flavanol Anova
 mod2 <-lm(Dup$Flav ~ Dup$Rep.)
 anova(mod2)
-#Anthocyanin
+#Anthocyanin Anova
 mod3 <-lm(Dup$Anth ~ Dup$Rep.)
 anova(mod3)
-#Nitrogen
+#NBI Anova
 mod4 <-lm(Dup$NBI ~ Dup$Rep.)
 anova(mod4)
 ```
@@ -135,42 +140,42 @@ The absence of statistically significant results indicates that our replicates a
 
 
 
-### Comparing Allocations
+#### Allocation Analysis
 
-Allocation refers to which group measurements were taken from, i.e. A Parental Tree (EC103, EC201), Outgroup Tree (CG), F1 Cross offspring
+Allocation refers to which group measurements were taken from, i.e. A Parental Tree (EC103 or EC201), Outgroup Tree (CG), Parental Offspring (F1)
 
-```{r Allocation}
-AL <-group_by(Data,Allocation)
+```{r Allocation Means}
+#Anthocyanin Mean
+AMA = mean(Data$Anth);AMA
+#Chlorophyll Mean
+CMA = mean(Data$Chl);CMA
+#Flavanol Mean
+FMA = mean(Data$Flav);FMA
+#NBI Mean
+NMA = mean(Data$NBI);NMA
 ```
-
-#### Measurement Means
-
-
-```{r}
-#Chlorophyll
-AlC = mean(AL$Chl);AlC
-#Nitrogen
-AlN = mean(AL$NBI);AlN
-#Flavanoids
-AlF = mean(AL$Flav);AlF
-#Anthocyanin
-AlA = mean(AL$Anth);AlA
-```
-
 
 #### Boxplot comparing medians and measurement distributions
 
 ```{r}
-plot5<- ggplot(Data) + aes(x = Allocation, y = Chl) + geom_boxplot()+geom_hline(yintercept = AlC)
-plot6<- ggplot(Data) + aes(x = Allocation, y = NBI) + geom_boxplot()+geom_hline(yintercept = AlN)
-plot7<- ggplot(Data) + aes(x = Allocation, y = Flav) + geom_boxplot()+geom_hline(yintercept = AlF)
-plot8<- ggplot(Data) + aes(x = Allocation, y = Anth) + geom_boxplot()+geom_hline(yintercept = AlA)
+#Boxplot Anthocyanin Replicates
+AAnth <- ggplot(Data) + aes(x = Rep., y = Anth) + geom_boxplot() +geom_hline(yintercept = AMA, color = "purple4") + ylab("Anthocyanin Measure") + xlab("Leaf Replicate Number") + ggtitle("Anthocyanin of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
-grid.arrange(plot5,plot6,plot7,plot8, ncol=2)
+#Boxplot Chlorophyll Replicates
+AChl <- ggplot(Data) + aes(x = Rep., y = Chl) + geom_boxplot() +geom_hline(yintercept = CMA, color = "purple4") + ylab("Chlorophyll Measure") + xlab("Leaf Replicate Number") + ggtitle("Chlorophyll of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
+
+#Boxplot Flavanol Replicates
+AFlav <- ggplot(Data) + aes(x = Rep., y = Flav) + geom_boxplot() +geom_hline(yintercept = FMA, color = "purple4") + ylab("Flavanol Measure") + xlab("Leaf Replicate Number") + ggtitle("Flavonol of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
+
+#Boxplot NBI Replicates
+ANBI <- ggplot(Data) + aes(x = Rep., y = NBI) + geom_boxplot() +geom_hline(yintercept = NMA, color = "purple4") + ylab("NBI Measure") + xlab("Leaf Replicate Number") + ggtitle("NBI of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
+
+#Display Plots
+grid.arrange(AAnth,AChl,AFlav,ANBI, ncol=2)
 ```
 
 
-#### ANOVAs
+##### ANOVAs
 
 ```{r}
 #Chlorophyll
@@ -192,11 +197,35 @@ anova(mod8)
 Investigating measures across the F1 cross population
 
 ```{r F1}
-O <-group_by(F1,Tree.ID)
-SO <-summarise(O,count = n(), Chl = mean(Chl,na.rm =T), NBI = mean(NBI, na.rm=T), Anth = mean(Anth, ra.rm = T), Flav = mean(Flav, na.rm = T));SO
+#Grouping F1 Measures By Tree
+F12 <-group_by(F1,Tree.ID)
+
+#Anthocyanin Mean
+AMF = mean(F12$Anth);AMF
+#Chlorophyll Mean
+CMF = mean(F12$Chl);CMF
+#Flavanol Mean
+FMF = mean(F12$Flav);FMF
+#NBI Mean
+NMF = mean(F12$NBI); NMF
 ```
 
-### Surface Content of Chlorophyll (µg/cm²)
+```{r}
+#Boxplot Anthocyanin F1
+FAnth <- ggplot(F12) + aes(x = Tree.ID, y = Anth) + geom_boxplot() +geom_hline(yintercept = AMF, color = "purple4") + ylab("Anthocyanin Measure") + xlab("Tree ID") + ggtitle("Anthocyanin of F1 population") + theme_classic();plot +stat_boxplot(notch = TRUE);FAnth
+
+#Boxplot Chlorophyll F1
+FChl <- ggplot(F12) + aes(x = Tree.ID, y = Chl) + geom_boxplot() +geom_hline(yintercept = CMF, color = "purple4") + ylab("Chlorophyll Measure") + xlab("Tree ID") + ggtitle("Chlorophyll of F1 Population") + theme_classic();plot +stat_boxplot(notch = TRUE);FChl
+
+#Boxplot Flavanol F1
+FFlav <- ggplot(F12) + aes(x = Tree.ID, y = Flav) + geom_boxplot() +geom_hline(yintercept = FMF, color = "purple4") + ylab("Flavanol Measure") + xlab("Tree ID") + ggtitle("Flavonol of F1 Population") + theme_classic();plot +stat_boxplot(notch = TRUE);FFlav
+
+#Boxplot NBI F1
+#FNBI <- ggplot(F12) + aes(x = Tree.ID, y = NBI) + geom_boxplot() +geom_hline(yintercept = NMF, color = "purple4") + ylab("NBI Measure") + xlab("Tree ID") + ggtitle("NBI of F1 Population") + theme_classic();plot +stat_boxplot(notch = TRUE):FNBI
+FNBI<-ggplot(F12) + aes(x = Tree.ID, y = NBI) + geom_boxplot() +geom_hline(yintercept = NMF);FNBI
+```
+
+### Surface Content of Chlorophyll (?g/cm?)
 
 
 ```{r Chl}
@@ -719,6 +748,55 @@ Anth7 <-lm(AnthM4$Anth ~ AnthM4$Column*AnthM4$Row)
 anova(Anth7)
 ```
 
+```{r EFlav}
+FlavTab = CMean[c(1:4,8)]
+
+write.xlsx(as.data.frame(FlavTab), file = "FlavTab.xlsx", sheetName = "Flav", col.names = T)
+FlavM2 <- read.xlsx("F.xlsx", sheetName = "Row")
+
+#Before Controlling for environmental effects
+
+Flavlm<- lm(CMean$Flav ~ CMean$Column*CMean$Row*CMean$Height)
+anova(Flavlm)
+
+Flavlm2 <- lm(CMean$Flav ~ CMean$Column)
+anova(Flavlm2)
+
+Flavlm2 <- lm(CMean$Flav ~ CMean$Row)
+anova(Flavlm2)
+
+Flavlm3 <- lm(CMean$Flav ~ CMean$Height)
+anova(Flavlm3)
+
+#After controlling for Height effects
+FlavM2 <- read.xlsx("Mflav.xlsx", sheetName = "Height")
+
+Flavlm4 <-lm(AnthM2$Flav ~ AnthM2$Height)
+anova(Flavlm4)
+
+CFlav <-group_by(CMean,Tree.ID,Column,Row)
+CFlav <-summarise(CMean, Flav = mean(Chl,na.rm = T), Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T), Anth = mean(Anth,na.rm = T))
+
+write.xlsx(as.data.frame(CAnth), file = "AnthT.xlsx", sheetName = "Anth", col.names = T)
+
+#Controlling Row effects
+FlavM2 <- read.xlsx("MFlav.xlsx", sheetName = "Row")
+
+Flavlm5 <- lm(FlavM22$Flav ~ FlavM2$Row)
+anova(Anthlm4)
+
+Anthlm5 <-lm(AnthM2$Anth ~ AnthM2$Row*AnthM2$Column)
+anova(Anthlm5)
+
+#Controlling Column effects
+AnthM4 <- read.xlsx("MAnth.xlsx", sheetName = "Col")
+Anthlm6 <-lm(AnthM4$Anth ~ AnthM4$Column)
+anova(Anthlm6)
+
+Anth7 <-lm(AnthM4$Anth ~ AnthM4$Column*AnthM4$Row)
+anova(Anth7)
+```
+
 ```{r EFlavanol}
 AnthTab = CMean[c(1:4,8)]
 
@@ -766,4 +844,3 @@ anova(Anthlm6)
 
 Anth7 <-lm(AnthM4$Anth ~ AnthM4$Column*AnthM4$Row)
 anova(Anth7)
-```

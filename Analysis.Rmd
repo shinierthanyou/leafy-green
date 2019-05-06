@@ -1,0 +1,230 @@
+---
+title: "ManukaAnalysis"
+author: "Melissa Taane"
+date: "06/05/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,cache = TRUE)
+library(xlsx)
+library(ggplot2)
+library(gplots)
+library(gridExtra)
+library(corrplot)
+library(dplyr)
+library(png)
+library(grid)
+library(heatmaply)
+```
+
+
+#### F1 Layout
+
+Map indicates the layout of the F1 generation resulting from a cross between EC201 and EC103 parents. Column 1 is approximately lengthways facing north.
+
+!["Map of F1 Trees"](Capture.png) 
+
+
+#### Height Diagram
+
+Diagram indicates the areas of leaf collection regarding height.
+Each Tree had 10 leaves collected, 3 from Low, 4 from Mid and 3 from High. The first leaf sampled was measured twice for replication comparison.
+
+!["Diagram of leaf collection levels"](Tree.png)
+
+
+#### Import and Arrange Data
+
+"Full.xlsx" contains measurement information from sampling with the Dualex (https://www.force-a.com/en/capteurs-optiques-optical-sensors/dualex-scientific-chlorophyll-meter/), including;
+
++ Surface content of chlorophyll in ?g/cm? (Chl) 
+
++ The index of epidermal flavanols (Flav) 
+
++ Nitrogen Balance Index status (NBI)
+
++ Epidermal Anthocyanins (Anth). 
+
+It also contains information about the block position, the leaf height information, and presense or absence of flowering
+
+
+Sheet "Dup" contains only the samples that were replicated.
+
+```{r}
+# Import Data Measures
+Data <-read.xlsx("Full.xlsx", sheetName ="Full")
+head(Data)
+
+# Import Replicate Data
+Dup <-read.xlsx("Full.xlsx", sheetName ="Dup")
+head(Dup)
+
+#Isolate Crimson Glory Outgroup
+CG = Data[c(1:11),]
+head(CG)
+
+#Isolate East Cape 201 Parent
+EC201 = Data[c(12:21),]
+head(EC201)
+
+#Isolate East Cape 103 Parent
+EC103 = Data[c(22:33),]
+head(EC103)
+
+#Isolate Offspring from the Parental Cross
+F1 = Data[c(34:1825),]
+head(F1)
+```
+
+#### Replicate Analysis
+
+Replicates were taken by measuring a leaf sample of each tree twice, in order to establish consistency and reliability of measurements with the Dualex.
+
+```{r replicate means}
+
+#Anthocyanin Mean
+AMR = mean(Dup$Anth);AMR
+
+#Chlorophyll Mean
+CMR = mean(Dup$Chl);CMR
+
+#Flavanoid Mean
+FMR = mean(Dup$Flav);FMR
+
+#NBI Mean
+NMR = mean(Dup$NBI);NMR
+```
+
+##### Replicate Plots
+
+```{r replicate plots}
+#Boxplot Anthocyanin Replicates
+RAnth <- ggplot(Dup) + aes(x = Rep., y = Anth) + geom_boxplot() +geom_hline(yintercept = AMR, color = "purple4") + ylab("Anthocyanin Content") + xlab("Leaf Replicate Number") + ggtitle("Anthocyanin Measurements of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
+
+#Boxplot Chlorophyll Replicates
+RChl<- ggplot(Dup) + aes(x = Rep., y = Chl) + geom_boxplot(colour = "darkorchid", fill = "plum") +geom_hline(yintercept = CMR, color = "darkorchid") + ylab("Chlorophyll g/cm") + xlab("Replicate Number") + ggtitle("Comparison of Chlorophyll levels of two replicate groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
+
+#Boxplot Flavnol Replicates
+RFlav <- ggplot(Dup) + aes(x = Rep., y = Flav) + geom_boxplot() +geom_hline(yintercept = FMR, color = "purple4") + ylab("Flavanold Content") + xlab("Leaf Replicate Number") + ggtitle("Flavonoid Measurements of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
+  
+#Boxplot NBI Replicates
+RNBI <- ggplot(Dup) + aes(x = Rep., y = NBI) + geom_boxplot() +geom_hline(yintercept = NMR, color = "purple4") + ylab("Nitrogen Balance Index") + xlab("Leaf Replicate Number") + ggtitle("Nitrogen Balance Index of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
+
+#Display Boxplots
+grid.arrange(RChl,RNBI,RAnth,RFlav, ncol = 2)
+```
+
+
+##### ANOVA of Replicates
+
+```{r}
+#Chlorophyll Anova
+mod <-lm(Dup$Chl ~ Dup$Rep.)
+anova(mod)
+#Flavanol Anova
+mod2 <-lm(Dup$Flav ~ Dup$Rep.)
+anova(mod2)
+#Anthocyanin Anova
+mod3 <-lm(Dup$Anth ~ Dup$Rep.)
+anova(mod3)
+#NBI Anova
+mod4 <-lm(Dup$NBI ~ Dup$Rep.)
+anova(mod4)
+```
+
+The absence of statistically significant results indicates that our replicates are likely to be consistent.
+
+
+
+#### Allocation Analysis
+
+Allocation refers to which group measurements were taken from, i.e. A Parental Tree (EC103 or EC201), Outgroup Tree (CG), Parental Offspring (F1)
+
+```{r Allocation Means}
+#Anthocyanin Mean
+AMA = mean(Data$Anth);AMA
+#Chlorophyll Mean
+CMA = mean(Data$Chl);CMA
+#Flavanol Mean
+FMA = mean(Data$Flav);FMA
+#NBI Mean
+NMA = mean(Data$NBI);NMA
+```
+
+#### Boxplot comparing medians and measurement distributions
+
+```{r}
+#Boxplot Anthocyanin Replicates
+AAnth <- ggplot(Data) + aes(x = Rep., y = Anth) + geom_boxplot() +geom_hline(yintercept = AMA, color = "purple4") + ylab("Anthocyanin Measure") + xlab("Leaf Replicate Number") + ggtitle("Anthocyanin of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
+
+#Boxplot Chlorophyll Replicates
+AChl <- ggplot(Data) + aes(x = Rep., y = Chl) + geom_boxplot() +geom_hline(yintercept = CMA, color = "purple4") + ylab("Chlorophyll Measure") + xlab("Leaf Replicate Number") + ggtitle("Chlorophyll of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
+
+#Boxplot Flavanol Replicates
+AFlav <- ggplot(Data) + aes(x = Rep., y = Flav) + geom_boxplot() +geom_hline(yintercept = FMA, color = "purple4") + ylab("Flavanol Measure") + xlab("Leaf Replicate Number") + ggtitle("Flavonol of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
+
+#Boxplot NBI Replicates
+ANBI <- ggplot(Data) + aes(x = Rep., y = NBI) + geom_boxplot() +geom_hline(yintercept = NMA, color = "purple4") + ylab("NBI Measure") + xlab("Leaf Replicate Number") + ggtitle("NBI of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
+
+#Display Plots
+grid.arrange(AAnth,AChl,AFlav,ANBI, ncol=2)
+```
+
+
+##### ANOVAs
+
+```{r}
+#Chlorophyll
+mod5 <-lm(Data$Chl ~ Data$Allocation)
+anova(mod5)
+#Nitrogen
+mod6 <-lm(Data$NBI ~ Data$Allocation)
+anova(mod5)
+#Flavanol
+mod7 <-lm(Data$Flav ~ Data$Allocation)
+anova(mod7)
+#Anthocyanin
+mod8 <-lm(Data$Anth ~ Data$Allocation)
+anova(mod8)
+```
+
+### Parental Cross Analysis (F1 Generation)
+
+Investigating measures across the F1 cross population
+
+```{r F1}
+#Grouping F1 Measures By Tree
+F12 <-group_by(F1,Tree.ID)
+F12 <- summarise(F12,Chl = mean(Chl,na.rm=T), NBI = mean(NBI, ra.nm = T), Anth = mean(Anth, na.rm=T),Flav = mean(Flav,na.rm =T))
+View(F12)
+#Anthocyanin Mean
+AMF = mean(F12$Anth);AMF
+#Chlorophyll Mean
+CMF = mean(F12$Chl);CMF
+#Flavanol Mean
+FMF = mean(F12$Flav);FMF
+#NBI Mean
+NMF = mean(F12$NBI); NMF
+```
+
+```{r}
+#Boxplot Anthocyanin F1
+FAnth <- ggplot(F12) + aes(x = Tree.ID, y = Anth) + geom_boxplot() +geom_hline(yintercept = AMF, color = "purple4") + ylab("Anthocyanin Measure") + xlab("Tree ID") + ggtitle("Anthocyanin of F1 population") + theme_classic();plot +stat_boxplot(notch = TRUE)
+#Histogram of Anthocyanin Distribution
+FHAnth <- ggplot(F12) + aes(x = Anth) + geom_histogram()
+#Display Anthocyanin Plots
+grid.arrange(FAnth,FHAnth)
+
+#Boxplot Chlorophyll F1
+FChl <- ggplot(F12) + aes(x = Tree.ID, y = Chl) + geom_boxplot() +geom_hline(yintercept = CMF, color = "purple4") + ylab("Chlorophyll Measure") + xlab("Tree ID") + ggtitle("Chlorophyll of F1 Population") + theme_classic();plot +stat_boxplot(notch = TRUE);FChl
+#Histogram of Chlorophyll
+FHChl <- ggplot(F12) + aes(x = Chl, y = Anth) + geom_point()
+
+#Boxplot Flavanol F1
+FFlav <- ggplot(F12) + aes(x = Tree.ID, y = Flav) + geom_boxplot() +geom_hline(yintercept = FMF, color = "purple4") + ylab("Flavanol Measure") + xlab("Tree ID") + ggtitle("Flavonol of F1 Population") + theme_classic();plot +stat_boxplot(notch = TRUE);FFlav
+
+#Boxplot NBI F1
+#FNBI <- ggplot(F12) + aes(x = Tree.ID, y = NBI) + geom_boxplot() +geom_hline(yintercept = NMF, color = "purple4") + ylab("NBI Measure") + xlab("Tree ID") + ggtitle("NBI of F1 Population") + theme_classic();plot +stat_boxplot(notch = TRUE):FNBI
+FNBI<-ggplot(F12) + aes(x = Tree.ID, y = NBI) + geom_boxplot() +geom_hline(yintercept = NMF);FNBI
+```
