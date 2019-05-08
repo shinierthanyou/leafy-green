@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,cache = TRUE)
+knitr::opts_chunk$set(echo = TRUE,cache = FALSE)
 library(xlsx)
 library(ggplot2)
 library(gplots)
@@ -156,16 +156,16 @@ NMA = mean(Data$NBI);NMA
 
 ```{r}
 #Boxplot Anthocyanin Replicates
-AAnth <- ggplot(Data) + aes(x = Rep., y = Anth) + geom_boxplot() +geom_hline(yintercept = AMA, color = "purple4") + ylab("Anthocyanin Measure") + xlab("Leaf Replicate Number") + ggtitle("Anthocyanin of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
+AAnth <- ggplot(Data) + aes(x = Allocation, y = Anth) + geom_boxplot() +geom_hline(yintercept = AMA, color = "purple4") + ylab("Anthocyanin Measure") + xlab("Allocation") + ggtitle("Anthocyanin of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
 #Boxplot Chlorophyll Replicates
-AChl <- ggplot(Data) + aes(x = Rep., y = Chl) + geom_boxplot() +geom_hline(yintercept = CMA, color = "purple4") + ylab("Chlorophyll Measure") + xlab("Leaf Replicate Number") + ggtitle("Chlorophyll of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
+AChl <- ggplot(Data) + aes(x = Allocation, y = Chl) + geom_boxplot() +geom_hline(yintercept = CMA, color = "purple4") + ylab("Chlorophyll Measure") + xlab("Allocation") + ggtitle("Chlorophyll of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
 #Boxplot Flavanol Replicates
-AFlav <- ggplot(Data) + aes(x = Rep., y = Flav) + geom_boxplot() +geom_hline(yintercept = FMA, color = "purple4") + ylab("Flavanol Measure") + xlab("Leaf Replicate Number") + ggtitle("Flavonol of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
+AFlav <- ggplot(Data) + aes(x = Allocation, y = Flav) + geom_boxplot() +geom_hline(yintercept = FMA, color = "purple4") + ylab("Flavanol Measure") + xlab("Allocation") + ggtitle("Flavonol of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
 #Boxplot NBI Replicates
-ANBI <- ggplot(Data) + aes(x = Rep., y = NBI) + geom_boxplot() +geom_hline(yintercept = NMA, color = "purple4") + ylab("NBI Measure") + xlab("Leaf Replicate Number") + ggtitle("NBI of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
+ANBI <- ggplot(Data) + aes(x = Allocation, y = NBI) + geom_boxplot() +geom_hline(yintercept = NMA, color = "purple4") + ylab("NBI Measure") + xlab("Allocation") + ggtitle("NBI of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
 #Display Plots
 grid.arrange(AAnth,AChl,AFlav,ANBI, ncol=2)
@@ -345,7 +345,7 @@ F1R = summarise(F1R,Chl = mean(Chl,na.rm=T), NBI = mean(NBI, ra.nm = T), Anth = 
 
 
 #Boxplot Anthocyanin Height
-RoAnth <- ggplot(F1) + aes(x = Row, y = Anth) + geom_boxplot() +geom_hline(yintercept = AMF, color = "purple4") + ylab("Anthocyanin Measure") + xlab("Row") + ggtitle("Anthocyanin of F1 population by Row") + theme_classic();plot +stat_boxplot(notch = TRUE);RoAnth
+RoAnth <- ggplot(F1) + aes(x = Row, y = Anth) + geom_boxplot() +geom_hline(yintercept = AMF, color = "purple4") + ylab("Anthocyanin Measure") + xlab("Row") + ggtitle("Anthocyanin of F1 population by Row") + theme_classic();plot +stat_boxplot(notch = TRUE)
 #Histogram of Anthocyanin
 RoHAnth <- ggplot(F1R) + aes(x = Anth) + geom_histogram()
 #Display plots
@@ -489,7 +489,16 @@ vF = F1[c(4,5,8,13,14,15,16)]
 vF = group_by(vF,Column,Row,Tree.ID)
 vF = summarise(vF, Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T), Anth = mean(Anth, na.rm = T), Chl = mean(Chl, na.rm = T))
 #Write to excel
-write.xlsx(as.data.frame(vF), file = "vF.xlsx", sheetName = "Row", col.names = T)
+#write.xlsx(as.data.frame(vF), file = "vF.xlsx", sheetName = "Row", col.names = T)
 #Import altered data
-#CDat = read.xlsx("vF2.xlsx", sheetName = "Sheet2")
+RDat = read.xlsx("vF2.xlsx", sheetName = "Sheet5")
+#New Anthocyanin anova
+CAlm = lm(RDat$Anth ~ RDat$Row)
+anova(CAlm)
+#New Chlorophyll anova
+CClm = lm(RDat$Chl ~ RDat$Row)
+anova(CClm)
+#New Flavonol anova
+CFlm = lm(RDat$Flav ~ RDat$Row)
+anova(CFlm)
 ```
