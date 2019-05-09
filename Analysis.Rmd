@@ -419,6 +419,20 @@ CNA = lm(F1$NBI ~ F1$Column)
 anova(CNA)
 ```
 
+```{r}
+AnthDoc <-read.xlsx("Anth.xlsx", sheetName = "Anth")
+heatmaply(AnthDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
+
+ChlDoc<-read.xlsx("Chl.xlsx", sheetName = "Chl")
+heatmaply(ChlDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
+
+NBIDoc<-read.xlsx("NBI.xlsx", sheetName = "NBI")
+heatmaply(NBIDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
+
+FlavDoc<-read.xlsx("Flav.xlsx", sheetName = "Flav")
+heatmaply(FlavDoc, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE)
+```
+
 ```{r interactive terms}
 #Anthocyanin
 CRHA = lm(F1$Anth ~ F1$Height*F1$Column*F1$Row)
@@ -464,41 +478,33 @@ anova(AHA)
 #New Flavonol Anova
 FHA = lm(HDat$Flav ~ HDat$Height)
 anova(FHA)
-```
 
-```{r controlling for column}
+#Write height data to excel
 #Select Column for Row, Column, Tree.ID, Flav, NBI
-zF = F1[c(4,5,8,14,16)]
-View(zF)
-zF = group_by(zF,Column,Row,Tree.ID)
-zF = summarise(zF, Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T))
+#Bas = group_by(HDat,Column,Row,Tree.ID)
+#Bas = summarise(Bas, Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T), Anth = mean(Anth, na.rm = T), Chl = mean(Chl, na.rm = T))
 #Write to excel
-#write.xlsx(as.data.frame(zF), file = "zF.xlsx", sheetName = "Column", col.names = T)
-#Import altered data
-CDat = read.xlsx("zF2.xlsx", sheetName = "Sheet2")
-#New Flavonol Anova
-FCA = lm(CDat$Flav ~ CDat$Column)
-anova(FCA)
-#New NBI Anova
-NCA = lm(CDat$NBI ~ CDat$Column)
-anova(NCA)
+#write.xlsx(as.data.frame(Bas), file = "comp.xlsx", sheetName = "Column", col.names = T)
 ```
 
-```{r controlling for row}
-vF = F1[c(4,5,8,13,14,15,16)]
-vF = group_by(vF,Column,Row,Tree.ID)
-vF = summarise(vF, Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T), Anth = mean(Anth, na.rm = T), Chl = mean(Chl, na.rm = T))
-#Write to excel
-#write.xlsx(as.data.frame(vF), file = "vF.xlsx", sheetName = "Row", col.names = T)
-#Import altered data
-RDat = read.xlsx("vF2.xlsx", sheetName = "Sheet5")
-#New Anthocyanin anova
-CAlm = lm(RDat$Anth ~ RDat$Row)
-anova(CAlm)
-#New Chlorophyll anova
-CClm = lm(RDat$Chl ~ RDat$Row)
-anova(CClm)
-#New Flavonol anova
-CFlm = lm(RDat$Flav ~ RDat$Row)
-anova(CFlm)
+
+```{r}
+#Read data controlled for column and row 
+Fin = read.xlsx("zF2.xlsx", sheetName = "Sheet1")
+
+#New Chl anova
+LMC = lm(Fin$Chl ~ Fin$Column*Fin$Row)
+anova(LMC)         
+
+#New Anth anova
+LMA = lm(Fin$Anth ~ Fin$Column*Fin$Row)
+anova(LMA)
+
+#New Flav anova
+LMF = lm(Fin$Flav ~ Fin$Column*Fin$Row)
+anova(LMF)
+
+#New NBI anova
+LMN = lm(Fin$NBI ~ Fin$Column*Fin$Row)
+anova(LMN)
 ```
