@@ -25,7 +25,6 @@ Map indicates the layout of the F1 generation resulting from a cross between EC2
 
 !["Map of F1 Trees"](Capture.png) 
 
-
 #### Height Diagram
 
 Diagram indicates the areas of leaf collection regarding height.
@@ -113,6 +112,8 @@ RNBI <- ggplot(Dup) + aes(x = Rep., y = NBI) + geom_boxplot() +geom_hline(yinter
 
 #Display Boxplots
 grid.arrange(RChl,RNBI,RAnth,RFlav, ncol = 2)
+
+edit(F1)
 ```
 
 
@@ -314,7 +315,6 @@ HFlav <- ggplot(F1) + aes(x = Height, y = Flav) + geom_boxplot() +geom_hline(yin
 
 #Boxplot NBI F1
 HNBI <- ggplot(F1) + aes(x = Height, y = NBI) + geom_boxplot() +geom_hline(yintercept = NMF, color = "purple4") + ylab("NBI Measure") + xlab("Height") + ggtitle("NBI of F1 Population") + theme_classic();plot +stat_boxplot(notch = TRUE)
-
 grid.arrange(HAnth,HChl,HFlav,HNBI)
 ```
 
@@ -322,7 +322,7 @@ grid.arrange(HAnth,HChl,HFlav,HNBI)
 #Anthocyanin ANOVA
 HAA = lm(F1$Anth ~ F1$Height)
 anova(HAA)
-
+summary(HAA)
 #Chlorophyll ANOVA
 HCA = lm(F1$Chl ~ F1$Height)
 anova(FCA)
@@ -401,7 +401,7 @@ CAA = lm(F1$Anth ~ F1$Column)
 anova(CAA)
 
 #Boxplot Chlorophyll F1
-CChl <- ggplot(F1) + aes(x = Column, y = Chl) + geom_boxplot() +geom_hline(yintercept = CMF, color = "purple4") + ylab("Chlorophyll Measure") + xlab("Column") + ggtitle("Chlorophyll of F1 Population by Column") + theme_classic();plot +stat_boxplot(notch = TRUE);CChl
+CChl <- ggplot(F1) + aes(x = Column, y = Chl) + geom_boxplot() +geom_hline(yintercept = CMF, color = "purple4") + ylab("Chlorophyll Measure") + xlab("Column") + ggtitle("Chlorophyll of F1 Population by Column") + theme_classic();plot +stat_boxplot(notch = TRUE, show.legend = TRUE);CChl
 #Anthocyanin ANOVA
 CCA = lm(F1$Chl ~ F1$Column)
 anova(CCA)
@@ -440,7 +440,6 @@ anova(CRHA)
 #Remove insignificant variables
 CRHA2 = lm(F1$Anth ~ F1$Height*F1$Row)
 anova(CRHA2)
-
 #Chlorophyll
 CRHC = lm(F1$Chl ~ F1$Height*F1$Column*F1$Row)
 anova(CRHC)
@@ -464,12 +463,13 @@ anova(CRHM2)
 ```
 
 ```{r controlling for Height}
+
 #Select Column,Row,Height,Tree.ID,Flav,Anth
-xF = F1[c(4,5,8,11,14,15)]
-xF = group_by(xF, Height, Row, Column,Tree.ID)
-xF = summarise(xF, Anth = mean(Anth, na.rm=T),Flav = mean(Flav,na.rm =T))
+xF = group_by(F1, F1$Height)
+summary(xF)
+
 #Write to excel
-#write.xlsx(as.data.frame(xF), file = "xF.xlsx", sheetName = "Height", col.names = T)
+write.xlsx(as.data.frame(xF), file = "correct.xlsx", sheetName = "Height", col.names = T)
 #Import altered data
 HDat <-read.xlsx("xF2.xlsx", sheetName ="Sheet2")
 #New Anthocyanin Anova
@@ -485,7 +485,9 @@ anova(FHA)
 #Bas = summarise(Bas, Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T), Anth = mean(Anth, na.rm = T), Chl = mean(Chl, na.rm = T))
 #Write to excel
 #write.xlsx(as.data.frame(Bas), file = "comp.xlsx", sheetName = "Column", col.names = T)
+
 ```
+
 
 
 ```{r}

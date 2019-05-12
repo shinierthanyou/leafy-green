@@ -19,6 +19,7 @@ library(dplyr)
 library(png)
 library(grid)
 library(heatmaply)
+library(corrplot)
 ```
 
 
@@ -669,6 +670,8 @@ anova(lm2)
 lm3 <- lm(CMean$Chl ~ CMean$Height)
 anova(lm3)
 
+
+
 #After controlling for row effects
 lm2 <-lm(ChlM2$Chl ~ ChlM2$Row)
 anova(lm2)
@@ -844,3 +847,152 @@ anova(Anthlm6)
 
 Anth7 <-lm(AnthM4$Anth ~ AnthM4$Column*AnthM4$Row)
 anova(Anth7)
+
+
+```{r}
+
+F12$Anth = F12$Anth - AMF
+summary(F12$Anth)
+F12$Chl = as.factor(F12$Chl)
+A <- mean(F1$Row[F1$Chl == "Chl"])
+A
+
+F12<-data.frame(Column=sample(c("1","2","3","4"), 10, T), value=rnorm(10))
+
+View(F12)
+r1<-with(F12, tapply(value, factor, mean))
+r1
+
+factor_means <- by(F1$Anth, F1$Row, mean)
+fm <- mean(F1$Row[F1$Anth == c(1:50)])
+summary(fm)
+summary(F1)
+library(data.table) 
+A <- setDT(F1[F1$Row == "1", ])[, mean(F1$Anth)]
+A
+
+mean(F1$Row,F1$Anth)
+
+
+
+#Anth plot before correction
+b4Anth = plot(F1$Anth);b4Anth
+#Chl plot before correction
+b4Chl = plot(F1$Chl)
+#Flav plot before correction
+b4Flav = plot(F1$Flav)
+#NBI
+b4NBI = plot(F1$NBI)
+
+
+#Grouping data by Column
+F12 = group_by(F12,Height)
+F12 = group_by(F1,Height)
+F12 = summarise()
+AnthTm = mean(F1$Anth)
+summary(F1)
+summary(F1$Row,F1$Height)
+View(F12)
+Taybz <-table(F1$Row,F1)
+F12 <-F1[order(F1$Height),]
+View(F12)
+(summary(F12$Height,F12$Flav))
+
+is.factor(F1$Row)
+levels(F1$Row)
+
+
+ANChl = lm(F1$Chl ~ F1$Row)
+summary(ANChl)
+plot(ANChl)
+coef(ANChl)
+Co = F1[c(4,5,8,11,13,14,15,16)]
+Table = as.table(coef(ANChl))
+Tab = write.table(coef(ANChl))
+cor(Co)
+corrplot(Co)
+Co2 = data.table(Co)
+Co2
+?data.table
+View(Co2)
+Co2 = group_by(Co2,Column)
+View(Co2)
+
+frequency(levels(Co2$Row))
+
+ROW = as.numeric(Co2$Row)
+
+hist(ROW)
+summary(ROW)
+levels(ROW)
+levels(Co2$Row)
+prop.table(Co2$Row)
+Co2
+```
+
+Controlling for Height,Column,Row effects 
+
+```{r}
+
+Con = F1[c(4:6,10,11:16)]
+ConH = group_by(Con,Height)
+#Bas = group_by(HDat,Column,Row,Tree.ID)
+#Bas = summarise(Bas, Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T), Anth = mean(Anth, na.rm = T), Chl = mean(Chl, na.rm = T))
+ConH = summarise(Con, Anth = mean(Anth, na.rm = T), Chl = mean(Chl, na.rm = T), Flav = mean(Flav,na.rm = T), NBI = mean(NBI, na.rm = T))
+ConH
+###
+RAnthC = Con$Anth - ConH$Anth
+RAnthC
+View(RAnthC)
+
+Con$HMean = ConH$Anth
+Con$AMH = Con$Anth - ConH$Anth
+View(Con)
+Con$AM = mean(Con$Anth)
+Con$AHM = ConH$Anth
+View(Con)
+
+View(ConH)
+
+
+qplot(F1$Anth)
+qplot(F1$Chl)
+```
+
+```{r}
+Dat = F1
+#Total Mean
+Dat$ATmean = mean(Dat$Anth)
+Dat$CTmean = mean(Dat$Chl)
+Dat$FTmean = mean(Dat$Flav)
+Dat$NTmean = mean(Dat$NBI)
+
+#Remove Total Mean
+Dat$Anth2 = Dat$Anth - Dat$ATmean
+Dat$Chl2 = Dat$Chl - Dat$CTmean
+Dat$Flav2 = Dat$Flav - Dat$FTmean
+Dat$NBI2 = Dat$NBI - Dat$NTmean
+
+#Height Mean
+DatH = group_by(Dat, Height,Column,Row)
+DatH = summarise(DatH, HAnth = mean(Anth, na.rm = T), HChl = mean(Chl, na.rm = T), HFlav = mean(Flav,na.rm = T), HNBI = mean(NBI, na.rm = T))
+
+DatH$HMAnth = DatH$Anth
+DatH$Chl = DatH$Chl
+DatH$HMChl = DatH$Chl
+DatH$HMFlav = DatH$Flav
+DatH$HMNBI = DatH$NBI
+
+merge(Dat,DatH)
+
+View(Dat)
+
+
+merge(cbind(Dat, X=rownames(Dat)), cbind(DatH, Height=rownames(DatH)))
+
+DatH$Hmean <- rownames(DatH)
+merge(Dat,DatH, by.x = 2, by.y = 0, all.x = TRUE)
+
+View(DatH)
+View(Dat)
+```
