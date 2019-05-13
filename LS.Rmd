@@ -974,8 +974,12 @@ Dat$Flav2 = Dat$Flav - Dat$FTmean
 Dat$NBI2 = Dat$NBI - Dat$NTmean
 
 #Height Mean
-DatH = group_by(Dat, Height,Column,Row)
+DatH = group_by(Dat, Height)
 DatH = summarise(DatH, HAnth = mean(Anth, na.rm = T), HChl = mean(Chl, na.rm = T), HFlav = mean(Flav,na.rm = T), HNBI = mean(NBI, na.rm = T))
+
+merge(Dat, DatH, by = "Height", all = TRUE)
+View(Dat)
+View(DatH)
 
 DatH$HMAnth = DatH$Anth
 DatH$Chl = DatH$Chl
