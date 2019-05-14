@@ -975,28 +975,60 @@ Dat$NBI2 = Dat$NBI - Dat$NTmean
 
 #Height Mean
 DatH = group_by(Dat, Height)
-DatH = summarise(DatH, HAnth = mean(Anth, na.rm = T), HChl = mean(Chl, na.rm = T), HFlav = mean(Flav,na.rm = T), HNBI = mean(NBI, na.rm = T))
+DatH = summarise(DatH, HAnth = mean(Anth, na.rm = T), HFlav = mean(Flav,na.rm = T))
 
-merge(Dat, DatH, by = "Height", all = TRUE)
+#Add Height Mean to Data
+Dat =merge(Dat, DatH, by.x = "Height")
+
+#Calculate Height Mean Deviation from Total Mean 
+Dat$ATH <- Dat$ATmean - Dat$HAnth
+Dat$FTH = Dat$FTmean - Dat$HFlav
+
+#Controlling for Height Anth and Flav
+Dat$Anth3 = Dat$Anth2 + Dat$ATH
+Dat$Flav3 = Dat$Flav2 + Dat$FTH
+
+#Column Mean
+DatC = group_by(Dat, Column)
+DatC = summarise(DatC, CFlav = mean(Flav,na.rm = T), CNBI = mean(NBI,na.rm = T))
+
+#Add Height Mean to Data
+Dat =merge(Dat, DatC, by.x = "Column")
+
+#Calculate Height Mean Deviation from Total Mean 
+Dat$FTH = Dat$FTmean - Dat$CFlav
+Dat$NTH = Dat$NTmean - Dat$CNBI
+
+#Controlling for Column Flav and NBI
+Dat$Flav4 = Dat$Flav3 + Dat$FTH
+Dat$NBI3 = Dat$NBI2 + Dat$NTH
+
+#Row Mean
+DatR = group_by(Dat, Row)
+DatR = summarise(DatR, RAnth = mean(Anth,na.rm = T),RChl = mean(Chl,na.rm = T), RFlav = mean(Flav,na.rm = T), RNBI = mean(NBI,na.rm = T))
+
+#Add Row Mean to Data
+Dat =merge(Dat, DatR, by.x = "Row")
 View(Dat)
-View(DatH)
 
-DatH$HMAnth = DatH$Anth
-DatH$Chl = DatH$Chl
-DatH$HMChl = DatH$Chl
-DatH$HMFlav = DatH$Flav
-DatH$HMNBI = DatH$NBI
+#Calculate Row Mean Deviation from Total Mean 
+Dat$ATR = Dat$ATmean - Dat$RAnth
+Dat$CTR = Dat$CTmean - Dat$RChl
+Dat$FTR = Dat$FTmean - Dat$RFlav
+Dat$NTR = Dat$NTmean - Dat$RNBI
 
-merge(Dat,DatH)
+#Controlling for Row in Anth, Chl, Flav and NBI
+Dat$Anth4 = Dat$Anth3 + Dat$ATR
+Dat$Chl3 = Dat$Chl2 + Dat$CTR
+Dat$Flav5 = Dat$Flav4 + Dat$FTR
+Dat$NBI4 = Dat$NBI3 + Dat$NTR
 
-View(Dat)
-
-
-merge(cbind(Dat, X=rownames(Dat)), cbind(DatH, Height=rownames(DatH)))
-
-DatH$Hmean <- rownames(DatH)
-merge(Dat,DatH, by.x = 2, by.y = 0, all.x = TRUE)
-
-View(DatH)
-View(Dat)
+AnAnth = lm(Dat$Anth4 ~ Dat$Height*Dat$Column*Dat$Row)
+anova(AnAnth)
+AnChl = lm(Dat$Chl3 ~ Dat$Height*Dat$Column*Dat$Row)
+anova(AnChl)
+AnFlav = lm(Dat$Flav5 ~ Dat$Height*Dat$Column*Dat$Row)
+anova(AnFlav)
+AnNBI = lm(Dat$NBI4 ~ Dat$Height*Dat$Column*Dat$Row)
+anova(AnNBI)
 ```
