@@ -103,20 +103,7 @@ NMR = mean(Dup$NBI);NMR
 ##### Replicate Plots
 
 ```{r replicate plots}
-#Boxplot Anthocyanin Replicates
-RAnth <- ggplot(Dup) + aes(x = Rep., y = Anth) + geom_boxplot() +geom_hline(yintercept = AMR, color = "purple4") + ylab("Anthocyanin Content") + xlab("Leaf Replicate Number") + ggtitle("Anthocyanin Measurements of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
-#Boxplot Chlorophyll Replicates
-RChl<- ggplot(Dup) + aes(x = Rep., y = Chl) + geom_boxplot(colour = "darkorchid", fill = "plum") +geom_hline(yintercept = CMR, color = "darkorchid") + ylab("Chlorophyll g/cm") + xlab("Replicate Number") + ggtitle("Comparison of Chlorophyll levels of two replicate groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
-
-#Boxplot Flavnol Replicates
-RFlav <- ggplot(Dup) + aes(x = Rep., y = Flav) + geom_boxplot() +geom_hline(yintercept = FMR, color = "purple4") + ylab("Flavanold Content") + xlab("Leaf Replicate Number") + ggtitle("Flavonoid Measurements of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
-  
-#Boxplot NBI Replicates
-RNBI <- ggplot(Dup) + aes(x = Rep., y = NBI) + geom_boxplot() +geom_hline(yintercept = NMR, color = "purple4") + ylab("Nitrogen Balance Index") + xlab("Leaf Replicate Number") + ggtitle("Nitrogen Balance Index of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
-
-#Display Boxplots
-grid.arrange(RChl,RNBI,RAnth,RFlav, ncol = 2)
 ```
 
 

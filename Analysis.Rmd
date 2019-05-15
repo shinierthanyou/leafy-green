@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,cache = TRUE)
+knitr::opts_chunk$set(echo = TRUE,cache = F)
 library(xlsx)
 library(ggplot2)
 library(gplots)
@@ -98,21 +98,34 @@ NMR = mean(Dup$NBI);NMR
 ##### Replicate Plots
 
 ```{r replicate plots}
-#Boxplot Anthocyanin Replicates
-RAnth <- ggplot(Dup) + aes(x = Rep., y = Anth) + geom_boxplot() +geom_hline(yintercept = AMR, color = "purple4") + ylab("Anthocyanin Content") + xlab("Leaf Replicate Number") + ggtitle("Anthocyanin Measurements of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
+#Anthocyanin Replicate Plots
+plot1<- ggplot(Dup) + aes(x = Rep., y = Anth ) + geom_boxplot() + ylab("Anthocyanin Measure") + xlab("Replicate Number") + ggtitle("Anthocyanin of Replicate Samples");plot1
+plot11<-ggplot(Dup) +aes(x = Tree.ID, y = Anth) + geom_point() +geom_hline(yintercept = AMR)+ ylab("Anthocyanin Measure") + xlab("Tree ID") + ggtitle("Anthocyanin of Replicate Samples")
+plot12 <-ggplot(Dup) +aes(Anth) +geom_histogram() + stat_bin(binwidth = 0.001) + ylab("Frequency") + xlab("Anthocyanin Measure") + ggtitle("Anthocyanin of Replicate Samples")
+grid.arrange(plot11,plot12)
 
-#Boxplot Chlorophyll Replicates
-RChl<- ggplot(Dup) + aes(x = Rep., y = Chl) + geom_boxplot(colour = "darkorchid", fill = "plum") +geom_hline(yintercept = CMR, color = "darkorchid") + ylab("Chlorophyll g/cm") + xlab("Replicate Number") + ggtitle("Comparison of Chlorophyll levels of two replicate groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
+#Chlorophyll Replicate Plots
+plot2<- ggplot(Dup) + aes(x = Rep., y = Chl) + geom_boxplot()+ ylab("Chlorophyll Measure") + xlab("Replicate Number") + ggtitle("Chlorophyll of Replicate Samples");plot2
+plot21 <-ggplot(Dup) +aes(x = Tree.ID, y = Chl) + geom_point() +geom_hline(yintercept = CMR)+ ylab("Chlorophyll Measure") + xlab("Tree ID") + ggtitle("Chlorophyll of Replicate Samples")
+plot22 <-ggplot(Dup) +aes(Chl) +geom_histogram() + stat_bin(binwidth = 2) + ylab("Frequency") + xlab("Chlorophyll Measure") + ggtitle("Chlorophyll of Replicate Samples")
+grid.arrange(plot21,plot22)
 
-#Boxplot Flavnol Replicates
-RFlav <- ggplot(Dup) + aes(x = Rep., y = Flav) + geom_boxplot() +geom_hline(yintercept = FMR, color = "purple4") + ylab("Flavanold Content") + xlab("Leaf Replicate Number") + ggtitle("Flavonoid Measurements of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
-  
-#Boxplot NBI Replicates
-RNBI <- ggplot(Dup) + aes(x = Rep., y = NBI) + geom_boxplot() +geom_hline(yintercept = NMR, color = "purple4") + ylab("Nitrogen Balance Index") + xlab("Leaf Replicate Number") + ggtitle("Nitrogen Balance Index of Two Replicate Groups") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
-#Display Boxplots
-grid.arrange(RChl,RNBI,RAnth,RFlav, ncol = 2)
+#Flavonol Replicate Plots
+plot3<- ggplot(Dup) + aes(x = Rep., y = Flav ) + geom_boxplot()+ ylab("Flavonol Measure") + xlab("Replicate Number") + ggtitle("Flavonol of Replicate Samples");plot3
+plot31 <-ggplot(Dup) +aes(x = Tree.ID, y = Flav) + geom_point() +geom_hline(yintercept = FMR)+ ylab("Flavonol Measure") + xlab("Tree ID") + ggtitle("Flavonol of Replicate Samples")
+plot32 <-ggplot(Dup) +aes(Flav) +geom_histogram() + stat_bin(binwidth = 0.001)+ ylab("Frequency") + xlab("Flavonol Measure") + ggtitle("Flavonol of Replicate Samples")
+grid.arrange(plot31,plot32)
+
+
+#NBI Replicate Plots
+plot4<- ggplot(Dup) + aes(x = Rep., y = NBI ) + geom_boxplot()+ ylab("NBI Measure") + xlab("Replicate Number") + ggtitle("NBI of Replicate Samples");plot4
+plot41 <-ggplot(Dup) +aes(x = Tree.ID, y = NBI) + geom_point() +geom_hline(yintercept = NMR) + ylab("NBI Measure") + xlab("Tree ID") + ggtitle("NBI of Replicate Samples")
+plot42 <-ggplot(Dup) +aes(NBI) +geom_histogram() + stat_bin(binwidth = 2)+ ylab("Frequency") + xlab("NBI Measure") + ggtitle("NBI of Replicate Samples")
+grid.arrange(plot41,plot42)
 ```
+
+There is no statistically significant differences between the two groups of measurements, this is a good sign indicative of the accuracy of the Dualex. 
 
 ##### ANOVA of Replicates
 
@@ -153,22 +166,21 @@ NMA = mean(Data$NBI);NMA
 #### Boxplot comparing medians and measurement distributions
 
 ```{r}
-#Boxplot Anthocyanin Replicates
+#Boxplot Anthocyanin Allocation
 AAnth <- ggplot(Data) + aes(x = Allocation, y = Anth) + geom_boxplot() +geom_hline(yintercept = AMA, color = "purple4") + ylab("Anthocyanin Measure") + xlab("Allocation") + ggtitle("Anthocyanin of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
-#Boxplot Chlorophyll Replicates
+#Boxplot Chlorophyll Allocation
 AChl <- ggplot(Data) + aes(x = Allocation, y = Chl) + geom_boxplot() +geom_hline(yintercept = CMA, color = "purple4") + ylab("Chlorophyll Measure") + xlab("Allocation") + ggtitle("Chlorophyll of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
-#Boxplot Flavanol Replicates
+#Boxplot Flavanol Allocation
 AFlav <- ggplot(Data) + aes(x = Allocation, y = Flav) + geom_boxplot() +geom_hline(yintercept = FMA, color = "purple4") + ylab("Flavanol Measure") + xlab("Allocation") + ggtitle("Flavonol of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
-#Boxplot NBI Replicates
+#Boxplot NBI Allocation
 ANBI <- ggplot(Data) + aes(x = Allocation, y = NBI) + geom_boxplot() +geom_hline(yintercept = NMA, color = "purple4") + ylab("NBI Measure") + xlab("Allocation") + ggtitle("NBI of Tree Allocation") + theme_classic();plot +stat_boxplot(notch = TRUE)
 
 #Display Plots
 grid.arrange(AAnth,AChl,AFlav,ANBI, ncol=2)
 ```
-
 
 ##### ANOVAs
 
@@ -186,56 +198,73 @@ anova(mod7)
 mod8 <-lm(Data$Anth ~ Data$Allocation)
 anova(mod8)
 ```
+
+F1 Samples appear more similar to that of the Crimson Glory plant than either/both parents - this is possibly due to age effects as CG is likely more similar in this regard being shorter (No age confirmed).
+ANOVAs incidate there is significant differences between the allocations - this is to be expected.
+
+
 #### Parent Tree Analysis
 
 ```{r t.tests}
 #Binding parents into single dataset
 Parent <- rbind(EC201,EC103)
+Parent$No = c(1:22)
 
 #Anthocyanin Mean
 AMP = mean(Parent$Anth)
-#Anthocyanin Boxplot
-PAnth <- ggplot(Parent) + aes(x = Tree.ID, y = Anth) + geom_boxplot() +geom_hline(yintercept = AMP, color = "purple4") + ylab("Anthocyanin Measure") + xlab("Tree ID") + ggtitle("Anthocyanin of Parent Trees") + theme_classic();plot +stat_boxplot(notch = TRUE)
-#Anthocyanin histogram
-PHAnth <- ggplot(Parent) + aes(x = Anth) + geom_histogram()
-#Anthocyanin Display plots 
-grid.arrange(PAnth, PHAnth)
+#Anthocyanin Parent Plots
+#Boxplot
+plot5<- ggplot(Parent) + aes(x = Allocation, y = Anth ) + geom_boxplot() + ylab("Anthocyanin Measure") + xlab("Parent") + ggtitle("Anthocyanin of Parent Samples");plot5
+#Scatter
+plot51<-ggplot(Parent) +aes(x = No, y = Anth) + geom_point() +geom_hline(yintercept = AMP)+ ylab("Anthocyanin Measure") + xlab("Measure") + ggtitle("Anthocyanin of Parent Samples")
+#Histogram
+plot52 <-ggplot(Parent) +aes(Anth) +geom_histogram() + stat_bin(binwidth = 0.001) + ylab("Frequency") + xlab("Anthocyanin Measure") + ggtitle("Anthocyanin of Parent Samples");plot52
+grid.arrange(plot51,plot52)
 #Anthocyanin T.test
 t.test(Parent$Anth ~ Parent$Tree.ID)
 
 #Chlorophyll Mean
 CMP = mean(Parent$Chl)
-#Chlorophyll Boxplot
-PChl <- ggplot(Parent) + aes(x = Tree.ID, y = Chl) + geom_boxplot() +geom_hline(yintercept = CMP, color = "purple4") + ylab("Chlorophyll Measure") + xlab("Tree ID") + ggtitle("Chlorophyll of Parent Trees") + theme_classic();plot +stat_boxplot(notch = TRUE)
-#Chlorophyll histogram
-PHChl <- ggplot(Parent) + aes(x = Chl) + geom_histogram()
-#Anthocyanin Display plots 
-grid.arrange(PChl, PHChl)
-#Anthocyanin T.test
+#Chlorophyll Parent Plots
+#Boxplot
+plot6<- ggplot(Parent) + aes(x = Allocation, y = Chl ) + geom_boxplot() + ylab("Chlorophyll Measure") + xlab("Parent") + ggtitle("Chlorophyll of Parent Samples");plot6
+#Scatter
+plot61<-ggplot(Parent) +aes(x = No, y = Chl) + geom_point() +geom_hline(yintercept = CMP)+ ylab("Chlorophyll Measure") + xlab("Measure") + ggtitle("Chlorophyll of Parent Samples")
+#Histogram
+plot62 <-ggplot(Parent) +aes(Chl) +geom_histogram() + stat_bin(binwidth = 2) + ylab("Frequency") + xlab("Chlorophyll Measure") + ggtitle("Chlorophyll of Parent Samples")
+grid.arrange(plot61,plot62)
+#Chlorophyll T.test
 t.test(Parent$Chl ~ Parent$Tree.ID)
 
 #Flavonol Mean
 FMP = mean(Parent$Flav)
-#Anthocyanin Boxplot
-PFlav <- ggplot(Parent) + aes(x = Tree.ID, y = Flav) + geom_boxplot() +geom_hline(yintercept = FMP, color = "purple4") + ylab("Flavanol Measure") + xlab("Tree ID") + ggtitle("Flavonol of Parent Trees") + theme_classic();plot +stat_boxplot(notch = TRUE)
-#Anthocyanin histogram
-PHFlav <- ggplot(Parent) + aes(x = Flav) + geom_histogram()
-#Anthocyanin Display plots 
-grid.arrange(PFlav, PHFlav)
+#Flavonol Parent Plots
+#Boxplot
+plot7<- ggplot(Parent) + aes(x = Allocation, y = Flav ) + geom_boxplot() + ylab("Flavonol Measure") + xlab("Parent") + ggtitle("Flavonol of Parent Samples");plot7
+#Scatter
+plot71<-ggplot(Parent) +aes(x = No, y = Flav) + geom_point() +geom_hline(yintercept = FMP)+ ylab("Flavonol Measure") + xlab("Measure") + ggtitle("Flavonol of Parent Samples")
+#Histogram
+plot72 <-ggplot(Parent) +aes(Flav) +geom_histogram() + stat_bin(binwidth = 0.0001) + ylab("Frequency") + xlab("Flavonol Measure") + ggtitle("Flavonol of Parent Samples")
+grid.arrange(plot71,plot72)
 #Anthocyanin T.test
 t.test(Parent$Flav ~ Parent$Tree.ID)
 
 #NBI Mean
 NMP = mean(Parent$NBI)
-#NBI Boxplot
-PNBI <- ggplot(Parent) + aes(x = Tree.ID, y = NBI) + geom_boxplot() +geom_hline(yintercept = NMP, color = "purple4") + ylab("NBI Measure") + xlab("Tree ID") + ggtitle("Anthocyanin of Parent Trees") + theme_classic();plot +stat_boxplot(notch = TRUE)
-#NBI histogram
-PHNBI <- ggplot(Parent) + aes(x = NBI) + geom_histogram()
-#Anthocyanin Display plots 
-grid.arrange(PNBI, PHNBI)
+#NBI Parent Plots
+#Boxplot
+plot8<- ggplot(Parent) + aes(x = Allocation, y = NBI ) + geom_boxplot() + ylab("NBI Measure") + xlab("Parent") + ggtitle("NBI of Parent Samples");plot8
+#Scatter
+plot81<-ggplot(Parent) +aes(x = No, y = NBI) + geom_point() +geom_hline(yintercept = NMP)+ ylab("NBI Measure") + xlab("Measure") + ggtitle("NBI of Parent Samples")
+#Histogram
+plot82 <-ggplot(Parent) +aes(NBI) +geom_histogram() + stat_bin(binwidth = 2) + ylab("Frequency") + xlab("NBI Measure") + ggtitle("NBI of Parent Samples")
+grid.arrange(plot81,plot82)
 #Anthocyanin T.test
 t.test(Parent$NBI ~ Parent$Tree.ID)
 ```
+
+Interesting sample pattern here, Chl and NBI start low and work high, Flav does the opposite. Maybe accuracy of measurements? 
+
 
 #### Parental Cross Analysis (F1 Generation)
 
@@ -340,7 +369,43 @@ anova(HNA)
 F1R = group_by(F1,Row)
 F1R = summarise(F1R,Chl = mean(Chl,na.rm=T), NBI = mean(NBI, ra.nm = T), Anth = mean(Anth, na.rm=T),Flav = mean(Flav,na.rm =T))
 
+#Comparing Rows with Differing Tree Numbers
 
+#1 Row with 2 Trees
+R2 = F1R[c(9),]
+#39 Rows with 3 Trees
+R3 = F1R[-c(16,26,4,40,36,5,50,42,44,46,9),]
+#10  Rows with 4 Trees
+R4 = F1R[c(16,26,4,40,36,5,50,42,44,46),]
+
+#Row Sample Summaries
+summary(R2)
+summary(R3)
+summary(R4)
+
+#Checking Variance (R2 discounted due to sample size of 1 row)
+var(R3$Anth)
+var(R4$Anth)
+var(R3$Chl)
+var(R4$Chl)
+var(R3$Flav)
+var(R4$Flav)
+var(R3$NBI)
+var(R4$NBI)
+
+
+#T.test 
+t.test(R4$Anth, R3$Anth, alternative = "two.sided", var.equal = FALSE)
+t.test(R4$Chl, R3$Chl, alternative = "two.sided", var.equal = FALSE)
+t.test(R4$Flav, R3$Flav, alternative = "two.sided", var.equal = FALSE)
+t.test(R4$Flav, R3$Flav, alternative = "two.sided", var.equal = FALSE)
+```
+
+There appears to be no signficant differences between Rows with 3 trees and rows with 4 trees for any of the measures. 
+
+#### Row Plots and ANOVAs
+
+```{r}
 #Boxplot Anthocyanin Height
 RoAnth <- ggplot(F1) + aes(x = Row, y = Anth) + geom_boxplot() +geom_hline(yintercept = AMF, color = "purple4") + ylab("Anthocyanin Measure") + xlab("Row") + ggtitle("Anthocyanin of F1 population by Row") + theme_classic();plot +stat_boxplot(notch = TRUE)
 #Histogram of Anthocyanin
