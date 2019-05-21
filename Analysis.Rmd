@@ -619,6 +619,93 @@ NBIDoc2 <-read.xlsx("DatHM2.xlsx", sheetName = "NBI")
 heatmaply(NBIDoc2, xlab = "Column",ylab ="Row", Rowv = FALSE, Colv = FALSE, main = "NBI After Correction")
 ```
 
+#### Looking at controlled data
+
+```{r}
+DatC = group_by(Dat, Tree.ID)
+DatC = summarise(DatC, Anth = mean(Anth4,na.rm = T), Chl = mean(Chl3,na.rm = T), Flav = mean(Flav5,na.rm = T), NBI = mean(NBI4,na.rm = T))
+#Anthocyanin
+CAM = mean(Dat$Anth4)
+#Boxplot
+Cplot1 <-ggplot(Dat) +aes(x = Tree.ID, y = Anth4) + geom_boxplot()+ ylab("Anth Measure") + xlab("Tree ID") + ggtitle("Anth of F1 after Corrections")+geom_hline(yintercept = CAM)
+Cplot11 <-ggplot(DatC) +aes(Anth) +geom_histogram() + stat_bin(binwidth = 0.001) + ylab("Frequency") + xlab("Anth Measure") + ggtitle("Anth of F1 after Corrections")
+grid.arrange(Cplot1,Cplot11)
+#Previous distribution
+grid.arrange(FAnth,FHAnth)
+#Column Compare
+Cplot12 <-ggplot(Dat) +aes(x = Column, y = Anth4) + geom_boxplot()+ ylab("Anth Measure") + xlab("Tree ID") + ggtitle("Anth of F1 after Corrections")+geom_hline(yintercept = CAM);Cplot12
+#Previous distribution comparison
+grid.arrange(CAnth,Cplot12, ncol = 2)
+# Row Compare
+RoAnth
+Cplot13 <-ggplot(Dat) +aes(x = Row, y = Anth4) + geom_boxplot()+ ylab("Anth Measure") + xlab("Row") + ggtitle("Anth of F1 after Corrections")+geom_hline(yintercept = CAM);Cplot13
+#Height Compare
+Cplot14 <-ggplot(Dat) +aes(x = Height, y = Anth4) + geom_boxplot()+ ylab("Anth Measure") + xlab("Height") + ggtitle("Anth of F1 after Corrections")+geom_hline(yintercept = CAM)
+grid.arrange(HAnth,Cplot14,ncol=2)
+
+
+#Chlorophyll
+CCM = mean(Dat$Chl3)
+#Boxplot
+Cplot2 <-ggplot(Dat) +aes(x = Tree.ID, y = Chl3) + geom_boxplot()+ ylab("Chl Measure") + xlab("Tree ID") + ggtitle("Chl of F1 after Corrections")+geom_hline(yintercept = CCM)
+#Histogram
+Cplot21 <-ggplot(DatC) +aes(Chl) +geom_histogram() + stat_bin(binwidth = 0.01) + ylab("Frequency") + xlab("Chl Measure") + ggtitle("Chl of F1 after Corrections")
+grid.arrange(Cplot2,Cplot21)
+#Previous Distribution
+grid.arrange(FChl,FHChl)
+#Column Compare
+Cplot22 <-ggplot(Dat) +aes(x = Column, y = Chl3) + geom_boxplot()+ ylab("Chl Measure") + xlab("Column") + ggtitle("Chl of F1 after Corrections")+geom_hline(yintercept = CAM)
+#Previous distribution
+grid.arrange(CChl,Cplot22, ncol = 2)
+# Row Compare
+RoChl
+Cplot23 <-ggplot(Dat) +aes(x = Row, y = Chl3) + geom_boxplot()+ ylab("Chl Measure") + xlab("Row") + ggtitle("Chl of F1 after Corrections")+geom_hline(yintercept = CAM);Cplot23
+#Height Compare
+Cplot24 <-ggplot(Dat) +aes(x = Height, y = Chl3) + geom_boxplot()+ ylab("Chl Measure") + xlab("Height") + ggtitle("Chl of F1 after Corrections")+geom_hline(yintercept = CCM)
+grid.arrange(HChl,Cplot24,ncol=2)
+
+#Flavonol
+CFM = mean(Dat$Flav5)
+#Boxplot
+Cplot3 <-ggplot(Dat) +aes(x = Tree.ID, y = Flav5) + geom_boxplot()+ ylab("Flav Measure") + xlab("Tree ID") + ggtitle("Flav of F1 after Corrections"+geom_hline(yintercept = CFM,color = "purple4"))
+#Histogram
+Cplot31 <-ggplot(DatC) +aes(Flav) +geom_histogram() + stat_bin(binwidth = 0.001) + ylab("Frequency") + xlab("Flav Measure") + ggtitle("Flav of F1 after Corrections")
+grid.arrange(Cplot3,Cplot31)
+#Previous Distribution
+grid.arrange(FFlav,FHFlav)
+#Column Compare
+Cplot32 <-ggplot(Dat) +aes(x = Column, y = Flav5) + geom_boxplot()+ ylab("Flav Measure") + xlab("Column") + ggtitle("Flav of F1 after Corrections")+geom_hline(yintercept = CFM)
+#Previous distribution
+grid.arrange(CFlav,Cplot32, ncol = 2)
+# Row Compare
+RoFlav
+Cplot33 <-ggplot(Dat) +aes(x = Row, y = Flav5) + geom_boxplot()+ ylab("Flav Measure") + xlab("Row") + ggtitle("Flav of F1 after Corrections")+geom_hline(yintercept = CFM);Cplot33
+#Height Compare
+Cplot34 <-ggplot(Dat) +aes(x = Height, y = Anth4) + geom_boxplot()+ ylab("Anth Measure") + xlab("Height") + ggtitle("Flav of F1 after Corrections")+geom_hline(yintercept = CFM)
+grid.arrange(HFlav,Cplot34,ncol=2)
+
+#NBI
+CNM = mean(Dat$NBI4)
+#Boxplot
+Cplot4 <-ggplot(Dat) +aes(x = Tree.ID, y = NBI4) + geom_boxplot()+ ylab("NBI Measure") + xlab("Tree ID") + ggtitle("NBI of F1 after Corrections")+geom_hline(yintercept = CNM)
+#Histogram
+Cplot41 <-ggplot(DatC) +aes(NBI) +geom_histogram() + stat_bin(binwidth = 0.001) + ylab("Frequency") + xlab("NBI Measure") + ggtitle("NBI of F1 after Corrections")
+grid.arrange(Cplot4,Cplot41)
+#Previous Distribution
+grid.arrange(FNBI,FHNBI)
+#Column Compare
+Cplot42 <-ggplot(Dat) +aes(x = Column, y = NBI4) + geom_boxplot()+ ylab("NBI Measure") + xlab("Column") + ggtitle("NBI of F1 after Corrections")+geom_hline(yintercept = CNM)
+#Previous distribution
+grid.arrange(CNBI,Cplot42, ncol = 2)
+# Row Compare
+RoNBI
+Cplot43 <-ggplot(Dat) +aes(x = Row, y = NBI4) + geom_boxplot()+ ylab("NBI Measure") + xlab("Row") + ggtitle("NBI of F1 after Corrections")+geom_hline(yintercept = CNM);Cplot43
+#Height Compare
+Cplot44 <-ggplot(Dat) +aes(x = Height, y = NBI4) + geom_boxplot()+ ylab("NBI Measure") + xlab("Height") + ggtitle("NBI of F1 after Corrections")+geom_hline(yintercept = CNM)
+grid.arrange(HNBI,Cplot44,ncol=2)
+
+```
+
 #### Correlations Between Measures
 
 Comparing correlations between the 4 dualex measures
