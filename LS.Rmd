@@ -1019,3 +1019,9 @@ anova(AnFlav)
 AnNBI = lm(Dat$NBI4 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnNBI)
 ```
+
+```{r height shit}
+
+Hg = group_by(F1, Height, Tree.ID)
+Hg = summarise(Hg, )
+```
