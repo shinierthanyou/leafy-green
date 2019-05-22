@@ -1022,10 +1022,10 @@ anova(AnNBI)
 
 ```{r height shit}
 
-Hg = group_by(F1, Height, Tree.ID)
-Hg = summarise(Hg, )
-
-
+Hg = group_by(Dat,Tree.ID,Column,Row)
+Hg = summarise(Hg)
+View(Hg)
+Hg = merge(Hg, Dat, by.x = "Tree.ID")
 Height = read.xlsx("HeightData.xlsx", sheetName = "Phenotypes April 2018")
 View(Height)
 Height$Tree.ID = Height$NA.
@@ -1033,9 +1033,12 @@ Height$H = Height$Height
 Height$H2 = Height$Height.1
 Height = Height[c(8:10)]
 #Add Height Mean to Data
-DatP =merge(Height,Dat, by.x = "Tree.ID")
+DatP =merge(Height,Hg, by.x = "Tree.ID")
 
 View(DatP)
 
-write.xlsx(Dat,"Data.xlsx", sheetName = "Data")
+write.xlsx(Hg,"Tree.xlsx", sheetName = "Data")
+
+
+write.xlsx(Hg, "D.xlsx", sheetName = "tree")
 ```

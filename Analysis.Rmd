@@ -756,5 +756,10 @@ anova(FF)
 
 NF<- lm(Dat$NBI4 ~ Dat$Flower)
 anova(NF)
+```
+#### Looking at Environment and Height
 
+```{r Heights from 2018}
+EH = read.xlsx("HeightL.xlsx", sheetName = "Sheet1")
+heatmaply(EH,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Tree Height Across Planting Block")
 ```
