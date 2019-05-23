@@ -762,4 +762,7 @@ anova(NF)
 ```{r Heights from 2018}
 EH = read.xlsx("HeightL.xlsx", sheetName = "Sheet1")
 heatmaply(EH,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Tree Height Across Planting Block")
-```
+EH2 = read.xlsx("HeightData.xlsx", sheetName = "Phenotypes April 2018")
+EH2$Tree.ID = EH2$NA.
+EH2 = EH2[c()]
+Dat2 = merge(Dat,EH, by,x = "Tree.ID")

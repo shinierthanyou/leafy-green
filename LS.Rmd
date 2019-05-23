@@ -1042,3 +1042,11 @@ write.xlsx(Hg,"Tree.xlsx", sheetName = "Data")
 
 write.xlsx(Hg, "D.xlsx", sheetName = "tree")
 ```
+
+```{r}
+Msr = group_by(Dat, measure,Tree.ID)
+Msr = summarise(Msr, Anth = Anth4, Flav = Flav5, Chl = Chl3,NBI = NBI4)
+DatH = summarise(DatH, Anth = mean(Anth, na.rm = T), HFlav = mean(Flav,na.rm = T))
+
+```
+
