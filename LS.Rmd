@@ -1021,7 +1021,6 @@ anova(AnNBI)
 ```
 
 ```{r height shit}
-
 Hg = group_by(Dat,Tree.ID,Column,Row)
 Hg = summarise(Hg)
 View(Hg)
@@ -1041,4 +1040,30 @@ write.xlsx(Hg,"Tree.xlsx", sheetName = "Data")
 
 
 write.xlsx(Hg, "D.xlsx", sheetName = "tree")
+```
+
+```{r}
+Msr = group_by(Dat, Tree.ID, measure)
+Msr = summarise(Msr, Anth = mean(Anth4), Flav = mean(Flav5), Chl = mean(Chl3),NBI = mean(NBI4))
+DatH = summarise(DatH, Anth = mean(Anth, na.rm = T), HFlav = mean(Flav,na.rm = T))
+```
+```{r}
+boxplot(F1$NBI)
+outliers <-boxplot(F1$NBI,plot=FALSE)$out
+F1[which(F1$NBI %in% outliers),]
+F1 <-F1[-which(F1$NBI %in% outliers),]
+boxplot(F1$NBI)
+
+boxplot(F1$Anth)
+Aoutliers <-boxplot(F1$Anth, plot = FALSE)$out
+F1[which(F1$Anth %in% Aoutliers),]
+F1 <- F1[-which(F1$Anth %in% Aoutliers),]
+boxplot(F1$Anth)
+
+
+```
+
+```{r}
+
+
 ```
