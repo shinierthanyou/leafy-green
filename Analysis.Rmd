@@ -261,6 +261,16 @@ ParNBI = summary(Parent$NBI)
 as.table(rbind(ParAnth,ParChl,ParFlav,ParNBI))
 ```
 
+##### Parent Group Means
+
+```{r}
+Parent2 = group_by(Parent,Tree.ID)
+Parent2 = summarise(Parent2, Anth = mean(Anth,na.rm = T), Chl = mean(Chl, na.rm = T), Flav = mean(Flav,na.rm = T), NBI = mean(NBI, na.rm = T))
+head(Parent2)
+```
+      
+
+
 ```{r}
 #Anthocyanin Parent Plots
 #Boxplot
