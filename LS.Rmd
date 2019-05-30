@@ -1066,4 +1066,8 @@ boxplot(F1$Anth)
 ```{r}
 
 
+plot12 <-ggplot(Dup) +aes(Anth,color=Rep., fill=Rep.) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin Absorbance Units") + ggtitle("Anthocyanin of Replicate Samples") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)) + geom_density(alpha=.2, fill="gray90", colour = "gray90");plot12
+
+
+ggplot(Dup, aes(x=Anth, color=Rep., fill=Rep.)) + geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2)
 ```

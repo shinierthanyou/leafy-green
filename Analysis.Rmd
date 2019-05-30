@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,cache = F)
+knitr::opts_chunk$set(echo = FALSE,cache = T)
 library(xlsx)
 library(ggplot2)
 library(gplots)
@@ -39,18 +39,15 @@ Each Tree had 10 leaves collected, 3 from Low, 4 from Mid and 3 from High. The f
 
 + Surface content of chlorophyll in ?g/cm? (Chl) 
 
-+ The index of epidermal flavanols (Flav) 
++ Epidermal Flavoid content in absorbance units; Flavonol(Flav) and Anthocyanin(Anth) 
 
 + Nitrogen Balance Index status (NBI)
 
-+ Epidermal Anthocyanins (Anth). 
-
 It also contains information about the block position, the leaf height information, and presense or absence of flowering
-
 
 Sheet "Dup" contains only the samples that were replicated.
 
-```{r}
+```{r Data Import, echo = T}
 # Import Data Measures
 Data <-read.xlsx("Full.xlsx", sheetName ="Full")
 head(Data)
@@ -63,19 +60,15 @@ head(Dup)
 
 #Isolate Crimson Glory Outgroup
 CG = Data[c(1:11),]
-head(CG)
 
 #Isolate East Cape 201 Parent
 EC201 = Data[c(12:21),]
-head(EC201)
 
 #Isolate East Cape 103 Parent
 EC103 = Data[c(22:33),]
-head(EC103)
 
 #Isolate Offspring from the Parental Cross
 F1 = Data[c(34:1825),]
-head(F1)
 ```
 
 #### Replicate Analysis
@@ -109,33 +102,64 @@ Dup2 = summarise(Dup2, Anth = mean(Anth, na.rm = T),Chl = mean(Chl, na.rm = T), 
 head(Dup2)
 ```
 
-##### Replicate Plots
+##### Anthocyanin Replicate Plots
 
-```{r replicate plots}
-#Anthocyanin Replicate Plots
-plot1<- ggplot(Dup) + aes(x = Rep., y = Anth ) + geom_boxplot() + ylab("Anthocyanin Measure") + xlab("Replicate Number") + ggtitle("Anthocyanin of Replicate Samples") +stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3);plot1
-plot11<-ggplot(Dup) +aes(x = Tree.ID, y = Anth) + geom_point() +geom_hline(yintercept = mean(Dup$Anth))+ ylab("Anthocyanin Measure") + xlab("Tree ID") + ggtitle("Anthocyanin of Replicate Samples")
-plot12 <-ggplot(Dup) +aes(Anth) +geom_histogram() + stat_bin(binwidth = 0.001) + ylab("Frequency") + xlab("Anthocyanin Measure") + ggtitle("Anthocyanin of Replicate Samples")
+```{r Anth Replicate Plots}
+#Anthocyanin Replicate Comparison
+plot1<- ggplot(Dup) + aes(x = Rep., y = Anth,) + geom_boxplot(fill = "dodgerblue1", size = 1.25) + ylab("Anthocyanin Measure") + xlab("Replicate Number") + ggtitle("Anthocyanin of Replicate Samples") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=5) +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Dup$Anth));plot1
+
+#Anth Mean Plot
+plot11<-ggplot(Dup) +aes(x = Tree.ID, y = Anth) + geom_point(colour = "dodgerblue4") +geom_hline(yintercept = mean(Dup$Anth), colour = "dodgerblue1")+ ylab("Anthocyanin Measure") + xlab("Tree ID") + ggtitle("Anthocyanin of Replicate Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of Measurement Distribution
+plot12 <-ggplot(Dup) +aes(Anth,color=Rep., fill=Rep.) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin Absorbance Units") + ggtitle("Anthocyanin of Replicate Samples") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
 grid.arrange(plot11,plot12)
+```
+##### Chlorphyll Replicate Plots
 
-#Chlorophyll Replicate Plots
-plot2<- ggplot(Dup) + aes(x = Rep., y = Chl) + geom_boxplot()+ ylab("Chlorophyll Measure") + xlab("Replicate Number") + ggtitle("Chlorophyll of Replicate Samples")+stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3,show_guide = FALSE);plot2
-plot21 <-ggplot(Dup) +aes(x = Tree.ID, y = Chl) + geom_point() +geom_hline(yintercept = mean(Dup$Chl))+ ylab("Chlorophyll Measure") + xlab("Tree ID") + ggtitle("Chlorophyll of Replicate Samples")
-plot22 <-ggplot(Dup) +aes(Chl) +geom_histogram() + stat_bin(binwidth = 2) + ylab("Frequency") + xlab("Chlorophyll Measure") + ggtitle("Chlorophyll of Replicate Samples")
+```{r Chl Replicate Plots}
+#Chlorophyll Replicate Comparison
+plot2<- ggplot(Dup) + aes(x = Rep., y = Chl) + geom_boxplot(fill = "dodgerblue1", size = 1.25)+ ylab("Surface Chlorophyll") + xlab("Replicate Number") + ggtitle("Chlorophyll of Replicate Samples")+stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=5) +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Dup$Chl));plot2
+
+#Chl Mean Plot
+plot21 <-ggplot(Dup) +aes(x = Tree.ID, y = Chl, colour = Rep.,fill = Rep.) + geom_point() +geom_hline(yintercept = mean(Dup$Chl), colour = "dodgerblue1")+ ylab("Surface Chlorophyll") + xlab("Tree ID") + ggtitle("Chlorophyll of Replicate Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of Chl Measurement Distribution
+plot22 <-ggplot(Dup) +aes(Chl,color=Rep., fill=Rep.) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Surface Chlorophyll") + ggtitle("Chlorphyll of Replicate Samples") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
 grid.arrange(plot21,plot22)
+```
+##### Flavonol Replicate Plots
 
+```{r Flav Replicate Plots}
+#Flavonol Replicate Comparison
+plot3<- ggplot(Dup) + aes(x = Rep., y = Flav) + geom_boxplot(fill = "dodgerblue1", size = 1.25)+ ylab("Surface Flavonol") + xlab("Replicate Number") + ggtitle("Flavonol of Replicate Samples")+stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=5) +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Dup$Flav));plot3
 
-#Flavonol Replicate Plots
-plot3<- ggplot(Dup) + aes(x = Rep., y = Flav ) + geom_boxplot()+ ylab("Flavonol Measure") + xlab("Replicate Number") + ggtitle("Flavonol of Replicate Samples")+stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3);plot3
-plot31 <-ggplot(Dup) +aes(x = Tree.ID, y = Flav) + geom_point() +geom_hline(yintercept = mean(Dup$Flav))+ ylab("Flavonol Measure") + xlab("Tree ID") + ggtitle("Flavonol of Replicate Samples")
-plot32 <-ggplot(Dup) +aes(Flav) +geom_histogram() + stat_bin(binwidth = 0.001)+ ylab("Frequency") + xlab("Flavonol Measure") + ggtitle("Flavonol of Replicate Samples")
+#Flav Mean Plot
+plot31 <-ggplot(Dup) +aes(x = Tree.ID, y = Flav, colour = Rep.,fill = Rep.) + geom_point() +geom_hline(yintercept = mean(Dup$Flav), colour = "dodgerblue1")+ ylab("Surface Flavonol") + xlab("Tree ID") + ggtitle("Flavonol of Replicate Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of Flav Measurement Distribution
+plot32 <-ggplot(Dup) +aes(Flav,color=Rep., fill=Rep.) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Surface Flavonol") + ggtitle("Flavonol of Replicate Samples") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
 grid.arrange(plot31,plot32)
+```
+##### Nitrogen Balance Replicate Plots
 
+```{r NBI Replicate Plots}
+#Nitrogen Replicate Comparison
+plot4<- ggplot(Dup) + aes(x = Rep., y = NBI) + geom_boxplot(fill = "dodgerblue1", size = 1.25)+ ylab("Surface Nitrogen") + xlab("Replicate Number") + ggtitle("Nitrogen of Replicate Samples")+stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=5) +theme_bw()+theme(plot.title = element_text(hjust = 0.5)) +geom_hline(yintercept = mean(Dup$NBI));plot4
 
-#NBI Replicate Plots
-plot4<- ggplot(Dup) + aes(x = Rep., y = NBI ) + geom_boxplot()+ ylab("NBI Measure") + xlab("Replicate Number") + ggtitle("NBI of Replicate Samples")+stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3);plot4
-plot41 <-ggplot(Dup) +aes(x = Tree.ID, y = NBI) + geom_point() +geom_hline(yintercept = mean(Dup$NBI)) + ylab("NBI Measure") + xlab("Tree ID") + ggtitle("NBI of Replicate Samples")
-plot42 <-ggplot(Dup) +aes(NBI) +geom_histogram() + stat_bin(binwidth = 2)+ ylab("Frequency") + xlab("NBI Measure") + ggtitle("NBI of Replicate Samples")
+#NBI Mean Plot
+plot41 <-ggplot(Dup) +aes(x = Tree.ID, y = NBI, colour = Rep.,fill = Rep.) + geom_point() +geom_hline(yintercept = mean(Dup$NBI), colour = "dodgerblue1")+ ylab("Surface Nitrogen") + xlab("Tree ID") + ggtitle("Nitrogen of Replicate Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of NBI Measurement Distribution
+plot42 <-ggplot(Dup) +aes(NBI,color=Rep., fill=Rep.) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Surface Nitrogen") + ggtitle("Nitrogen of Replicate Samples") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
 grid.arrange(plot41,plot42)
 ```
 
@@ -185,46 +209,22 @@ as.table(rbind(AllAnth,AllChl,AllFlav,AllNBI))
 Data2 = group_by(Data, Allocation)
 Data2 = summarise(Data2, Anth = mean(Anth, na.rm = T),Chl = mean(Chl, na.rm = T), Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T))
 head(Data2)
-
-CGAnth = summary(CG$Anth)
-F1Anth = summary(F1$Anth)
-Anth201 = summary(EC201$Anth)
-Anth103 = summary(EC103$Anth)
-
-CGChl = summary(CG$Chl)
-F1Chl = summary(F1$Chl)
-Chl201 = summary(EC201$Chl)
-Chl103 = summary(EC103$Chl)
-
-
-CGFlav = summary(CG$Flav)
-F1Flav = summary(F1$Flav)
-Flav201 = summary(EC201$Flav)
-Flav103 = summary(EC103$Flav)
-
-CGNBI = summary(CG$NBI)
-F1NBI = summary(F1$NBI)
-NBI201 = summary(EC201$NBI)
-NBI103 = summary(EC103$NBI)
-
-as.table(rbind(CGAnth,F1Anth,Anth201,Anth103,CGChl,F1Chl,Chl201,Chl103,CGFlav,F1Flav,Flav201,Flav103,CGNBI,F1NBI,NBI201,NBI103))
 ```
-
 
 #### Boxplot comparing medians and measurement distributions
 
-```{r}
+```{r Allocation Boxplots}
 #Boxplot Anthocyanin Allocation
-AAnth <- ggplot(Data) + aes(x = Allocation, y = Anth) + geom_boxplot() +geom_hline(yintercept = mean(Data$Anth), color = "purple4") + ylab("Anthocyanin Measure") + xlab("Allocation") + ggtitle("Anthocyanin of Tree Allocation") + theme_classic()+stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3)
+AAnth<- ggplot(Data) + aes(x = Allocation, y = Anth) + geom_boxplot(fill = "dodgerblue1", size = 1)+ ylab("Anth") + xlab("Allocation") + ggtitle("Anth of Allocations")+stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) +theme_bw()+theme(plot.title = element_text(hjust = 0.5)) +geom_hline(yintercept = mean(Data$Anth))
 
 #Boxplot Chlorophyll Allocation
-AChl <- ggplot(Data) + aes(x = Allocation, y = Chl) + geom_boxplot() +geom_hline(yintercept = mean(Data$Chl), color = "purple4") + ylab("Chlorophyll Measure") + xlab("Allocation") + ggtitle("Chlorophyll of Tree Allocation") + theme_classic()+stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3)
+AChl<- ggplot(Data) + aes(x = Allocation, y = Chl) + geom_boxplot(fill = "dodgerblue1", size = 1)+ ylab("Chl") + xlab("Allocation") + ggtitle("Chl of Allocations")+stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) +theme_bw()+theme(plot.title = element_text(hjust = 0.5)) +geom_hline(yintercept = mean(Data$Chl))
 
 #Boxplot Flavanol Allocation
-AFlav <- ggplot(Data) + aes(x = Allocation, y = Flav) + geom_boxplot() +geom_hline(yintercept = mean(Data$Flav), color = "purple4") + ylab("Flavanol Measure") + xlab("Allocation") + ggtitle("Flavonol of Tree Allocation") + theme_classic()+stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3)
+AFlav<- ggplot(Data) + aes(x = Allocation, y = Flav) + geom_boxplot(fill = "dodgerblue1", size = 1)+ ylab("Flav") + xlab("Allocation") + ggtitle("Flav of Allocations")+stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) +theme_bw()+theme(plot.title = element_text(hjust = 0.5)) +geom_hline(yintercept = mean(Data$Flav))
 
 #Boxplot NBI Allocation
-ANBI <- ggplot(Data) + aes(x = Allocation, y = NBI) + geom_boxplot() +geom_hline(yintercept = mean(Data$NBI), color = "purple4") + ylab("NBI Measure") + xlab("Allocation") + ggtitle("NBI of Tree Allocation") + theme_classic()+stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3)
+ANBI<- ggplot(Data) + aes(x = Allocation, y = NBI) + geom_boxplot(fill = "dodgerblue1", size = 1)+ ylab("NBI") + xlab("Allocation") + ggtitle("NBI of Allocations")+stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) +theme_bw()+theme(plot.title = element_text(hjust = 0.5)) +geom_hline(yintercept = mean(Data$NBI))
 
 #Display Plots
 grid.arrange(AAnth,AChl,AFlav,ANBI, ncol=2)
@@ -232,7 +232,7 @@ grid.arrange(AAnth,AChl,AFlav,ANBI, ncol=2)
 
 ##### ANOVAs
 
-```{r}
+```{r Allocation Anova}
 #Chlorophyll
 mod5 <-lm(Data$Chl ~ Data$Allocation)
 anova(mod5)
@@ -253,10 +253,9 @@ ANOVAs incidate there is significant differences between the allocations - this 
 
 #### Parent Tree Analysis
 
-```{r t.tests}
+```{r Parent t.tests}
 #Binding parents into single dataset
 Parent <- rbind(EC201,EC103)
-Parent$No = c(1:22)
 #Summary Stats
 Parent2 = group_by(Parent, Tree.ID)
 Parent2 = summarise(Parent2,Anth = mean(Anth, na.rm = T),Chl = mean(Chl, na.rm = T), Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T))
@@ -273,52 +272,76 @@ ParNBI = summary(Parent$NBI)
 
 as.table(rbind(ParAnth,ParChl,ParFlav,ParNBI))
 ```
+##### Anthocyanin Parent Plots
 
-```{r}
-#Anthocyanin Parent Plots
-#Boxplot
-plot5<- ggplot(Parent) + aes(x = Allocation, y = Anth ) + geom_boxplot() + ylab("Anthocyanin Measure") + xlab("Parent") + ggtitle("Anthocyanin of Parent Samples")+stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3)
-#Scatter
-plot51<-ggplot(Parent) +aes(x = No, y = Anth) + geom_point() +geom_hline(yintercept = mean(Parent$Anth))+ ylab("Anthocyanin Measure") + xlab("Measure") + ggtitle("Anthocyanin of Parent Samples")
-#Histogram
-plot52 <-ggplot(Parent) +aes(Anth) +geom_histogram() + stat_bin(binwidth = 0.001) + ylab("Frequency") + xlab("Anthocyanin Measure") + ggtitle("Anthocyanin of Parent Samples")
-grid.arrange(plot5,plot51,plot52)
-#Anthocyanin T.test
+```{r Anth Parent Plots}
+#Anthocyanin Parent Comparison
+plot5<- ggplot(Parent) + aes(x = Tree.ID, y = Anth,) + geom_boxplot(fill = "dodgerblue1", size = 1.25) + ylab("Anthocyanin Measure") + xlab("Parent") + ggtitle("Anthocyanin of Parent Samples") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=5) +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Parent$Anth));plot1
+
+#Anth Mean Plot
+plot51<-ggplot(Parent) +aes(x = measure, y = Anth, colour = Tree.ID, fill = Tree.ID) + geom_point() +geom_hline(yintercept = mean(Parent$Anth), colour = "dodgerblue1")+ ylab("Anthocyanin") + xlab("Measure") + ggtitle("Anthocyanin of Parent Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of Measurement Distribution
+plot52 <-ggplot(Parent) +aes(Anth,color=Tree.ID, fill=Tree.ID) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin Distribution of Parents") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
+grid.arrange(plot51,plot52)
+
+#T.test
 t.test(Parent$Anth ~ Parent$Tree.ID)
+```
 
 
-#Chlorophyll Parent Plots
-#Boxplot
-plot6<- ggplot(Parent) + aes(x = Allocation, y = Chl ) + geom_boxplot() + ylab("Chlorophyll Measure") + xlab("Parent") + ggtitle("Chlorophyll of Parent Samples")+stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3)
-#Scatter
-plot61<-ggplot(Parent) +aes(x = No, y = Chl) + geom_point() +geom_hline(yintercept = mean(Parent$Chl))+ ylab("Chlorophyll Measure") + xlab("Measure") + ggtitle("Chlorophyll of Parent Samples")
-#Histogram
-plot62 <-ggplot(Parent) +aes(Chl) +geom_histogram() + stat_bin(binwidth = 2) + ylab("Frequency") + xlab("Chlorophyll Measure") + ggtitle("Chlorophyll of Parent Samples")
-grid.arrange(plot6,plot61,plot62)
-#Chlorophyll T.test
+
+##### Chlorophyll Parent Plots
+
+```{r Chl Parent Plots}
+#Chlorophyll Parent Comparison
+plot6<- ggplot(Parent) + aes(x = Tree.ID, y = Chl,) + geom_boxplot(fill = "dodgerblue1", size = 1.25) + ylab("Chlorophyll Measure") + xlab("Parent") + ggtitle("Chlorophyll of Parent Samples") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=5) +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Parent$Chl));plot1
+
+#Chl Mean Plot
+plot61<-ggplot(Parent) +aes(x = measure, y = Chl, colour = Tree.ID, fill = Tree.ID) + geom_point() +geom_hline(yintercept = mean(Parent$Chl), colour = "dodgerblue1")+ ylab("Chlorophyll") + xlab("Measure") + ggtitle("Chlorophyll of Parent Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of Measurement Distribution
+plot62 <-ggplot(Parent) +aes(Chl,color=Tree.ID, fill=Tree.ID) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll Distribution of Parents") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
+grid.arrange(plot61,plot62)
+
 t.test(Parent$Chl ~ Parent$Tree.ID)
+```
+##### Flavonol Parent Plots
 
-#Flavonol Parent Plots
-#Boxplot
-plot7<- ggplot(Parent) + aes(x = Allocation, y = Flav ) + geom_boxplot() + ylab("Flavonol Measure") + xlab("Parent") + ggtitle("Flavonol of Parent Samples")+stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3)
-#Scatter
-plot71<-ggplot(Parent) +aes(x = No, y = Flav) + geom_point() +geom_hline(yintercept = mean(Parent$Flav))+ ylab("Flavonol Measure") + xlab("Measure") + ggtitle("Flavonol of Parent Samples")
-#Histogram
-plot72 <-ggplot(Parent) +aes(Flav) +geom_histogram() + stat_bin(binwidth = 0.0001) + ylab("Frequency") + xlab("Flavonol Measure") + ggtitle("Flavonol of Parent Samples")
-grid.arrange(plot7,plot71,plot72)
-#Anthocyanin T.test
+```{r Flav Parent Plots}
+#Flavonol Parent Comparison
+plot7<- ggplot(Parent) + aes(x = Tree.ID, y = Flav,) + geom_boxplot(fill = "dodgerblue1", size = 1.25) + ylab("Flavonol Measure") + xlab("Parent") + ggtitle("Flavonol of Parent Samples") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=5) +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Parent$Flav));plot1
+
+#Flav Mean Plot
+plot71<-ggplot(Parent) +aes(x = measure, y = Flav, colour = Tree.ID, fill = Tree.ID) + geom_point() +geom_hline(yintercept = mean(Parent$Flav), colour = "dodgerblue1")+ ylab("Flavonol") + xlab("Measure") + ggtitle("Flavonol of Parent Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of Measurement Distribution
+plot72 <-ggplot(Parent) +aes(Flav,color=Tree.ID, fill=Tree.ID) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol Distribution of Parents") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
+grid.arrange(plot71,plot72)
+
 t.test(Parent$Flav ~ Parent$Tree.ID)
+```
+##### Nitrogen Parent Plots
 
+```{r NBI Parent Plots}
+#Nitrogen Parent Comparison
+plot8<- ggplot(Parent) + aes(x = Tree.ID, y = NBI,) + geom_boxplot(fill = "dodgerblue1", size = 1.25) + ylab("Nitrogen Measure") + xlab("Parent") + ggtitle("Nitrogen of Parent Samples") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=5) +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Parent$NBI));plot1
 
-#NBI Parent Plots
-#Boxplot
-plot8<- ggplot(Parent) + aes(x = Allocation, y = NBI ) + geom_boxplot() + ylab("NBI Measure") + xlab("Parent") + ggtitle("NBI of Parent Samples")+stat_summary(fun.y=mean, colour="darkred", geom="point", shape=18, size=3)
-#Scatter
-plot81<-ggplot(Parent) +aes(x = No, y = NBI) + geom_point() +geom_hline(yintercept = mean(Parent$NBI))+ ylab("NBI Measure") + xlab("Measure") + ggtitle("NBI of Parent Samples")
-#Histogram
-plot82 <-ggplot(Parent) +aes(NBI) +geom_histogram() + stat_bin(binwidth = 2) + ylab("Frequency") + xlab("NBI Measure") + ggtitle("NBI of Parent Samples")
-grid.arrange(plot8,plot81,plot82)
-#Anthocyanin T.test
+#NBI Mean Plot
+plot81<-ggplot(Parent) +aes(x = measure, y = NBI, colour = Tree.ID, fill = Tree.ID) + geom_point() +geom_hline(yintercept = mean(Parent$NBI), colour = "dodgerblue1")+ ylab("Nitrogen") + xlab("Measure") + ggtitle("Nitrogen of Parent Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of Measurement Distribution
+plot82 <-ggplot(Parent) +aes(NBI,color=Tree.ID, fill=Tree.ID) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Nitrogen") + ggtitle("Nitrogen Distribution of Parents") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
+grid.arrange(plot81,plot82)
+
 t.test(Parent$NBI ~ Parent$Tree.ID)
 ```
 
@@ -336,56 +359,89 @@ F12 <- summarise(F12,Chl = mean(Chl,na.rm=T), NBI = mean(NBI, ra.nm = T), Anth =
 head(F12)
 ```
 
-```{r Preliminary Look at F1}
 
-#Boxplot Anthocyanin F1
-FAnth <- ggplot(F1) + aes(x = Tree.ID, y = Anth) + geom_boxplot() +geom_hline(yintercept = mean(F1$Anth), color = "purple4") + ylab("Anthocyanin Measure") + xlab("Tree ID") + ggtitle("Anthocyanin of F1 population") + theme_classic();FAnth
-#Mean Measures Anthocyanin
-FSAnth <- ggplot(F12) + aes(x = Tree.ID, y = Anth) + geom_point() +geom_hline(yintercept = mean(F12$Anth)) + ylab("Anthocyanin Measure") + xlab("Tree ID") + ggtitle("Anthocyanin of F1 population")
-#Histogram of Anthocyanin Distribution
-FHAnth <- ggplot(F1) + aes(x = Anth) + geom_histogram()
-#Display Anthocyanin Plots
-grid.arrange(FSAnth,FHAnth)
+##### Anthocyanin Overview
+
+```{r F1 Anth}
+#Anthocyanin F1 Comparison
+FAnth<- ggplot(F1) + aes(x = Tree.ID, y = Anth,) + geom_boxplot(colour = "turquoise4") + ylab("Anthocyanin Measure") + xlab("F1") + ggtitle("Anthocyanin of F1 Samples") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(F1$Anth), colour = "orchid3");FAnth
+
+#Anth Mean Plot
+FMAnth<-ggplot(F12) +aes(x = Tree.ID, y = Anth) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(F12$Anth), colour = "orchid3")+ ylab("Anthocyanin") + xlab("Tree ID") + ggtitle("Anthocyanin of F1 Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of Measurement Distribution
+HAnth <-ggplot(F12) +aes(Anth) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin Distribution of F1") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
+grid.arrange(FMAnth,HAnth)
+
 #Anthocyanin ANOVA
 FAA = lm(F1$Anth ~ F1$Tree.ID)
 anova(FAA)
-
-#Boxplot Chlorophyll F1
-FChl <- ggplot(F1) + aes(x = Tree.ID, y = Chl) + geom_boxplot() +geom_hline(yintercept = mean(F1$Chl), color = "purple4") + ylab("Chlorophyll Measure") + xlab("Tree ID") + ggtitle("Chlorophyll of F1 Population") + theme_classic();FChl
-#Mean Measures Chlorophyll
-FSChl <- ggplot(F12) + aes(x = Tree.ID, y = Chl) + geom_point() +geom_hline(yintercept = mean(F12$Chl)) + ylab("Chlorophyll Measure") + xlab("Tree ID") + ggtitle("Chlorophyll of F1 population")
-#Histogram of Chlorophyll
-FHChl <- ggplot(F1) + aes(x = Chl) + geom_histogram()
-#Display Chlorophyll Plots
-grid.arrange(FSChl, FHChl)
-#Chlorophyll ANOVA
-FCA = lm(F1$Chl ~ F1$Tree.ID)
-anova(FCA)
-
-#Boxplot Flavanol F1
-FFlav <- ggplot(F1) + aes(x = Tree.ID, y = Flav) + geom_boxplot() +geom_hline(yintercept = mean(F1$Flav), color = "purple4") + ylab("Flavanol Measure") + xlab("Tree ID") + ggtitle("Flavonol of F1 Population") + theme_classic();FFlav
-#Mean Measures Flavonol
-FSFlav <- ggplot(F12) + aes(x = Tree.ID, y = Flav) + geom_point() +geom_hline(yintercept = mean(F12$Flav)) + ylab("Flavonol Measure") + xlab("Tree ID") + ggtitle("Flavonol of F1 population")
-#Histogram of Flavonol
-FHFlav <- ggplot(F1) + aes(x = Flav) + geom_histogram()
-#Display Chlorophyll Plots
-grid.arrange(FSFlav, FHFlav)
-#Flavonol ANOVA
-FFA = lm(F1$Flav ~ F1$Tree.ID)
-anova(FFA)
-
-#Boxplot NBI F1
-FNBI <- ggplot(F1) + aes(x = Tree.ID, y = NBI) + geom_boxplot() +geom_hline(yintercept = mean(F1$NBI), color = "purple4") + ylab("NBI Measure") + xlab("Tree ID") + ggtitle("NBI of F1 Population") + theme_classic();FNBI
-#Mean Measures NBI
-FSNBI <- ggplot(F12) + aes(x = Tree.ID, y = NBI) + geom_point() +geom_hline(yintercept = mean(F12$NBI)) + ylab("NBI Measure") + xlab("Tree ID") + ggtitle("NBI of F1 population")
-#Histogram of NBI
-FHNBI <- ggplot(F1) + aes(x = NBI) + geom_histogram()
-#Display NBI Plots
-grid.arrange(FSNBI, FHNBI)
-#NBI ANOVA
-FNA = lm(F1$NBI ~ F1$Tree.ID)
-anova(FNA)
 ```
+
+##### Chlorophyll Overview
+
+```{r F1 Chl}
+#Chlorophyll F1 Comparison
+FChl<- ggplot(F1) + aes(x = Tree.ID, y = Chl,) + geom_boxplot(colour = "turquoise4") + ylab("Chlorophyll Measure") + xlab("F1") + ggtitle("Chlorophyll of F1 Samples") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(F1$Chl), colour = "orchid3");FChl
+
+#Chl Mean Plot
+FMChl<-ggplot(F12) +aes(x = Tree.ID, y = Chl) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(F12$Chl), colour = "orchid3")+ ylab("Chlorophyll") + xlab("Tree ID") + ggtitle("Chlorophyll of F1 Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of Measurement Distribution
+HChl <-ggplot(F12) +aes(Chl) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll Distribution of F1") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
+grid.arrange(FMChl,HChl)
+
+#Chlorophyll ANOVA
+FAA = lm(F1$Chl ~ F1$Tree.ID)
+anova(FAA)
+```
+
+##### Flavonol Overview
+
+```{r F1 Flav}
+#Flavonol F1 Comparison
+FFlav<- ggplot(F1) + aes(x = Tree.ID, y = Flav,) + geom_boxplot(colour = "turquoise4") + ylab("Flavonol Measure") + xlab("F1") + ggtitle("Flavonol of F1 Samples") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(F1$Flav), colour = "orchid3");FFlav
+
+#Flav Mean Plot
+FMFlav<-ggplot(F12) +aes(x = Tree.ID, y = Flav) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(F12$Flav), colour = "orchid3")+ ylab("Flavonol") + xlab("Tree ID") + ggtitle("Flavonol of F1 Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of Measurement Distribution
+HFlav <-ggplot(F12) +aes(Flav) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol Distribution of F1") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
+grid.arrange(FMFlav,HFlav)
+
+#Flavonol ANOVA
+FAA = lm(F1$Flav ~ F1$Tree.ID)
+anova(FAA)
+```
+
+##### Nitrogen Overview
+
+```{r F1 NBI}
+#Nitrogen F1 Comparison
+FNBI<- ggplot(F1) + aes(x = Tree.ID, y = NBI,) + geom_boxplot(colour = "turquoise4") + ylab("Nitrogen Measure") + xlab("F1") + ggtitle("Nitrogen of F1 Samples") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(F1$NBI), colour = "orchid3");FNBI
+
+#NBI Mean Plot
+FMNBI<-ggplot(F12) +aes(x = Tree.ID, y = NBI) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(F12$NBI), colour = "orchid3")+ ylab("Nitrogen") + xlab("Tree ID") + ggtitle("Nitrogen of F1 Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram of Measurement Distribution
+HNBI <-ggplot(F12) +aes(NBI) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Nitrogen") + ggtitle("Nitrogen Distribution of F1") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Display Plots
+grid.arrange(FMNBI,HNBI)
+
+#Nitrogen ANOVA
+FAA = lm(F1$NBI ~ F1$Tree.ID)
+anova(FAA)
+```
+
+#### A Closer Look at Invidual Trees and Their Measurements
+
 
 ```{r investigating measure numbers of random samples}
 Msr = group_by(F1, Tree.ID, measure)
@@ -803,11 +859,11 @@ Cplot1 <-ggplot(Dat) +aes(x = Tree.ID, y = Anth4) + geom_boxplot()+ ylab("Anth M
 Cplot11 <-ggplot(DatC) +aes(Anth) +geom_histogram() + stat_bin(binwidth = 0.001) + ylab("Frequency") + xlab("Anth Measure") + ggtitle("Anth of F1 after Corrections")
 grid.arrange(Cplot1,Cplot11)
 #Previous distribution
-grid.arrange(FAnth,FHAnth)
+#grid.arrange(FAnth,FHAnth)
 #Column Compare
 Cplot12 <-ggplot(Dat) +aes(x = Column, y = Anth4) + geom_boxplot()+ ylab("Anth Measure") + xlab("Tree ID") + ggtitle("Anth of F1 after Corrections")+geom_hline(yintercept = CAM);Cplot12
 #Previous distribution comparison
-grid.arrange(CAnth,Cplot12, ncol = 2)
+#grid.arrange(CAnth,Cplot12, ncol = 2)
 # Row Compare
 RoAnth
 Cplot13 <-ggplot(Dat) +aes(x = Row, y = Anth4) + geom_boxplot()+ ylab("Anth Measure") + xlab("Row") + ggtitle("Anth of F1 after Corrections")+geom_hline(yintercept = CAM);Cplot13
@@ -824,11 +880,11 @@ Cplot2 <-ggplot(Dat) +aes(x = Tree.ID, y = Chl3) + geom_boxplot()+ ylab("Chl Mea
 Cplot21 <-ggplot(DatC) +aes(Chl) +geom_histogram() + stat_bin(binwidth = 0.01) + ylab("Frequency") + xlab("Chl Measure") + ggtitle("Chl of F1 after Corrections")
 grid.arrange(Cplot2,Cplot21)
 #Previous Distribution
-grid.arrange(FChl,FHChl)
+#grid.arrange(FChl,FHChl)
 #Column Compare
 Cplot22 <-ggplot(Dat) +aes(x = Column, y = Chl3) + geom_boxplot()+ ylab("Chl Measure") + xlab("Column") + ggtitle("Chl of F1 after Corrections")+geom_hline(yintercept = CAM)
 #Previous distribution
-grid.arrange(CChl,Cplot22, ncol = 2)
+#grid.arrange(CChl,Cplot22, ncol = 2)
 # Row Compare
 RoChl
 Cplot23 <-ggplot(Dat) +aes(x = Row, y = Chl3) + geom_boxplot()+ ylab("Chl Measure") + xlab("Row") + ggtitle("Chl of F1 after Corrections")+geom_hline(yintercept = CAM);Cplot23
@@ -844,11 +900,11 @@ Cplot3 <-ggplot(Dat) +aes(x = Tree.ID, y = Flav5) + geom_boxplot()+ ylab("Flav M
 Cplot31 <-ggplot(DatC) +aes(Flav) +geom_histogram() + stat_bin(binwidth = 0.001) + ylab("Frequency") + xlab("Flav Measure") + ggtitle("Flav of F1 after Corrections")
 grid.arrange(Cplot3,Cplot31)
 #Previous Distribution
-grid.arrange(FFlav,FHFlav)
+#grid.arrange(FFlav,FHFlav)
 #Column Compare
 Cplot32 <-ggplot(Dat) +aes(x = Column, y = Flav5) + geom_boxplot()+ ylab("Flav Measure") + xlab("Column") + ggtitle("Flav of F1 after Corrections")+geom_hline(yintercept = CFM)
 #Previous distribution
-grid.arrange(CFlav,Cplot32, ncol = 2)
+#grid.arrange(CFlav,Cplot32, ncol = 2)
 # Row Compare
 RoFlav
 Cplot33 <-ggplot(Dat) +aes(x = Row, y = Flav5) + geom_boxplot()+ ylab("Flav Measure") + xlab("Row") + ggtitle("Flav of F1 after Corrections")+geom_hline(yintercept = CFM);Cplot33
@@ -864,11 +920,11 @@ Cplot4 <-ggplot(Dat) +aes(x = Tree.ID, y = NBI4) + geom_boxplot()+ ylab("NBI Mea
 Cplot41 <-ggplot(DatC) +aes(NBI) +geom_histogram() + stat_bin(binwidth = 0.001) + ylab("Frequency") + xlab("NBI Measure") + ggtitle("NBI of F1 after Corrections")
 grid.arrange(Cplot4,Cplot41)
 #Previous Distribution
-grid.arrange(FNBI,FHNBI)
+#grid.arrange(FNBI,FHNBI)
 #Column Compare
 Cplot42 <-ggplot(Dat) +aes(x = Column, y = NBI4) + geom_boxplot()+ ylab("NBI Measure") + xlab("Column") + ggtitle("NBI of F1 after Corrections")+geom_hline(yintercept = CNM)
 #Previous distribution
-grid.arrange(CNBI,Cplot42, ncol = 2)
+#grid.arrange(CNBI,Cplot42, ncol = 2)
 # Row Compare
 RoNBI
 Cplot43 <-ggplot(Dat) +aes(x = Row, y = NBI4) + geom_boxplot()+ ylab("NBI Measure") + xlab("Row") + ggtitle("NBI of F1 after Corrections")+geom_hline(yintercept = CNM);Cplot43
