@@ -3,8 +3,8 @@ title: "ManukaAnalysis"
 author: "Melissa Taane"
 date: "06/05/2019"
 output:
-  word_document: default
   html_document: default
+  word_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -25,7 +25,7 @@ library(heatmaply)
 
 Map indicates the layout of the F1 generation resulting from a cross between EC201 and EC103 parents. Column 1 is approximately lengthways facing north.
 
-!["Map of F1 Trees"](Capture.png) 
+!["Map of F1 Trees"](Capture.png)
 
 #### Height Diagram
 
@@ -371,7 +371,7 @@ FAnth<- ggplot(F1) + aes(x = Tree.ID, y = Anth,) + geom_boxplot(colour = "turquo
 FMAnth<-ggplot(F12) +aes(x = Tree.ID, y = Anth) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(F12$Anth), colour = "orchid3")+ ylab("Anthocyanin") + xlab("Tree ID") + ggtitle("Anthocyanin of F1 Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
 
 #Histogram of Measurement Distribution
-HAnth <-ggplot(F12) +aes(Anth) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin Distribution of F1") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+HAnth <-ggplot(F12) +aes(Anth) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 
 #Display Plots
 grid.arrange(FMAnth,HAnth)
@@ -391,7 +391,7 @@ FChl<- ggplot(F1) + aes(x = Tree.ID, y = Chl,) + geom_boxplot(colour = "turquois
 FMChl<-ggplot(F12) +aes(x = Tree.ID, y = Chl) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(F12$Chl), colour = "orchid3")+ ylab("Chlorophyll") + xlab("Tree ID") + ggtitle("Chlorophyll of F1 Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
 
 #Histogram of Measurement Distribution
-HChl <-ggplot(F12) +aes(Chl) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll Distribution of F1") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+HChl <-ggplot(F12) +aes(Chl) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 
 #Display Plots
 grid.arrange(FMChl,HChl)
@@ -411,7 +411,7 @@ FFlav<- ggplot(F1) + aes(x = Tree.ID, y = Flav,) + geom_boxplot(colour = "turquo
 FMFlav<-ggplot(F12) +aes(x = Tree.ID, y = Flav) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(F12$Flav), colour = "orchid3")+ ylab("Flavonol") + xlab("Tree ID") + ggtitle("Flavonol of F1 Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
 
 #Histogram of Measurement Distribution
-HFlav <-ggplot(F12) +aes(Flav) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol Distribution of F1") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+HFlav <-ggplot(F12) +aes(Flav) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 
 #Display Plots
 grid.arrange(FMFlav,HFlav)
@@ -431,7 +431,7 @@ FNBI<- ggplot(F1) + aes(x = Tree.ID, y = NBI,) + geom_boxplot(colour = "turquois
 FMNBI<-ggplot(F12) +aes(x = Tree.ID, y = NBI) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(F12$NBI), colour = "orchid3")+ ylab("Nitrogen") + xlab("Tree ID") + ggtitle("Nitrogen of F1 Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
 
 #Histogram of Measurement Distribution
-HNBI <-ggplot(F12) +aes(NBI) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Nitrogen") + ggtitle("Nitrogen Distribution of F1") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+HNBI <-ggplot(F12) +aes(NBI) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Nitrogen") + ggtitle("Nitrogen Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 
 #Display Plots
 grid.arrange(FMNBI,HNBI)
@@ -441,7 +441,7 @@ FAA = lm(F1$NBI ~ F1$Tree.ID)
 anova(FAA)
 ```
 
-#### A Closer Look at Invidual Trees and Their Measurements
+#### A Closer Look at Invidual F1 Trees and Their Measurements
 
 
 ```{r investigating measure numbers of random samples}
@@ -537,7 +537,7 @@ NBIGC <-ggplot(IN4GC) + aes(x = measure, y = NBI) + geom_point() + geom_hline(yi
 grid.arrange(AnthGC,ChlGC,FlavGC,NBIGC)
 ```
 
-#### Height Analysis
+##### F1 Height Analysis
 
 ```{r Height Analysis}
 F13 = group_by(F1,Height)
@@ -563,6 +563,7 @@ grid.arrange(HAnth,HChl,HFlav,HNBI)
 HAA = lm(F1$Anth ~ F1$Height)
 anova(HAA)
 summary(HAA)
+
 #Chlorophyll ANOVA
 HCA = lm(F1$Chl ~ F1$Height)
 anova(HCA)
@@ -741,7 +742,7 @@ anova(CRHM2)
 
 Controlling for Height,Column,Row effects 
 
-```{r}
+```{r Controlling for effects, echo = TRUE}
 Dat = F1
 #Total Mean
 Dat$ATmean = mean(Dat$Anth)
