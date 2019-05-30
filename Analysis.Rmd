@@ -2,7 +2,9 @@
 title: "ManukaAnalysis"
 author: "Melissa Taane"
 date: "06/05/2019"
-output: html_document
+output:
+  word_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -109,7 +111,7 @@ head(Dup2)
 plot1<- ggplot(Dup) + aes(x = Rep., y = Anth,) + geom_boxplot(fill = "dodgerblue1", size = 1.25) + ylab("Anthocyanin Measure") + xlab("Replicate Number") + ggtitle("Anthocyanin of Replicate Samples") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=5) +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Dup$Anth));plot1
 
 #Anth Mean Plot
-plot11<-ggplot(Dup) +aes(x = Tree.ID, y = Anth) + geom_point(colour = "dodgerblue4") +geom_hline(yintercept = mean(Dup$Anth), colour = "dodgerblue1")+ ylab("Anthocyanin Measure") + xlab("Tree ID") + ggtitle("Anthocyanin of Replicate Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+plot11<-ggplot(Dup) +aes(x = Tree.ID, y = Anth, colour = Rep.,fill = Rep.) + geom_point() +geom_hline(yintercept = mean(Dup$Anth), colour = "dodgerblue1")+ ylab("Anthocyanin Measure") + xlab("Tree ID") + ggtitle("Anthocyanin of Replicate Samples")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
 
 #Histogram of Measurement Distribution
 plot12 <-ggplot(Dup) +aes(Anth,color=Rep., fill=Rep.) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin Absorbance Units") + ggtitle("Anthocyanin of Replicate Samples") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
@@ -272,6 +274,7 @@ ParNBI = summary(Parent$NBI)
 
 as.table(rbind(ParAnth,ParChl,ParFlav,ParNBI))
 ```
+
 ##### Anthocyanin Parent Plots
 
 ```{r Anth Parent Plots}
@@ -286,12 +289,7 @@ plot52 <-ggplot(Parent) +aes(Anth,color=Tree.ID, fill=Tree.ID) +geom_histogram(a
 
 #Display Plots
 grid.arrange(plot51,plot52)
-
-#T.test
-t.test(Parent$Anth ~ Parent$Tree.ID)
 ```
-
-
 
 ##### Chlorophyll Parent Plots
 
@@ -307,9 +305,8 @@ plot62 <-ggplot(Parent) +aes(Chl,color=Tree.ID, fill=Tree.ID) +geom_histogram(ae
 
 #Display Plots
 grid.arrange(plot61,plot62)
-
-t.test(Parent$Chl ~ Parent$Tree.ID)
 ```
+
 ##### Flavonol Parent Plots
 
 ```{r Flav Parent Plots}
@@ -324,9 +321,8 @@ plot72 <-ggplot(Parent) +aes(Flav,color=Tree.ID, fill=Tree.ID) +geom_histogram(a
 
 #Display Plots
 grid.arrange(plot71,plot72)
-
-t.test(Parent$Flav ~ Parent$Tree.ID)
 ```
+
 ##### Nitrogen Parent Plots
 
 ```{r NBI Parent Plots}
@@ -341,12 +337,18 @@ plot82 <-ggplot(Parent) +aes(NBI,color=Tree.ID, fill=Tree.ID) +geom_histogram(ae
 
 #Display Plots
 grid.arrange(plot81,plot82)
+```
 
+##### Parent t.tests
+
+```{r Parent t.test}
+t.test(Parent$Anth ~ Parent$Tree.ID)
+t.test(Parent$Chl ~ Parent$Tree.ID)
+t.test(Parent$Flav ~ Parent$Tree.ID)
 t.test(Parent$NBI ~ Parent$Tree.ID)
 ```
 
 Interesting sample pattern here, Chl and NBI start low and work high, Flav does the opposite. Maybe accuracy of measurements? 
-
 
 #### Parental Cross Analysis (F1 Generation)
 
@@ -358,7 +360,6 @@ F12 <-group_by(F1,Tree.ID)
 F12 <- summarise(F12,Chl = mean(Chl,na.rm=T), NBI = mean(NBI, ra.nm = T), Anth = mean(Anth, na.rm=T),Flav = mean(Flav,na.rm =T))
 head(F12)
 ```
-
 
 ##### Anthocyanin Overview
 
