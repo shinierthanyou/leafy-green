@@ -180,7 +180,7 @@ There is no statistically significant differences between the two groups of meas
 #Anthocyanin Anova
 mod3 <-lm(Dup$Anth ~ Dup$Rep.)
 anova(mod3)
-
+summary(mod3)
 ```
 
 + Chlorophyll
@@ -189,7 +189,7 @@ anova(mod3)
 #Chlorophyll Anova
 mod <-lm(Dup$Chl ~ Dup$Rep.)
 anova(mod)
-
+summary(mod)
 ```
 
 + Flavonol
@@ -198,6 +198,7 @@ anova(mod)
 #Flavanol Anova
 mod2 <-lm(Dup$Flav ~ Dup$Rep.)
 anova(mod2)
+summary(mod2)
 ```
 
 + Nitrogen
@@ -206,6 +207,7 @@ anova(mod2)
 #NBI Anova
 mod4 <-lm(Dup$NBI ~ Dup$Rep.)
 anova(mod4)
+summary(mod4)
 ```
 
 The absence of statistically significant results indicates that our replicates are likely to be consistent.
@@ -265,6 +267,7 @@ grid.arrange(ABA,ABC,ABF,ABN,ncol=2)
 #Anthocyanin
 mod8 <-lm(Data$Anth ~ Data$Allocation)
 anova(mod8)
+summary(mod8)
 ```
 
 + Chlorophyll
@@ -273,6 +276,7 @@ anova(mod8)
 #Chlorophyll
 mod5 <-lm(Data$Chl ~ Data$Allocation)
 anova(mod5)
+summary(mod5)
 ```
 
 + Flavonol
@@ -281,6 +285,7 @@ anova(mod5)
 #Flavanol
 mod7 <-lm(Data$Flav ~ Data$Allocation)
 anova(mod7)
+summary(mod7)
 ```
 
 + Nitrogen
@@ -289,6 +294,7 @@ anova(mod7)
 #Nitrogen
 mod6 <-lm(Data$NBI ~ Data$Allocation)
 anova(mod5)
+summary(mod6)
 ```
 
 F1 Samples (Approx 3 years) appear more similar to that of the Crimson Glory plant than either/both parents - this is possibly due to age effects as CG is likely more similar in this regard being shorter (No age confirmed).
@@ -655,7 +661,7 @@ grid.arrange(HBA,HBC,HBF,HBN)
 ### Anthocyanin
 
 ```{r}
-HMA <-ggplot(F1) +aes(x = Tree.ID, y = Anth, colour = Height, fill = Height) + geom_point() +geom_hline(yintercept = mean(F1$Anth), colour = "dodgerblue1")+ ylab("Anthocyanin") + xlab("Tree ID") + ggtitle("Anthocyanin Height Measures")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));HMA
+HMA <-ggplot(F1) +aes(x = Tree.ID, y = Anth, colour = Height, fill = Height) + geom_point() +geom_hline(yintercept = mean(F1$Anth), colour = "dodgerblue1")+ ylab("Anthocyanin") + xlab("Tree ID") + ggtitle("Anthocyanin Height Measures") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));HMA
 
 HHA <-ggplot(F1) +aes(Anth,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));HHA
 ```
@@ -689,19 +695,91 @@ HHN <-ggplot(F1) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..den
 #Anthocyanin ANOVA
 HAA = lm(F1$Anth ~ F1$Height)
 anova(HAA)
+summary(HAA)
+
 
 #Chlorophyll ANOVA
 HCA = lm(F1$Chl ~ F1$Height)
 anova(HCA)
+summary(HCA)
 
 #Flavonol ANOVA
 HFA = lm(F1$Flav ~ F1$Height)
 anova(HFA)
+summary(HFA)
 
 #NBI ANOVA
 HNA = lm(F1$NBI ~ F1$Height)
 anova(HNA)
+summary(HNA)
 ```
+
+### Height Analysis within Trees
+
+```{r}
+HWT = group_by(F1, Height, Tree.ID)
+HWT = summarise(HWT, Anth = mean(Anth, na.rm = T), Chl = mean(Chl, na.rm = T), Flav = mean(Flav, na.rm = T), NBI = mean(NBI, na.rm = T))
+head(HWT)
+
+High = HWT[c(1:159),]
+Mid = HWT[c(319:477),]
+Low = HWT[c(160:318),]
+
+
+#Anth
+AHLA = lm(High$Anth ~ Low$Anth)
+anova(AHLA)
+summary(AHLA)
+
+AHMA = lm(High$Anth ~ Mid$Anth)
+anova(AHMA)
+summary(AHMA)
+
+AMLA = lm(Mid$Anth ~ Low$Anth)
+anova(AMLA)
+summary(AMLA)
+
+#Chl
+AHLC = lm(High$Chl ~ Low$Chl)
+anova(AHLC)
+summary(AHLC)
+
+AHMC = lm(High$Chl ~ Mid$Chl)
+anova(AHMC)
+summary(AHMC)
+
+AMLC = lm(Mid$Chl ~ Low$Chl)
+anova(AMLC)
+summary(AMLC)
+
+#Flav
+AHLF = lm(High$Flav ~ Low$Flav)
+anova(AHLF)
+summary(AHLF)
+
+AHMF = lm(High$Flav ~ Mid$Flav)
+anova(AHMF)
+summary(AHMF)
+
+AMLF = lm(Mid$Flav ~ Low$Flav)
+anova(AMLF)
+summary(AMLF)
+
+#NBI
+AHLN = lm(High$NBI ~ Low$NBI)
+anova(AHLN)
+summary(AHLN)
+
+AHMN = lm(High$NBI ~ Mid$NBI)
+anova(AHMN)
+summary(AHMN)
+
+AMLN = lm(Mid$NBI ~ Low$NBI)
+anova(AMLN)
+summary(AMLN)
+```
+
+
 
 ### Row Analysis
 
@@ -839,15 +917,19 @@ grid.arrange(RoMN,RoHN)
 ```{r}
 AnRoA = lm(F1$Anth ~ F1$Row)
 anova(AnRoA)
+summary(AnRoA)
 
 AnRoC = lm(F1$Chl ~ F1$Row)
 anova(AnRoC)
+summary(AnRoC)
 
 AnRoF = lm(F1$Flav ~ F1$Row)
 anova(AnRoF)
+summary(AnRoF)
 
 AnRoN = lm(F1$NBI ~ F1$Row)
 anova(AnRoN)
+summary(AnRoN)
 ```
 #### Column Analysis
 
@@ -893,18 +975,22 @@ grid.arrange(CBA,CBC,CBF,CBN)
 #Anthocyanin ANOVA
 CAA = lm(F1$Anth ~ F1$Column)
 anova(CAA)
+summary(CAA)
 
 #Chlorophyll ANOVA
 CCA = lm(F1$Chl ~ F1$Column)
 anova(CCA)
+summary(CCA)
 
 #Flavonol ANOVA
 CFA = lm(F1$Flav ~ F1$Column)
 anova(CFA)
+summary(CFA)
 
 #NBI ANOVA
 CNA = lm(F1$NBI ~ F1$Column)
 anova(CNA)
+summary(CNA)
 ```
 
 
@@ -912,29 +998,37 @@ anova(CNA)
 #Anthocyanin
 CRHA = lm(F1$Anth ~ F1$Height*F1$Column*F1$Row)
 anova(CRHA)
+summary(CRHA)
 #Remove insignificant variables
 CRHA2 = lm(F1$Anth ~ F1$Height*F1$Row)
 anova(CRHA2)
+summary(CRHA2)
 #Chlorophyll
 CRHC = lm(F1$Chl ~ F1$Height*F1$Column*F1$Row)
 anova(CRHC)
+summary(CRHC)
 #Remove insignificant variables
 CRHC2 = lm(F1$Chl ~ F1$Height*F1$Row)
 anova(CRHC2)
+summary(CRHC2)
 #Further Remove insignificant variables
 CRHC3 = lm(F1$Chl ~ F1$Row)
 anova(CRHC3)
+summary(CRHC3)
 
 #Flavonol
 CRHF = lm(F1$Flav ~ F1$Height*F1$Column*F1$Row)
 anova(CRHF)
+summary(CRHF)
 
 #NBI
 CRHN = lm(F1$NBI ~ F1$Height*F1$Column*F1$Row)
 anova(CRHN)
+summary(CRHN)
 #Remove insignificant variables
 CRHM2 = lm(F1$NBI ~ F1$Row*F1$Column)
 anova(CRHM2)
+summary(CRHM2)
 ```
 
 ### Controlling for Height,Column,Row effects 
@@ -1038,12 +1132,16 @@ Dat$NBI5 = Dat$NBI4 + Dat$NTR
 #Anova Checks
 AnAnth = lm(Dat$Anth5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnAnth)
+summary(AnAnth)
 AnChl = lm(Dat$Chl5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnChl)
+summary(AnChl)
 AnFlav = lm(Dat$Flav5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnFlav)
+summary(AnFlav)
 AnNBI = lm(Dat$NBI5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnNBI)
+summary(AnNBI)
 ```
 
 ### Comparison Heatmaps
@@ -1373,15 +1471,19 @@ grid.arrange(plot39,plot40,plot41,plot42)
 
 AF<- lm(Dat$Anth5 ~ Dat$Flower)
 anova(AF)
+summary(AF)
 
 CF<- lm(Dat$Chl5 ~ Dat$Flower)
 anova(CF)
+summary(CF)
 
 FF<- lm(Dat$Flav5 ~ Dat$Flower)
 anova(FF)
+summary(FF)
 
 NF<- lm(Dat$NBI5 ~ Dat$Flower)
 anova(NF)
+summary(NF)
 ```
 #### Environment and Height
 
