@@ -1081,8 +1081,35 @@ plot12 <-ggplot(Dup) +aes(Anth,color=Rep., fill=Rep.) +geom_histogram(aes(y=..de
 
 
 ggplot(Dup, aes(x=Anth, color=Rep., fill=Rep.)) + geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2)
+```
 
 
+```{r}
+H08 = read.xlsx("Height phenotype 20 April 2018 and 2019.xlsx", sheetName = "Phenotypes April 2018")
+H09 = read.xlsx("Height phenotype 20 April 2018 and 2019.xlsx", sheetName = "Phenotypes April 2019")
 
+H08$Tree.ID = H08$NA.
+H08$Height08 = H08$Height
+H09$Tree.ID = H09$NA.
+H09$Height09 = H09$Height
+
+H08 = H08[c(12,13)]
+H09 = H09[c(13,14)]
+
+H089 = merge(H08,H09, by.x = "Tree.ID")
+H089$Tree.ID = as.factor(H089$Tree.ID)
+
+
+write.xlsx(H089, "H089.xlsx", sheetName = "H089")
+H089 = read.xlsx("H0892.xlsx", sheetName = "H089")
+
+
+DatTree = group_by(Dat, Tree.ID, Column, Row)
+DatTree = summarise(DatTree, Anth = mean(Anth4), Flav = mean(Flav5), Chl = mean(Chl3),NBI = mean(NBI4))
+DatTree$Tree.ID = as.factor(DatTree$Tree.ID)
+
+H089 = merge(H089,DatTree, by.x = "Tree.ID", all = TRUE)
+View(H089)
 
 ```
+

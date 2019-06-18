@@ -396,10 +396,27 @@ grid.arrange(PMN,PHN)
 
 ### Parent t.tests
 
++ Anthocyanin
+
 ```{r Parent t.test}
 t.test(Parent$Anth ~ Parent$Tree.ID)
+```
+
++ Chlorophyll
+
+```{r}
 t.test(Parent$Chl ~ Parent$Tree.ID)
+```
+
++ Flavonol
+
+```{r}
 t.test(Parent$Flav ~ Parent$Tree.ID)
+```
+
++ NBI
+
+```{r}
 t.test(Parent$NBI ~ Parent$Tree.ID)
 ```
 
@@ -662,52 +679,58 @@ grid.arrange(HBA,HBC,HBF,HBN)
 
 ```{r}
 HMA <-ggplot(F1) +aes(x = Tree.ID, y = Anth, colour = Height, fill = Height) + geom_point() +geom_hline(yintercept = mean(F1$Anth), colour = "dodgerblue1")+ ylab("Anthocyanin") + xlab("Tree ID") + ggtitle("Anthocyanin Height Measures") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));HMA
-
-HHA <-ggplot(F1) +aes(Anth,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));HHA
 ```
 
 ### Chlorophyll
 
 ```{r}
 HMC <-ggplot(F1) +aes(x = Tree.ID, y = Chl, colour = Height, fill = Height) + geom_point() +geom_hline(yintercept = mean(F1$Chl), colour = "dodgerblue1")+ ylab("Chlorophyll") + xlab("Tree ID") + ggtitle("Chlorophyll Height Measures")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));HMC
-
-HHC <-ggplot(F1) +aes(Chl,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));HHC
 ```
 
 ### Flavonol
 
 ```{r}
 HMF <-ggplot(F1) +aes(x = Tree.ID, y = Flav, colour = Height, fill = Height) + geom_point() +geom_hline(yintercept = mean(F1$Flav), colour = "dodgerblue1")+ ylab("Flavonol") + xlab("Tree ID") + ggtitle("Flavonol Height Measures")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));HMF
-
-HHF <-ggplot(F1) +aes(Flav,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));HHF
 ```
 
 ### Nitrogen
 
 ```{r}
 HMN <-ggplot(F1) +aes(x = Tree.ID, y = NBI, colour = Height, fill = Height) + geom_point() +geom_hline(yintercept = mean(F1$NBI), colour = "dodgerblue1")+ ylab("Nitrogen") + xlab("Tree ID") + ggtitle("Nitrogen Height Measures")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));HMN
-
-HHN <-ggplot(F1) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Nitrogen") + ggtitle("Nitrogen by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));HHN
 ```
 
+### ANOVAS
+
++ Anthocyanin
 
 ```{r Height Anova}
 #Anthocyanin ANOVA
 HAA = lm(F1$Anth ~ F1$Height)
 anova(HAA)
 summary(HAA)
+```
 
++ Chlorophyll
 
+```{r}
 #Chlorophyll ANOVA
 HCA = lm(F1$Chl ~ F1$Height)
 anova(HCA)
 summary(HCA)
+```
 
++ Flavonol
+
+```{r}
 #Flavonol ANOVA
 HFA = lm(F1$Flav ~ F1$Height)
 anova(HFA)
 summary(HFA)
+```
 
++ NBI
+
+```{r}
 #NBI ANOVA
 HNA = lm(F1$NBI ~ F1$Height)
 anova(HNA)
@@ -725,61 +748,134 @@ High = HWT[c(1:159),]
 Mid = HWT[c(319:477),]
 Low = HWT[c(160:318),]
 
+HighMid = rbind(High,Mid)
+HighLow = rbind(High,Low)
+MidLow = rbind(Mid,Low)
 
+```
+
+#### Anthocyanin High vs Low
+
+```{r}
 #Anth
 AHLA = lm(High$Anth ~ Low$Anth)
 anova(AHLA)
 summary(AHLA)
 
+ggplot(HighLow) +aes(Anth,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Anthocyanin High vs Mid
+
+```{r}
 AHMA = lm(High$Anth ~ Mid$Anth)
 anova(AHMA)
 summary(AHMA)
 
+ggplot(HighMid) +aes(Anth,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Anthocyanin Mid vs Low 
+
+```{r}
 AMLA = lm(Mid$Anth ~ Low$Anth)
 anova(AMLA)
 summary(AMLA)
 
+ggplot(MidLow) +aes(Anth,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Chlorophyll High vs Low
+
+```{r}
 #Chl
 AHLC = lm(High$Chl ~ Low$Chl)
 anova(AHLC)
 summary(AHLC)
 
+ggplot(HighLow) +aes(Chl,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Chlorophyll High vs Mid
+
+```{r}
 AHMC = lm(High$Chl ~ Mid$Chl)
 anova(AHMC)
 summary(AHMC)
 
+ggplot(HighMid) +aes(Chl,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Chlorophyll Mid vs Low
+
+```{r}
 AMLC = lm(Mid$Chl ~ Low$Chl)
 anova(AMLC)
 summary(AMLC)
 
+ggplot(MidLow) +aes(Chl,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Flavonol High vs Low
+
+```{r}
 #Flav
 AHLF = lm(High$Flav ~ Low$Flav)
 anova(AHLF)
 summary(AHLF)
 
+ggplot(HighLow) +aes(Flav,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### Flavonol High vs Mid
+
+```{r}
 AHMF = lm(High$Flav ~ Mid$Flav)
 anova(AHMF)
 summary(AHMF)
+ggplot(HighMid) +aes(Flav,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
 
+#### Flavonol Mid vs Low
+
+```{r}
 AMLF = lm(Mid$Flav ~ Low$Flav)
 anova(AMLF)
 summary(AMLF)
 
+ggplot(MidLow) +aes(Flav,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### NBI High vs Low
+
+```{r}
 #NBI
 AHLN = lm(High$NBI ~ Low$NBI)
 anova(AHLN)
 summary(AHLN)
 
-AHMN = lm(High$NBI ~ Mid$NBI)
-anova(AHMN)
-summary(AHMN)
-
-AMLN = lm(Mid$NBI ~ Low$NBI)
-anova(AMLN)
-summary(AMLN)
+ggplot(HighLow) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("NBI") + ggtitle("Nitrogen by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
+#### NBI High vs Mid
+
+
+```{r}
+AHMN = lm(High$NBI ~ Mid$NBI)
+anova(AHMN)
+summary(AHMN)
+ggplot(HighMid) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("NBI") + ggtitle("Nitrogen by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
+
+#### NBI Mid vs Low
+
+```{r}
+AMLN = lm(Mid$NBI ~ Low$NBI)
+anova(AMLN)
+summary(AMLN)
+ggplot(MidLow) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("NBI") + ggtitle("Nitrogen by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
 
 ### Row Analysis
 
@@ -917,19 +1013,19 @@ grid.arrange(RoMN,RoHN)
 ```{r}
 AnRoA = lm(F1$Anth ~ F1$Row)
 anova(AnRoA)
-summary(AnRoA)
+#summary(AnRoA)
 
 AnRoC = lm(F1$Chl ~ F1$Row)
 anova(AnRoC)
-summary(AnRoC)
+#summary(AnRoC)
 
 AnRoF = lm(F1$Flav ~ F1$Row)
 anova(AnRoF)
-summary(AnRoF)
+#summary(AnRoF)
 
 AnRoN = lm(F1$NBI ~ F1$Row)
 anova(AnRoN)
-summary(AnRoN)
+#summary(AnRoN)
 ```
 #### Column Analysis
 
@@ -998,37 +1094,37 @@ summary(CNA)
 #Anthocyanin
 CRHA = lm(F1$Anth ~ F1$Height*F1$Column*F1$Row)
 anova(CRHA)
-summary(CRHA)
+#summary(CRHA)
 #Remove insignificant variables
 CRHA2 = lm(F1$Anth ~ F1$Height*F1$Row)
 anova(CRHA2)
-summary(CRHA2)
+#summary(CRHA2)
 #Chlorophyll
 CRHC = lm(F1$Chl ~ F1$Height*F1$Column*F1$Row)
 anova(CRHC)
-summary(CRHC)
+#summary(CRHC)
 #Remove insignificant variables
 CRHC2 = lm(F1$Chl ~ F1$Height*F1$Row)
 anova(CRHC2)
-summary(CRHC2)
+#summary(CRHC2)
 #Further Remove insignificant variables
 CRHC3 = lm(F1$Chl ~ F1$Row)
 anova(CRHC3)
-summary(CRHC3)
+#summary(CRHC3)
 
 #Flavonol
 CRHF = lm(F1$Flav ~ F1$Height*F1$Column*F1$Row)
 anova(CRHF)
-summary(CRHF)
+#summary(CRHF)
 
 #NBI
 CRHN = lm(F1$NBI ~ F1$Height*F1$Column*F1$Row)
 anova(CRHN)
-summary(CRHN)
+#summary(CRHN)
 #Remove insignificant variables
 CRHM2 = lm(F1$NBI ~ F1$Row*F1$Column)
 anova(CRHM2)
-summary(CRHM2)
+#summary(CRHM2)
 ```
 
 ### Controlling for Height,Column,Row effects 
@@ -1132,16 +1228,16 @@ Dat$NBI5 = Dat$NBI4 + Dat$NTR
 #Anova Checks
 AnAnth = lm(Dat$Anth5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnAnth)
-summary(AnAnth)
+#summary(AnAnth)
 AnChl = lm(Dat$Chl5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnChl)
-summary(AnChl)
+#summary(AnChl)
 AnFlav = lm(Dat$Flav5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnFlav)
-summary(AnFlav)
+#summary(AnFlav)
 AnNBI = lm(Dat$NBI5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnNBI)
-summary(AnNBI)
+#summary(AnNBI)
 ```
 
 ### Comparison Heatmaps
@@ -1232,7 +1328,7 @@ grid.arrange(HBA,HBA2, ncol = 2)
 #Height Histogram
 HHA2 <-ggplot(Dat) +aes(Anth5,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height After Correction") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 
-grid.arrange(HHA,HHA2)
+#grid.arrange(HHA,HHA2)
 
 #Height Means
 HMA2 <-ggplot(Dat) +aes(x = Tree.ID, y = Anth5, colour = Height, fill = Height) + geom_point() +geom_hline(yintercept = mean(Dat$Anth5), colour = "dodgerblue1")+ ylab("Anthocyanin") + xlab("Tree ID") + ggtitle("Anthocyanin Height Measures After Correction")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
@@ -1288,7 +1384,7 @@ grid.arrange(HBC,HBC2, ncol = 2)
 #Height Histogram
 HHC2 <-ggplot(Dat) +aes(Chl5,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll by Height After Correction") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 
-grid.arrange(HHC,HHC2)
+#grid.arrange(HHC,HHC2)
 
 #Height Means
 HMC2 <-ggplot(Dat) +aes(x = Tree.ID, y = Chl5, colour = Height, fill = Height) + geom_point() +geom_hline(yintercept = mean(Dat$Chl5), colour = "dodgerblue1")+ ylab("Chlorophyll") + xlab("Tree ID") + ggtitle("Chlorophyll Height Measures After Correction")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
@@ -1344,7 +1440,7 @@ grid.arrange(HBF,HBF2, ncol = 2)
 #Height Histogram
 HHF2 <-ggplot(Dat) +aes(Flav5,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol by Height After Correction") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 
-grid.arrange(HHF,HHF2)
+#grid.arrange(HHF,HHF2)
 
 #Height Means
 HMF2 <-ggplot(Dat) +aes(x = Tree.ID, y = Flav5, colour = Height, fill = Height) + geom_point() +geom_hline(yintercept = mean(Dat$Flav5), colour = "dodgerblue1")+ ylab("Flavonol") + xlab("Tree ID") + ggtitle("Flavonol Height Measures After Correction")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
@@ -1395,12 +1491,12 @@ grid.arrange(FHN,FHN2)
 #Height Boxplot
 HBN2 <- ggplot(Dat) + aes(x = Height, y = NBI5,) + geom_boxplot(fill = "dodgerblue1", size = 1.25) + ylab("Nitrogen Measure") + xlab("Height") + ggtitle("NBI Height After Correction") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=3) +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Dat$NBI5))
 
-grid.arrange(HBN,HBN2, ncol = 2)
+#grid.arrange(HBN,HBN2, ncol = 2)
 
 #Height Histogram
 HHN2 <-ggplot(Dat) +aes(NBI5,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Nitrogen") + ggtitle("Nitrogen by Height After Correction") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 
-grid.arrange(HHN,HHN2)
+#grid.arrange(HHN,HHN2)
 
 #Height Means
 HMN2 <-ggplot(Dat) +aes(x = Tree.ID, y = NBI5, colour = Height, fill = Height) + geom_point() +geom_hline(yintercept = mean(Dat$NBI5), colour = "dodgerblue1")+ ylab("Nitrogen") + xlab("Tree ID") + ggtitle("Nitrogen Height Measures After Correction")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
@@ -1490,6 +1586,50 @@ summary(NF)
 ```{r Heights from 2018}
 EH = read.xlsx("HeightL.xlsx", sheetName = "Sheet1")
 heatmaply(EH,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Tree Height Across Planting Block")
+
+DatTree = group_by(Dat, Tree.ID, Column, Row)
+DatTree = summarise(DatTree, Anth = mean(Anth4), Flav = mean(Flav5), Chl = mean(Chl3),NBI = mean(NBI4))
+DatTree$Tree.ID = as.factor(DatTree$Tree.ID)
+
+H089 = read.xlsx("H0892.xlsx", sheetName = "H089")
+H089 = merge(H089,DatTree, by.x = "Tree.ID", all = TRUE)
+write.xlsx(H089, "H0893.xlsx", sheetName = "089")
+H089$Height08 = as.character(H089$Height08)
+H089$Height08 = as.numeric(H089$Height08)
+H089$Height09 = as.character(H089$Height09)
+H089$Height09  = as.numeric(H089$Height09)
+H089$Diff = H089$Height09 - H089$Height08
+
+H0A = lm(H089$Anth ~ H089$Diff)
+anova(H0A)
+H08A = lm(H089$Anth ~ H089$Height08)
+anova(H08A)
+H09A = lm(H089$Anth ~ H089$Height09)
+anova(H09A)
+
+H0C = lm(H089$Chl ~ H089$Diff)
+anova(H0C)
+H08C = lm(H089$Chl ~ H089$Height08)
+anova(H08C)
+H09C = lm(H089$Chl ~ H089$Height09)
+anova(H09C)
+
+H0F = lm(H089$Flav ~ H089$Diff)
+anova(H0F)
+H08F = lm(H089$Flav ~ H089$Height08)
+anova(H08F)
+H09F = lm(H089$Flav ~ H089$Height09)
+anova(H09F)
+
+H0N = lm(H089$NBI ~ H089$Diff)
+anova(H0N)
+H08N = lm(H089$NBI ~ H089$Height08)
+anova(H08N)
+H09N = lm(H089$NBI ~ H089$Height09)
+anova(H09N)
+
+Diff = read.xlsx("H08932.xlsx", sheetName = "Diff")
+heatmaply(Diff,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Height difference 2018/19")
 ```
 
 
