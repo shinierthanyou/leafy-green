@@ -1113,3 +1113,37 @@ View(H089)
 
 ```
 
+```{r}
+
+H089[complete.cases(H089[ , 2:4]),]
+H0892 = read.xlsx("H08932.xlsx", sheetName = "Sheet1")
+
+H0892$Height09 = as.character(H0892$Height09)
+H0892$Height09 = as.numeric(H0892$Height09)
+
+ggplot(H0892) + aes(x = Row, y = Height08) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Height Measures by Row 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Height08), colour = "red")
+
+ggplot(H0892) + aes(x = Row, y = Height09) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Height Measures by Row 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Height09), colour = "red")
+
+ggplot(H0892) + aes(x = Row, y = Diff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Height Measures by Row 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Diff), colour = "red")
+
+H089R = group_by(H0892, Row)
+H089R = summarise(H089R, Height08 = mean(Height08, na.rm = T), Height09 = mean(Height09, na.rm = T), Diff = mean(Diff, na.rm = T))
+
+#Mean Distribution
+ggplot(H089R) +aes(x = Row, y = Height08) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$Height08), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Height Row Means 2018")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+ggplot(H089R) +aes(x = Row, y = Height09) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$Height09), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Height Row Means 2019")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+#Histogram
+ggplot(H0892) +aes(Height08) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2018") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+ggplot(H0892) +aes(Height09) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2019") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+ggplot(H0892) +aes(Diff) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2018/2019 Differences") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+```
+
+```{r}
+HData = merge(H0892 ,H089C, by.x = "Column", all = TRUE)
+HData = merge(HData ,H089R, by.x = "Row", all = TRUE)
+```

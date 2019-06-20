@@ -1629,9 +1629,178 @@ H09N = lm(H089$NBI ~ H089$Height09)
 anova(H09N)
 
 Diff = read.xlsx("H08932.xlsx", sheetName = "Diff")
-heatmaply(Diff,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Height difference 2018/19")
+heatmaply(Diff,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Height difference between 2018 and 2019")
+```
+
+```{r}
+H0892 = read.xlsx("H08932.xlsx", sheetName = "Sheet1")
+
+H0892$Height09 = as.character(H0892$Height09)
+H0892$Height09 = as.numeric(H0892$Height09)
+
+#Histogram
+H1 = ggplot(H0892) +aes(Height08) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2018") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));H1
+
+H2 = ggplot(H0892) +aes(Height09) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2019") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));H2
+
+H3 = ggplot(H0892) +aes(Diff) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2018/2019 Differences") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));H3
+```
+
+#### Row Height Analysis
+
+```{r}
+#Row Height Distributions
+R1 = ggplot(H0892) + aes(x = Row, y = Height08) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Height Measures by Row 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Height08), colour = "red");R1
+
+R2 = ggplot(H0892) + aes(x = Row, y = Height09) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Height Measures by Row 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Height09), colour = "red");R2
+
+R3 = ggplot(H0892) + aes(x = Row, y = Diff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Difference in Height Measures 2018/2019 by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Diff), colour = "red");R3
+
+H089R = group_by(H0892, Row)
+H089R = summarise(H089R, RowHM8 = mean(Height08, na.rm = T), RowHM9 = mean(Height09, na.rm = T), RDiff = mean(Diff, na.rm = T))
+
+#Mean Distribution
+R4 = ggplot(H089R) +aes(x = Row, y = RowHM8) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$RowHM8), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Height Row Means 2018")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));R4
+
+R5 = ggplot(H089R) +aes(x = Row, y = RowHM9) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$RowHM9), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Height Row Means 2019")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));R5
+
+R6 = ggplot(H089R) +aes(x = Row, y = RDiff) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$RDiff), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Difference in Row Height Means 2018, 2019")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));R6
+
+HRA8 = lm(H0892$Height08 ~ H0892$Row)
+anova(HRA8)
+
+HRA9 = lm(H0892$Height09 ~ H0892$Row)
+anova(HRA9)
+
+HRAD = lm(H0892$Diff ~ H0892$Row)
+anova(HRAD)
+```
+
+#### Column Height Analysis
+
+```{r}
+#Height Distributions
+C1 = ggplot(H0892) + aes(x = Column, y = Height08) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Height Measures by Column 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Height08), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3);C1
+
+C2 = ggplot(H0892) + aes(x = Column, y = Height09) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Height Measures by Column 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Height09), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3);C2
+
+C3 = ggplot(H0892) + aes(x = Column, y = Diff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Difference in Height Measures 2018/2019 by Column") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Diff), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3);C3
+
+HCA8 = lm(H0892$Height08 ~ H0892$Column)
+anova(HCA8)
+
+HCA9 = lm(H0892$Height09 ~ H0892$Column)
+anova(HCA9)
+
+HCAD = lm(H0892$Diff ~ H0892$Column)
+anova(HCAD)
+```
+
+```{r}
+H089C = group_by(H0892, Column)
+H089C = summarise(H089C, ColHM8 = mean(Height08, na.rm = T), ColHM9 = mean(Height09, na.rm = T), CDiff = mean(Diff, na.rm = T))
+
+HData = merge(H0892 ,H089C, by.x = "Column", all = TRUE)
+HData = merge(HData ,H089R, by.x = "Row", all = TRUE)
+
+HData$HM8 = mean(HData$Height08)
+HData$HM9 = mean(HData$Height09)
+
+HData$CD8 = HData$ColHM8 - HData$HM8
+HData$CD9 = HData$ColHM9 - HData$HM9
+
+HData$RD8 = HData$RowHM8 - HData$HM8
+HData$RD9 = HData$RowHM9 - HData$HM9
+
+HData$F8 = HData$Height08 - HData$HM8 - HData$CD8 - HData$RD8
+HData$F9 = HData$Height09 - HData$HM9 - HData$CD9 - HData$RD9
+
+HData$FDiff = HData$F9 - HData$F8
+```
+
+#### Adjusted Histograms
+
+
+```{r}
+#Histogram
+H12 = ggplot(HData) +aes(F8) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2018") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+grid.arrange(H1,H12)
+
+H22 = ggplot(HData) +aes(F9) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2019") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+grid.arrange(H2,H22)
+
+H32 = ggplot(HData) +aes(FDiff) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2018/2019 Differences") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+grid.arrange(H3,H32)
+```
+
+#### Adjusted Row
+
+```{r}
+#Row Height Distributions
+R12 = ggplot(HData) + aes(x = Row, y = F8) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Height Measures by Row 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$F8), colour = "red")
+
+grid.arrange(R1,R12)
+
+R22 = ggplot(HData) + aes(x = Row, y = F9) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Height Measures by Row 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$F9), colour = "red")
+
+grid.arrange(R2,R22)
+
+R32 = ggplot(HData) + aes(x = Row, y = FDiff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Difference in Height Measures 2018/2019 by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$FDiff), colour = "red")
+
+grid.arrange(R3, R32)
+
+HDataR = group_by(HData, Row)
+HDataR = summarise(HDataR, FRM8 = mean(F8, na.rm = T), FRM9 = mean(F9, na.rm = T), FRMDif = mean(FDiff, na.rm = T))
+
+#Mean Distribution
+R42 = ggplot(HDataR) +aes(x = Row, y = FRM8) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(HDataR$FRM8), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Height Row Means 2018")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+grid.arrange(R4,R42)
+
+R52 = ggplot(HDataR) +aes(x = Row, y = FRM9) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$RowHM9), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Height Row Means 2019")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+grid.arrange(R5, R52)
+
+R62 = ggplot(H089R) +aes(x = Row, y = RDiff) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$RDiff), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Difference in Row Height Means 2018, 2019")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+
+grid.arrange(R6,R62)
+
+HRA8 = lm(H0892$Height08 ~ H0892$Row)
+anova(HRA8)
+
+HRA9 = lm(H0892$Height09 ~ H0892$Row)
+anova(HRA9)
+
+HRAD = lm(H0892$Diff ~ H0892$Row)
+anova(HRAD)
 ```
 
 
+#### Column Height
 
+```{r}
+#Height Distributions
+C12 = ggplot(HData) + aes(x = Column, y = F8) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Adjusted Height Measures by Column 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$CD8), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
 
+grid.arrange(C1,C12,ncol = 2)
+
+C22 = ggplot(HData) + aes(x = Column, y = F9) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Adjusted Height Measures by Column 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$F9), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
+
+grid.arrange(C2,C22,ncol = 2)
+
+C32 = ggplot(H0892) + aes(x = Column, y = Diff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Adjusted") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Diff), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
+
+grid.arrange(C3,C32, ncol = 2)
+
+FHCA8 = lm(HData$F8 ~ HData$Column)
+anova(FHCA8)
+
+FHCA9 = lm(HData$F9 ~ HData$Column)
+anova(FHCA9)
+
+FHCAD = lm(HData$FDiff ~ HData$Column)
+anova(FHCAD)
+```
