@@ -76,7 +76,7 @@ F1 = Data[c(34:1825),]
 
 ## Replicate Analysis
 
-Replicates were taken by re-measuring a single leaf sample taken from each tree, this was to help establish the consistency of measurements given by the Dualex to help verify measurement accuracy.
+Replicates were taken by re-measuring a single leaf sample taken from each tree, this was to help establish the consistency of measurements given by the Dualex to help verify measurement accuracy. Replicates are split into two groups each containing one replicate measure from each leaf sample.
 
 
 ### Replicate Data Overview
@@ -757,104 +757,103 @@ MidLow = rbind(Mid,Low)
 #### Anthocyanin High vs Low
 
 ```{r}
+HvLA = ggplot(HighLow) +aes(Anth,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)); HvLA
+
 #Anth
 AHLA = lm(High$Anth ~ Low$Anth)
 anova(AHLA)
 summary(AHLA)
-
-ggplot(HighLow) +aes(Anth,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 #### Anthocyanin High vs Mid
 
 ```{r}
+HvMA = ggplot(HighMid) +aes(Anth,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));HvMA
+
 AHMA = lm(High$Anth ~ Mid$Anth)
 anova(AHMA)
 summary(AHMA)
-
-ggplot(HighMid) +aes(Anth,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 #### Anthocyanin Mid vs Low 
 
 ```{r}
+MvLA = ggplot(MidLow) +aes(Anth,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));MvLA
+
 AMLA = lm(Mid$Anth ~ Low$Anth)
 anova(AMLA)
 summary(AMLA)
-
-ggplot(MidLow) +aes(Anth,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 #### Chlorophyll High vs Low
 
 ```{r}
-#Chl
+HvLC = ggplot(HighLow) +aes(Chl,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)); HvLC
+
+
 AHLC = lm(High$Chl ~ Low$Chl)
 anova(AHLC)
 summary(AHLC)
-
-ggplot(HighLow) +aes(Chl,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 #### Chlorophyll High vs Mid
 
 ```{r}
+HvMC = ggplot(HighMid) +aes(Chl,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));HvMC
+
 AHMC = lm(High$Chl ~ Mid$Chl)
 anova(AHMC)
 summary(AHMC)
-
-ggplot(HighMid) +aes(Chl,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 #### Chlorophyll Mid vs Low
 
 ```{r}
+MvLC = ggplot(MidLow) +aes(Chl,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));MvLC
+
 AMLC = lm(Mid$Chl ~ Low$Chl)
 anova(AMLC)
 summary(AMLC)
-
-ggplot(MidLow) +aes(Chl,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 #### Flavonol High vs Low
 
 ```{r}
-#Flav
+HvLF= ggplot(HighLow) +aes(Flav,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)); HvLF
+
 AHLF = lm(High$Flav ~ Low$Flav)
 anova(AHLF)
 summary(AHLF)
-
-ggplot(HighLow) +aes(Flav,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 #### Flavonol High vs Mid
 
 ```{r}
+HvMF = ggplot(HighMid) +aes(Flav,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)); HvMF
+
 AHMF = lm(High$Flav ~ Mid$Flav)
 anova(AHMF)
 summary(AHMF)
-ggplot(HighMid) +aes(Flav,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 #### Flavonol Mid vs Low
 
 ```{r}
+MvLF = ggplot(MidLow) +aes(Flav,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)); MvLF
+
 AMLF = lm(Mid$Flav ~ Low$Flav)
 anova(AMLF)
 summary(AMLF)
-
-ggplot(MidLow) +aes(Flav,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 #### NBI High vs Low
 
 ```{r}
-#NBI
+HvLN = ggplot(HighLow) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("NBI") + ggtitle("Nitrogen by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)); HvLN
+
 AHLN = lm(High$NBI ~ Low$NBI)
 anova(AHLN)
 summary(AHLN)
-
-ggplot(HighLow) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("NBI") + ggtitle("Nitrogen by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
@@ -862,19 +861,21 @@ ggplot(HighLow) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..dens
 
 
 ```{r}
+HvMN = ggplot(HighMid) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("NBI") + ggtitle("Nitrogen by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)); HvMN
+
 AHMN = lm(High$NBI ~ Mid$NBI)
 anova(AHMN)
 summary(AHMN)
-ggplot(HighMid) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("NBI") + ggtitle("Nitrogen by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 #### NBI Mid vs Low
 
 ```{r}
+MvLN = ggplot(MidLow) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("NBI") + ggtitle("Nitrogen by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)); MvLN
+
 AMLN = lm(Mid$NBI ~ Low$NBI)
 anova(AMLN)
 summary(AMLN)
-ggplot(MidLow) +aes(NBI,color=Height, fill=Height) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity")+ geom_density(alpha=.2) + ylab("Frequency") + xlab("NBI") + ggtitle("Nitrogen by Height") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ### Row Analysis
@@ -1527,7 +1528,7 @@ grid.arrange(CBN,CBN2, ncol=2)
 ```
 
 
-#### Correlations Between Measures
+#### Correlation Plots Between Chemicals
 
 Comparing correlations between the 4 dualex measures
 
@@ -1540,7 +1541,11 @@ plot12<-ggplot(Dat) + aes(x = Chl5, y = Flav5) + geom_point(shape = 21) +theme_b
 plot13<-ggplot(Dat) + aes(x = Chl5, y = NBI5) + geom_point(shape = 21) +theme_bw()+geom_smooth()
 plot14<-ggplot(Dat) + aes(x = Flav5, y = NBI5) + geom_point(shape = 21) +theme_bw()+geom_smooth()
 grid.arrange(plot9,plot10,plot11,plot12,plot13,plot14)
+```
 
+#### Correlation ANOVAs
+
+```{r Chemical Comparison ANOVAs}
 AnthComp = lm(Anth5 ~ Chl5*Flav5*NBI5, data = Dat)
 anova(AnthComp)
 
@@ -1554,17 +1559,24 @@ NBIComp = lm(NBI5 ~ Anth5*Chl5*Flav5, data = Dat)
 anova(NBIComp)
 ```
 
-#### Flowering
+#### Flowering Status and Chemical Measures
 
 ```{r}
 #Plots Flowering vs Non-Flowering
-plot39<- ggplot(Dat) + aes(x = Flower, y = Anth5) + geom_boxplot()
-plot40<- ggplot(Dat) + aes(x = Flower, y = Chl5) + geom_boxplot()
-plot41<- ggplot(Dat) + aes(x = Flower, y = Flav5) + geom_boxplot()
-plot42<- ggplot(Dat) + aes(x = Flower, y = NBI5) + geom_boxplot()
+plot39 = ggplot(Dat) + aes(x = Flower, y = Anth5) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Anth") + xlab("Flower Status") + ggtitle("Anthocyanin") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Dat$Anth5), colour = "red") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=3)
 
-grid.arrange(plot39,plot40,plot41,plot42)
+plot40= ggplot(Dat) + aes(x = Flower, y = Chl5) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Chl") + xlab("Flower Status") + ggtitle("Chlorophyll") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Dat$Chl5), colour = "red") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=3)
 
+plot41= ggplot(Dat) + aes(x = Flower, y = Flav5) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Flav") + xlab("Flower Status") + ggtitle("Flavonol") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Dat$Flav5), colour = "red") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=3)
+
+plot42= ggplot(Dat) + aes(x = Flower, y = NBI5) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("NBI") + xlab("Flower Status") + ggtitle("NBI") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Dat$NBI5), colour = "red") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=3)
+
+grid.arrange(plot39,plot40,plot41,plot42, top = "Chemical Measures Related to Flowering")
+```
+
+#### Flowering ANOVAs
+
+```{r flower anova}
 AF<- lm(Dat$Anth5 ~ Dat$Flower)
 anova(AF)
 summary(AF)
@@ -1581,56 +1593,110 @@ NF<- lm(Dat$NBI5 ~ Dat$Flower)
 anova(NF)
 summary(NF)
 ```
-#### Environment and Height
 
-```{r Heights from 2018}
-EH = read.xlsx("HeightL.xlsx", sheetName = "Sheet1")
-heatmaply(EH,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Tree Height Across Planting Block")
+### Preparing Data for Environement and Height Analysis
 
+```{r}
 DatTree = group_by(Dat, Tree.ID, Column, Row)
 DatTree = summarise(DatTree, Anth = mean(Anth4), Flav = mean(Flav5), Chl = mean(Chl3),NBI = mean(NBI4))
 DatTree$Tree.ID = as.factor(DatTree$Tree.ID)
 
 H089 = read.xlsx("H0892.xlsx", sheetName = "H089")
 H089 = merge(H089,DatTree, by.x = "Tree.ID", all = TRUE)
-write.xlsx(H089, "H0893.xlsx", sheetName = "089")
+#write.xlsx(H089, "H0893.xlsx", sheetName = "089")
 H089$Height08 = as.character(H089$Height08)
 H089$Height08 = as.numeric(H089$Height08)
 H089$Height09 = as.character(H089$Height09)
 H089$Height09  = as.numeric(H089$Height09)
 H089$Diff = H089$Height09 - H089$Height08
+```
 
-H0A = lm(H089$Anth ~ H089$Diff)
-anova(H0A)
+#### Environment and Height 2018
+
+```{r Heights from 2018 and 2019}
+EH = read.xlsx("H08932.xlsx", sheetName = "Sheet3")
+EH$X1 = as.character(EH$X1)
+EH$X1 = as.numeric(EH$X1)
+EH$X2 = as.character(EH$X2)
+EH$X2 = as.numeric(EH$X2)
+EH$X3 = as.character(EH$X3)
+EH$X3 = as.numeric(EH$X3)
+EH$X4 = as.character(EH$X4)
+EH$X4 = as.numeric(EH$X4)
+heatmaply(EH,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Tree Height Across Planting Block 2018")
+```
+
+#### Environmental AVONA 2018
+
+```{r}
 H08A = lm(H089$Anth ~ H089$Height08)
 anova(H08A)
+
+H08C = lm(H089$Chl ~ H089$Height08)
+anova(H08C)
+
+H08F = lm(H089$Flav ~ H089$Height08)
+anova(H08F)
+
+H08N = lm(H089$NBI ~ H089$Height08)
+anova(H08N)
+```
+
+#### Environment and Height 2019
+
+```{r}
+EH9 = read.xlsx("H08932.xlsx", sheetName = "Sheet2")
+EH9$X1 = as.character(EH9$X1)
+EH9$X1 = as.numeric(EH9$X1)
+EH9$X2 = as.character(EH9$X2)
+EH9$X2 = as.numeric(EH9$X2)
+EH9$X3 = as.character(EH9$X3)
+EH9$X3 = as.numeric(EH9$X3)
+EH9$X4 = as.character(EH9$X4)
+EH9$X4 = as.numeric(EH9$X4)
+heatmaply(EH9,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Tree Height Across Planting Block 2019")
+```
+
+#### Environmental AVONA 2019
+
+```{r}
 H09A = lm(H089$Anth ~ H089$Height09)
 anova(H09A)
 
-H0C = lm(H089$Chl ~ H089$Diff)
-anova(H0C)
-H08C = lm(H089$Chl ~ H089$Height08)
-anova(H08C)
 H09C = lm(H089$Chl ~ H089$Height09)
 anova(H09C)
 
-H0F = lm(H089$Flav ~ H089$Diff)
-anova(H0F)
-H08F = lm(H089$Flav ~ H089$Height08)
-anova(H08F)
 H09F = lm(H089$Flav ~ H089$Height09)
 anova(H09F)
 
-H0N = lm(H089$NBI ~ H089$Diff)
-anova(H0N)
-H08N = lm(H089$NBI ~ H089$Height08)
-anova(H08N)
 H09N = lm(H089$NBI ~ H089$Height09)
 anova(H09N)
+```
 
+#### Environment and Height Differences 2018/2019
+
+```{r}
 Diff = read.xlsx("H08932.xlsx", sheetName = "Diff")
 heatmaply(Diff,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Height difference between 2018 and 2019")
 ```
+
+#### Height Differences 2018/2019 ANOVAs
+
+```{r}
+H0A = lm(H089$Anth ~ H089$Diff)
+anova(H0A)
+
+H0C = lm(H089$Chl ~ H089$Diff)
+anova(H0C)
+
+H0F = lm(H089$Flav ~ H089$Diff)
+anova(H0F)
+
+H0N = lm(H089$NBI ~ H089$Diff)
+anova(H0N)
+```
+
+#### Height Distribution Plots
 
 ```{r}
 H0892 = read.xlsx("H08932.xlsx", sheetName = "Sheet1")
@@ -1646,7 +1712,8 @@ H2 = ggplot(H0892) +aes(Height09) +geom_histogram(aes(y=..density..), alpha=0.5,
 H3 = ggplot(H0892) +aes(Diff) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2018/2019 Differences") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));H3
 ```
 
-#### Row Height Analysis
+#### Row Height Plots
+
 
 ```{r}
 #Row Height Distributions
@@ -1654,7 +1721,7 @@ R1 = ggplot(H0892) + aes(x = Row, y = Height08) + geom_boxplot(fill = "dodgerblu
 
 R2 = ggplot(H0892) + aes(x = Row, y = Height09) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Height Measures by Row 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Height09), colour = "red");R2
 
-R3 = ggplot(H0892) + aes(x = Row, y = Diff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Difference in Height Measures 2018/2019 by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Diff), colour = "red");R3
+R3 = ggplot(H0892) + aes(x = Row, y = Diff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Difference in Height Measures 2018-19 by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Diff), colour = "red");R3
 
 H089R = group_by(H0892, Row)
 H089R = summarise(H089R, RowHM8 = mean(Height08, na.rm = T), RowHM9 = mean(Height09, na.rm = T), RDiff = mean(Diff, na.rm = T))
@@ -1664,8 +1731,12 @@ R4 = ggplot(H089R) +aes(x = Row, y = RowHM8) + geom_point(colour = "turquoise3")
 
 R5 = ggplot(H089R) +aes(x = Row, y = RowHM9) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$RowHM9), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Height Row Means 2019")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));R5
 
-R6 = ggplot(H089R) +aes(x = Row, y = RDiff) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$RDiff), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Difference in Row Height Means 2018, 2019")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));R6
+R6 = ggplot(H089R) +aes(x = Row, y = RDiff) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$RDiff), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Difference in Row Height Means 2018-19")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));R6
+```
 
+#### Row Height ANOVAs
+
+```{r}
 HRA8 = lm(H0892$Height08 ~ H0892$Row)
 anova(HRA8)
 
@@ -1676,7 +1747,7 @@ HRAD = lm(H0892$Diff ~ H0892$Row)
 anova(HRAD)
 ```
 
-#### Column Height Analysis
+#### Column Height Plots
 
 ```{r}
 #Height Distributions
@@ -1684,8 +1755,12 @@ C1 = ggplot(H0892) + aes(x = Column, y = Height08) + geom_boxplot(fill = "dodger
 
 C2 = ggplot(H0892) + aes(x = Column, y = Height09) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Height Measures by Column 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Height09), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3);C2
 
-C3 = ggplot(H0892) + aes(x = Column, y = Diff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Difference in Height Measures 2018/2019 by Column") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Diff), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3);C3
+C3 = ggplot(H0892) + aes(x = Column, y = Diff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Height Difference 2018-19 by Column") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Diff), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3);C3
+```
 
+#### Column Height ANOVAs
+
+```{r}
 HCA8 = lm(H0892$Height08 ~ H0892$Column)
 anova(HCA8)
 
@@ -1696,7 +1771,9 @@ HCAD = lm(H0892$Diff ~ H0892$Column)
 anova(HCAD)
 ```
 
-```{r}
+#### Adjusting Height by Environment
+
+```{r Height Adjustment, echo=TRUE}
 H089C = group_by(H0892, Column)
 H089C = summarise(H089C, ColHM8 = mean(Height08, na.rm = T), ColHM9 = mean(Height09, na.rm = T), CDiff = mean(Diff, na.rm = T))
 
@@ -1716,58 +1793,84 @@ HData$F8 = HData$Height08 - HData$HM8 - HData$CD8 - HData$RD8
 HData$F9 = HData$Height09 - HData$HM9 - HData$CD9 - HData$RD9
 
 HData$FDiff = HData$F9 - HData$F8
+#write.xlsx(HData, "HData.xlsx")
 ```
 
-#### Adjusted Histograms
+##### Adjusted 2018 Height Map
+```{r}
+H82 = read.xlsx("HData2.xlsx", sheetName = "H8")
+heatmaply(H82,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Adjusted Height 2018")
+```
 
+##### Adjusted 2019 Height Map
 
 ```{r}
+H92 = read.xlsx("HData2.xlsx", sheetName = "H9")
+heatmaply(H92,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "Adjusted Height 2019")
+```
+
+##### Adjusted 2018-19 Height Difference Map
+
+```{r}
+HD2 = read.xlsx("HData2.xlsx", sheetName = "Diff")
+heatmaply(HD2,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = " Adjusted Height difference between 2018 and 2019")
+```
+
+
+#### Adjusted Height Distribution Histograms
+
+
+```{r Adjusted Height}
 #Histogram
-H12 = ggplot(HData) +aes(F8) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2018") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+H12 = ggplot(HData) +aes(F8) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Adjusted Tree Height 2018") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 
 grid.arrange(H1,H12)
 
-H22 = ggplot(HData) +aes(F9) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2019") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+H22 = ggplot(HData) +aes(F9) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Adjusted Tree Height 2019") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 
 grid.arrange(H2,H22)
 
-H32 = ggplot(HData) +aes(FDiff) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Height distribution of 2018/2019 Differences") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+H32 = ggplot(HData) +aes(FDiff) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height (cm)") + ggtitle("Adjusted Tree Height Differences 2018-2019") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
 
 grid.arrange(H3,H32)
 ```
 
-#### Adjusted Row
+#### Adjusted Row Height Plots
 
-```{r}
+```{r Adjusted Row Height}
 #Row Height Distributions
-R12 = ggplot(HData) + aes(x = Row, y = F8) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Height Measures by Row 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$F8), colour = "red")
+R12 = ggplot(HData) + aes(x = Row, y = F8) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Adjusted Row Heights 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$F8), colour = "red")
 
-grid.arrange(R1,R12)
+grid.arrange(R1,R12, top = "2018 Row Heights")
 
-R22 = ggplot(HData) + aes(x = Row, y = F9) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Height Measures by Row 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$F9), colour = "red")
+R22 = ggplot(HData) + aes(x = Row, y = F9) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Adjusted Row Heights 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$F9), colour = "red")
 
-grid.arrange(R2,R22)
+grid.arrange(R2,R22,  top = "2019 Row Heights")
 
-R32 = ggplot(HData) + aes(x = Row, y = FDiff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Difference in Height Measures 2018/2019 by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$FDiff), colour = "red")
+R32 = ggplot(HData) + aes(x = Row, y = FDiff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Row") + ggtitle("Adjusted Row Height Difference") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$FDiff), colour = "red")
 
-grid.arrange(R3, R32)
+grid.arrange(R3, R32,  top = "2018-19 Difference Row Heights")
 
 HDataR = group_by(HData, Row)
 HDataR = summarise(HDataR, FRM8 = mean(F8, na.rm = T), FRM9 = mean(F9, na.rm = T), FRMDif = mean(FDiff, na.rm = T))
 
 #Mean Distribution
-R42 = ggplot(HDataR) +aes(x = Row, y = FRM8) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(HDataR$FRM8), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Height Row Means 2018")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+R42 = ggplot(HDataR) +aes(x = Row, y = FRM8) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(HDataR$FRM8), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Adjusted Height Row Means 2018")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
 
-grid.arrange(R4,R42)
+grid.arrange(R4,R42,  top = "2018 Row Height Means")
 
-R52 = ggplot(HDataR) +aes(x = Row, y = FRM9) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$RowHM9), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Height Row Means 2019")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+R52 = ggplot(HDataR) +aes(x = Row, y = FRM9) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(HDataR$FRM9), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Adjusted Height Row Means 2019")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
 
-grid.arrange(R5, R52)
+grid.arrange(R5, R52,  top = "2019 Row Height Means")
 
-R62 = ggplot(H089R) +aes(x = Row, y = RDiff) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(H089R$RDiff), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Difference in Row Height Means 2018, 2019")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
+R62 = ggplot(HDataR) +aes(x = Row, y = FRMDif) + geom_point(colour = "turquoise3") +geom_hline(yintercept = mean(HDataR$FRMDif), colour = "orchid3")+ ylab("Height (cm)") + xlab("Row") + ggtitle("Adjusted Row Height Difference")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))
 
-grid.arrange(R6,R62)
+grid.arrange(R6,R62, top = "2018-19 Difference Row Height Means")
+```
 
+#### Adjusted Row ANOVAs
+
+```{r Adjusted Row Anova}
 HRA8 = lm(H0892$Height08 ~ H0892$Row)
 anova(HRA8)
 
@@ -1779,22 +1882,26 @@ anova(HRAD)
 ```
 
 
-#### Column Height
+#### Adjusted Column Height Plots
 
-```{r}
+```{r Adjusted Column Height}
 #Height Distributions
-C12 = ggplot(HData) + aes(x = Column, y = F8) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Adjusted Height Measures by Column 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$CD8), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
+C12 = ggplot(HData) + aes(x = Column, y = F8) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Adjusted Column Heights 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$CD8), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
 
 grid.arrange(C1,C12,ncol = 2)
 
-C22 = ggplot(HData) + aes(x = Column, y = F9) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Adjusted Height Measures by Column 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$F9), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
+C22 = ggplot(HData) + aes(x = Column, y = F9) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Adjusted Column Heights 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$F9), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
 
 grid.arrange(C2,C22,ncol = 2)
 
-C32 = ggplot(H0892) + aes(x = Column, y = Diff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Adjusted") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(H0892$Diff), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
+C32 = ggplot(HData) + aes(x = Column, y = FDiff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Column") + ggtitle("Adjusted Column Difference") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(HData$FDiff), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
 
 grid.arrange(C3,C32, ncol = 2)
+```
 
+#### Adjusted Column ANOVAs
+
+```{r Adjusted Column Height Anova}
 FHCA8 = lm(HData$F8 ~ HData$Column)
 anova(FHCA8)
 
@@ -1803,4 +1910,91 @@ anova(FHCA9)
 
 FHCAD = lm(HData$FDiff ~ HData$Column)
 anova(FHCAD)
+```
+
+
+#### Corrlelations Between 2018 Heights and Leaf Chemistry
+
+
+```{r chemical and height correlations}
+
+Corr1 = ggplot(HData) +aes(x = F8, y = Anth) + geom_point(colour = "turquoise3") + ylab("Anthocyanin") + xlab("Height") + ggtitle("Height 2018 and Anthocyanin")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+Corr2 = ggplot(HData) +aes(x = F8, y = Chl) + geom_point(colour = "turquoise3") + ylab("Chlorophyll") + xlab("Height") + ggtitle("Height 2018 and Chlorophyll")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+Corr3 = ggplot(HData) +aes(x = F8, y = Flav) + geom_point(colour = "turquoise3") + ylab("Flavonol") + xlab("Height") + ggtitle("Height 2018 and Flavonol")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+Corr4 = ggplot(HData) +aes(x = F8, y = NBI) + geom_point(colour = "turquoise3") + ylab("NBI") + xlab("Height") + ggtitle("Height 2018 and NBI")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+
+
+grid.arrange(Corr1, Corr2, Corr3, Corr4)
+```
+
+#### 2018 Heights and Leaf Chemistry ANOVAs
+
+```{r}
+An1 = lm(HData$F8 ~ HData$Anth)
+anova(An1)
+
+An2 = lm(HData$F8 ~ HData$Chl)
+anova(An2)
+
+An3 = lm(HData$F8 ~ HData$Flav)
+anova(An1)
+
+An4 = lm(HData$F8 ~ HData$NBI)
+anova(An4)
+```
+
+#### Corrlelations Between 2019 Heights and Leaf Chemistry
+
+```{r}
+Corr5 = ggplot(HData) +aes(x = F9, y = Anth) + geom_point(colour = "turquoise3") + ylab("Anthocyanin") + xlab("Height") + ggtitle("Height 2019 and Anthocyanin")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+Corr6 = ggplot(HData) +aes(x = F9, y = Chl) + geom_point(colour = "turquoise3") + ylab("Chlorophyll") + xlab("Height") + ggtitle("Height 2019 and Chlorophyll")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+Corr7 = ggplot(HData) +aes(x = F9, y = Flav) + geom_point(colour = "turquoise3") + ylab("Flavonol") + xlab("Height") + ggtitle("Height 2019 and Flavonol")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+Corr8 = ggplot(HData) +aes(x = F9, y = NBI) + geom_point(colour = "turquoise3") + ylab("NBI") + xlab("Height") + ggtitle("Height 2019 and NBI")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+
+
+grid.arrange(Corr5, Corr6, Corr7, Corr8)
+```
+
+#### 2019 Heights and Leaf Chemistry ANOVAs
+
+```{r}
+An5 = lm(HData$F9 ~ HData$Anth)
+anova(An5)
+
+An6 = lm(HData$F9 ~ HData$Chl)
+anova(An6)
+
+An7 = lm(HData$F9 ~ HData$Flav)
+anova(An7)
+
+An8 = lm(HData$F9 ~ HData$NBI)
+anova(An8)
+```
+
+#### Corrlelations Between Height Differences 2018-2019 and Leaf Chemistry
+
+```{r}
+Corr9 = ggplot(HData) +aes(x = FDiff, y = Anth) + geom_point(colour = "turquoise3") + ylab("Anthocyanin") + xlab("Height") + ggtitle("Height Difference and Anthocyanin")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+Corr10 = ggplot(HData) +aes(x = FDiff, y = Chl) + geom_point(colour = "turquoise3") + ylab("Chlorophyll") + xlab("Height") + ggtitle("Height Difference and Chlorophyll")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+Corr11 = ggplot(HData) +aes(x = FDiff, y = Flav) + geom_point(colour = "turquoise3") + ylab("Flavonol") + xlab("Height") + ggtitle("Height Difference and Flavonol")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+Corr12 = ggplot(HData) +aes(x = FDiff, y = NBI) + geom_point(colour = "turquoise3") + ylab("NBI") + xlab("Height") + ggtitle("Height Difference and NBI")+theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_smooth()
+
+
+grid.arrange(Corr9, Corr10, Corr11, Corr12)
+```
+
+#### Height Differences 2018-2019 and Leaf Chemistry ANOVAs
+
+```{r}
+An9 = lm(HData$FDiff ~ HData$Anth)
+anova(An9)
+
+An10 = lm(HData$FDiff ~ HData$Chl)
+anova(An10)
+
+An11 = lm(HData$FDiff ~ HData$Flav)
+anova(An11)
+
+An12 = lm(HData$FDiff ~ HData$NBI)
+anova(An12)
 ```
