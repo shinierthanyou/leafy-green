@@ -1998,3 +1998,35 @@ anova(An11)
 An12 = lm(HData$FDiff ~ HData$NBI)
 anova(An12)
 ```
+
+#### Height and Flowering
+
+```{r}
+Flower = group_by(Dat, Tree.ID, Flower)
+Flower = summarise(Flower, Chl = mean(Chl))
+Flower = Flower[c(1,2)]
+HData = merge(HData, Flower, by.x = "Tree.ID", all = TRUE)
+Flower = HData
+Flower = Flower[c(1:3,7:10,23:26)]
+Flower = Flower[-c(144,148:150,152:156,159,161:168,170:179),]
+
+ggplot(Flower) + aes(x = Flower, y = F8) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height") + xlab("Flower Status") + ggtitle("Adjusted Column Heights 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Flower$F8), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
+
+
+ggplot(Flower) + aes(x = Flower, y = F9) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Flower Status") + ggtitle("Adjusted Column Heights 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Flower$F9), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
+
+
+ggplot(Flower) + aes(x = Flower, y = FDiff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height (cm)") + xlab("Flower Status") + ggtitle("Adjusted Column Difference") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = mean(Flower$FDiff), colour = "red") +stat_summary(fun.y=mean, colour="green", geom="point", shape=18, size=3) 
+
+FH8 = lm(Flower$F8 ~ Flower$Flower)
+anova(FH8)
+summary(FH8)
+
+FH9 = lm(Flower$F9 ~ Flower$Flower)
+anova(FH9)
+summary(FH9)
+
+FD = lm(Flower$FDiff ~ Flower$Flower)
+anova(FD)
+summary(FD)
+```
