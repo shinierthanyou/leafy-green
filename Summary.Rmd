@@ -1,0 +1,30 @@
+---
+title: "Summary"
+author: "Melissa Taane"
+date: "6/28/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,cache = F)
+library(xlsx)
+library(ggplot2)
+library(gplots)
+library(gridExtra)
+library(corrplot)
+library(dplyr)
+library(png)
+library(grid)
+library(heatmaply)
+```
+
+# Summary of EC201 x EC103 F1 Cross
+
+### Distritubtions
+
+```{r}
+grid.arrange(FHA2,FBA2,FMA2, ncol=2)
+grid.arrange(FHC2,FBC2,FMC2, ncol=2)
+grid.arrange(FHF2,FBF2,FMF2, ncol=2)
+grid.arrange(FHN2,FBN2,FMN2, ncol=2)
+```

@@ -180,7 +180,7 @@ There is no statistically significant differences between the two groups of meas
 #Anthocyanin Anova
 mod3 <-lm(Dup$Anth ~ Dup$Rep.)
 anova(mod3)
-summary(mod3)
+summary(mod3)$r.squared
 ```
 
 + Chlorophyll
@@ -189,7 +189,7 @@ summary(mod3)
 #Chlorophyll Anova
 mod <-lm(Dup$Chl ~ Dup$Rep.)
 anova(mod)
-summary(mod)
+summary(mod)$r.squared
 ```
 
 + Flavonol
@@ -198,7 +198,7 @@ summary(mod)
 #Flavanol Anova
 mod2 <-lm(Dup$Flav ~ Dup$Rep.)
 anova(mod2)
-summary(mod2)
+summary(mod2)$r.squared
 ```
 
 + Nitrogen
@@ -207,7 +207,7 @@ summary(mod2)
 #NBI Anova
 mod4 <-lm(Dup$NBI ~ Dup$Rep.)
 anova(mod4)
-summary(mod4)
+summary(mod4)$r.squared
 ```
 
 The absence of statistically significant results indicates that our replicates are likely to be consistent.
@@ -267,7 +267,7 @@ grid.arrange(ABA,ABC,ABF,ABN,ncol=2)
 #Anthocyanin
 mod8 <-lm(Data$Anth ~ Data$Allocation)
 anova(mod8)
-summary(mod8)
+summary(mod8)$r.squared
 ```
 
 + Chlorophyll
@@ -276,7 +276,7 @@ summary(mod8)
 #Chlorophyll
 mod5 <-lm(Data$Chl ~ Data$Allocation)
 anova(mod5)
-summary(mod5)
+summary(mod5)$r.squared
 ```
 
 + Flavonol
@@ -285,7 +285,7 @@ summary(mod5)
 #Flavanol
 mod7 <-lm(Data$Flav ~ Data$Allocation)
 anova(mod7)
-summary(mod7)
+summary(mod7)$r.squared
 ```
 
 + Nitrogen
@@ -294,7 +294,7 @@ summary(mod7)
 #Nitrogen
 mod6 <-lm(Data$NBI ~ Data$Allocation)
 anova(mod5)
-summary(mod6)
+summary(mod6)$r.squared
 ```
 
 F1 Samples (Approx 3 years) appear more similar to that of the Crimson Glory plant than either/both parents - this is possibly due to age effects as CG is likely more similar in this regard being shorter (No age confirmed).
@@ -400,24 +400,28 @@ grid.arrange(PMN,PHN)
 
 ```{r Parent t.test}
 t.test(Parent$Anth ~ Parent$Tree.ID)
+summary(lm(Parent$Anth ~ Parent$Tree.ID))$r.squared
 ```
 
 + Chlorophyll
 
 ```{r}
 t.test(Parent$Chl ~ Parent$Tree.ID)
+summary(lm(Parent$Chl ~ Parent$Tree.ID))$r.squared
 ```
 
 + Flavonol
 
 ```{r}
 t.test(Parent$Flav ~ Parent$Tree.ID)
+summary(lm(Parent$Flav ~ Parent$Tree.ID))$r.squared
 ```
 
 + NBI
 
 ```{r}
 t.test(Parent$NBI ~ Parent$Tree.ID)
+summary(lm(Parent$NBI ~ Parent$Tree.ID))$r.squared
 ```
 
 Interesting sample pattern here, Chl and NBI start low and work high, Flav does the opposite. Maybe accuracy of measurements? 
@@ -451,6 +455,7 @@ grid.arrange(FMA,FHA)
 #Anthocyanin ANOVA
 FAA = lm(F1$Anth ~ F1$Tree.ID)
 anova(FAA)
+summary(FAA)$r.squared
 ```
 
 ### Chlorophyll Overview
@@ -469,8 +474,9 @@ FHC <-ggplot(F12) +aes(Chl) +geom_histogram(aes(y=..density..), alpha=0.5, posit
 grid.arrange(FMC,FHC)
 
 #Chlorophyll ANOVA
-FAA = lm(F1$Chl ~ F1$Tree.ID)
-anova(FAA)
+FAC = lm(F1$Chl ~ F1$Tree.ID)
+anova(FAC)
+summary(FAC)$r.squared
 ```
 
 ### Flavonol Overview
@@ -489,8 +495,9 @@ FHF <-ggplot(F12) +aes(Flav) +geom_histogram(aes(y=..density..), alpha=0.5, posi
 grid.arrange(FMF,FHF)
 
 #Flavonol ANOVA
-FAA = lm(F1$Flav ~ F1$Tree.ID)
-anova(FAA)
+FAF = lm(F1$Flav ~ F1$Tree.ID)
+anova(FAF)
+summary(FAF)$r.squared
 ```
 
 ### Nitrogen Overview
@@ -509,8 +516,9 @@ FHN <-ggplot(F12) +aes(NBI) +geom_histogram(aes(y=..density..), alpha=0.5, posit
 grid.arrange(FMN,FHN)
 
 #Nitrogen ANOVA
-FAA = lm(F1$NBI ~ F1$Tree.ID)
-anova(FAA)
+FAN = lm(F1$NBI ~ F1$Tree.ID)
+anova(FAN)
+summary(FAN)$r.squared
 ```
 
 ### A Closer Look at Invidual F1 Trees and Their Measurements
@@ -707,7 +715,7 @@ HMN <-ggplot(F1) +aes(x = Tree.ID, y = NBI, colour = Height, fill = Height) + ge
 #Anthocyanin ANOVA
 HAA = lm(F1$Anth ~ F1$Height)
 anova(HAA)
-summary(HAA)
+summary(HAA)$r.squared
 ```
 
 + Chlorophyll
@@ -716,7 +724,7 @@ summary(HAA)
 #Chlorophyll ANOVA
 HCA = lm(F1$Chl ~ F1$Height)
 anova(HCA)
-summary(HCA)
+summary(HCA)$r.squared
 ```
 
 + Flavonol
@@ -725,7 +733,7 @@ summary(HCA)
 #Flavonol ANOVA
 HFA = lm(F1$Flav ~ F1$Height)
 anova(HFA)
-summary(HFA)
+summary(HFA)$r.squared
 ```
 
 + NBI
@@ -734,7 +742,7 @@ summary(HFA)
 #NBI ANOVA
 HNA = lm(F1$NBI ~ F1$Height)
 anova(HNA)
-summary(HNA)
+summary(HNA)$r.squared
 ```
 
 ### Height Analysis within Trees
@@ -751,7 +759,6 @@ Low = HWT[c(160:318),]
 HighMid = rbind(High,Mid)
 HighLow = rbind(High,Low)
 MidLow = rbind(Mid,Low)
-
 ```
 
 #### Anthocyanin High vs Low
@@ -1014,19 +1021,19 @@ grid.arrange(RoMN,RoHN)
 ```{r}
 AnRoA = lm(F1$Anth ~ F1$Row)
 anova(AnRoA)
-#summary(AnRoA)
+summary(AnRoA)$r.squared
 
 AnRoC = lm(F1$Chl ~ F1$Row)
 anova(AnRoC)
-#summary(AnRoC)
+summary(AnRoC)$r.squared
 
 AnRoF = lm(F1$Flav ~ F1$Row)
 anova(AnRoF)
-#summary(AnRoF)
+summary(AnRoF)$r.squared
 
 AnRoN = lm(F1$NBI ~ F1$Row)
 anova(AnRoN)
-#summary(AnRoN)
+summary(AnRoN)$r.squared
 ```
 #### Column Analysis
 
@@ -1072,22 +1079,22 @@ grid.arrange(CBA,CBC,CBF,CBN)
 #Anthocyanin ANOVA
 CAA = lm(F1$Anth ~ F1$Column)
 anova(CAA)
-summary(CAA)
+summary(CAA)$r.squared
 
 #Chlorophyll ANOVA
 CCA = lm(F1$Chl ~ F1$Column)
 anova(CCA)
-summary(CCA)
+summary(CCA)$r.squared
 
 #Flavonol ANOVA
 CFA = lm(F1$Flav ~ F1$Column)
 anova(CFA)
-summary(CFA)
+summary(CFA)$r.squared
 
 #NBI ANOVA
 CNA = lm(F1$NBI ~ F1$Column)
 anova(CNA)
-summary(CNA)
+summary(CNA)$r.squared
 ```
 
 
@@ -1095,37 +1102,37 @@ summary(CNA)
 #Anthocyanin
 CRHA = lm(F1$Anth ~ F1$Height*F1$Column*F1$Row)
 anova(CRHA)
-#summary(CRHA)
+summary(CRHA)$r.squared
 #Remove insignificant variables
 CRHA2 = lm(F1$Anth ~ F1$Height*F1$Row)
 anova(CRHA2)
-#summary(CRHA2)
+summary(CRHA2)$r.squared
 #Chlorophyll
 CRHC = lm(F1$Chl ~ F1$Height*F1$Column*F1$Row)
 anova(CRHC)
-#summary(CRHC)
+summary(CRHC)$r.squared
 #Remove insignificant variables
 CRHC2 = lm(F1$Chl ~ F1$Height*F1$Row)
 anova(CRHC2)
-#summary(CRHC2)
+summary(CRHC2)$r.squared
 #Further Remove insignificant variables
 CRHC3 = lm(F1$Chl ~ F1$Row)
 anova(CRHC3)
-#summary(CRHC3)
+summary(CRHC3)$r.squared
 
 #Flavonol
 CRHF = lm(F1$Flav ~ F1$Height*F1$Column*F1$Row)
 anova(CRHF)
-#summary(CRHF)
+summary(CRHF)$r.squared
 
 #NBI
 CRHN = lm(F1$NBI ~ F1$Height*F1$Column*F1$Row)
 anova(CRHN)
-#summary(CRHN)
+summary(CRHN)$r.squared
 #Remove insignificant variables
 CRHM2 = lm(F1$NBI ~ F1$Row*F1$Column)
 anova(CRHM2)
-#summary(CRHM2)
+summary(CRHM2)$r.squared
 ```
 
 ### Controlling for Height,Column,Row effects 
@@ -1229,16 +1236,20 @@ Dat$NBI5 = Dat$NBI4 + Dat$NTR
 #Anova Checks
 AnAnth = lm(Dat$Anth5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnAnth)
-#summary(AnAnth)
+summary(AnAnth)$r.squared
+
 AnChl = lm(Dat$Chl5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnChl)
-#summary(AnChl)
+summary(AnChl)$r.squared
+
 AnFlav = lm(Dat$Flav5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnFlav)
-#summary(AnFlav)
+summary(AnFlav)$r.squared
+
 AnNBI = lm(Dat$NBI5 ~ Dat$Height*Dat$Column*Dat$Row)
 anova(AnNBI)
-#summary(AnNBI)
+summary(AnNBI)$r.squared
+
 ```
 
 ### Comparison Heatmaps
@@ -1548,15 +1559,28 @@ grid.arrange(plot9,plot10,plot11,plot12,plot13,plot14)
 ```{r Chemical Comparison ANOVAs}
 AnthComp = lm(Anth5 ~ Chl5*Flav5*NBI5, data = Dat)
 anova(AnthComp)
+summary(AnthComp)$r.squared
 
 ChlComp = lm(Chl5 ~ Anth5*Flav5*NBI5, data = Dat)
 anova(ChlComp)
+summary(ChlComp)$r.squared
 
 FlavComp = lm(Flav5 ~ Anth5*Chl5*NBI5, data = Dat)
 anova(FlavComp)
+summary(FlavComp)$r.squared
 
+```
+
+##### Nitrogen Balance Index Anova
+
+```{r}
 NBIComp = lm(NBI5 ~ Anth5*Chl5*Flav5, data = Dat)
 anova(NBIComp)
+```
++ r squared
+
+```{r}
+summary(NBIComp)$r.squared
 ```
 
 #### Flowering Status and Chemical Measures
@@ -1579,19 +1603,19 @@ grid.arrange(plot39,plot40,plot41,plot42, top = "Chemical Measures Related to Fl
 ```{r flower anova}
 AF<- lm(Dat$Anth5 ~ Dat$Flower)
 anova(AF)
-summary(AF)
+summary(AF)$r.squared
 
 CF<- lm(Dat$Chl5 ~ Dat$Flower)
 anova(CF)
-summary(CF)
+summary(CF)$r.squared
 
 FF<- lm(Dat$Flav5 ~ Dat$Flower)
 anova(FF)
-summary(FF)
+summary(FF)$r.squared
 
 NF<- lm(Dat$NBI5 ~ Dat$Flower)
 anova(NF)
-summary(NF)
+summary(NF)$r.squared
 ```
 
 ### Preparing Data for Environement and Height Analysis
@@ -1631,15 +1655,19 @@ heatmaply(EH,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "T
 ```{r}
 H08A = lm(H089$Anth ~ H089$Height08)
 anova(H08A)
+summary(H08A)$r.squared
 
 H08C = lm(H089$Chl ~ H089$Height08)
 anova(H08C)
+summary(H08C)$r.squared
 
 H08F = lm(H089$Flav ~ H089$Height08)
 anova(H08F)
+summary(H08F)$r.squared
 
 H08N = lm(H089$NBI ~ H089$Height08)
 anova(H08N)
+summary(H08N)$r.squared
 ```
 
 #### Environment and Height 2019
@@ -1662,15 +1690,19 @@ heatmaply(EH9,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = "
 ```{r}
 H09A = lm(H089$Anth ~ H089$Height09)
 anova(H09A)
+summary(H09A)$r.squared
 
 H09C = lm(H089$Chl ~ H089$Height09)
 anova(H09C)
+summary(H09C)$r.squared
 
 H09F = lm(H089$Flav ~ H089$Height09)
 anova(H09F)
+summary(H09F)$r.squared
 
 H09N = lm(H089$NBI ~ H089$Height09)
 anova(H09N)
+summary(H09N)$r.squared
 ```
 
 #### Environment and Height Differences 2018/2019
@@ -1685,15 +1717,19 @@ heatmaply(Diff,Colv = FALSE, Rowv = FALSE, xlab = "Column",ylab = "Row", main = 
 ```{r}
 H0A = lm(H089$Anth ~ H089$Diff)
 anova(H0A)
+summary(H0A)$r.squared
 
 H0C = lm(H089$Chl ~ H089$Diff)
 anova(H0C)
+summary(H0C)$r.squared
 
 H0F = lm(H089$Flav ~ H089$Diff)
 anova(H0F)
+summary(H0F)$r.squared
 
 H0N = lm(H089$NBI ~ H089$Diff)
 anova(H0N)
+summary(H0N)$r.squared
 ```
 
 #### Height Distribution Plots
@@ -1739,12 +1775,15 @@ R6 = ggplot(H089R) +aes(x = Row, y = RDiff) + geom_point(colour = "turquoise3") 
 ```{r}
 HRA8 = lm(H0892$Height08 ~ H0892$Row)
 anova(HRA8)
+summary(HRA8)$r.squared
 
 HRA9 = lm(H0892$Height09 ~ H0892$Row)
 anova(HRA9)
+summary(HRA9)$r.squared
 
 HRAD = lm(H0892$Diff ~ H0892$Row)
 anova(HRAD)
+summary(HRAD)$r.squared
 ```
 
 #### Column Height Plots
@@ -1763,12 +1802,15 @@ C3 = ggplot(H0892) + aes(x = Column, y = Diff) + geom_boxplot(fill = "dodgerblue
 ```{r}
 HCA8 = lm(H0892$Height08 ~ H0892$Column)
 anova(HCA8)
+summary(HCA8)$r.squared
 
 HCA9 = lm(H0892$Height09 ~ H0892$Column)
 anova(HCA9)
+summary(HCA9)$r.squared
 
 HCAD = lm(H0892$Diff ~ H0892$Column)
 anova(HCAD)
+summary(HCAD)$r.squared
 ```
 
 #### Adjusting Height by Environment
@@ -1873,12 +1915,15 @@ grid.arrange(R6,R62, top = "2018-19 Difference Row Height Means")
 ```{r Adjusted Row Anova}
 HRA8 = lm(H0892$Height08 ~ H0892$Row)
 anova(HRA8)
+summary(HRA8)$r.squared
 
 HRA9 = lm(H0892$Height09 ~ H0892$Row)
 anova(HRA9)
+summary(HRA9)$r.squared
 
 HRAD = lm(H0892$Diff ~ H0892$Row)
 anova(HRAD)
+summary(HRAD)$r.squared
 ```
 
 
@@ -1904,14 +1949,16 @@ grid.arrange(C3,C32, ncol = 2)
 ```{r Adjusted Column Height Anova}
 FHCA8 = lm(HData$F8 ~ HData$Column)
 anova(FHCA8)
+summary(FHCA8)$r.squared
 
 FHCA9 = lm(HData$F9 ~ HData$Column)
 anova(FHCA9)
+summary(FHCA9)$r.squared
 
 FHCAD = lm(HData$FDiff ~ HData$Column)
 anova(FHCAD)
+summary(FHCAD)$r.squared
 ```
-
 
 #### Corrlelations Between 2018 Heights and Leaf Chemistry
 
@@ -1932,15 +1979,19 @@ grid.arrange(Corr1, Corr2, Corr3, Corr4)
 ```{r}
 An1 = lm(HData$F8 ~ HData$Anth)
 anova(An1)
+summary(An1)$r.squared
 
 An2 = lm(HData$F8 ~ HData$Chl)
 anova(An2)
+summary(An2)$r.squared
 
 An3 = lm(HData$F8 ~ HData$Flav)
-anova(An1)
+anova(An3)
+summary(An3)$r.squared
 
 An4 = lm(HData$F8 ~ HData$NBI)
 anova(An4)
+summary(An4)$r.squared
 ```
 
 #### Corrlelations Between 2019 Heights and Leaf Chemistry
@@ -1960,15 +2011,19 @@ grid.arrange(Corr5, Corr6, Corr7, Corr8)
 ```{r}
 An5 = lm(HData$F9 ~ HData$Anth)
 anova(An5)
+summary(An5)$r.squared
 
 An6 = lm(HData$F9 ~ HData$Chl)
 anova(An6)
+summary(An6)$r.squared
 
 An7 = lm(HData$F9 ~ HData$Flav)
 anova(An7)
+summary(An7)$r.squared
 
 An8 = lm(HData$F9 ~ HData$NBI)
 anova(An8)
+summary(An8)$r.squared
 ```
 
 #### Corrlelations Between Height Differences 2018-2019 and Leaf Chemistry
@@ -1988,15 +2043,19 @@ grid.arrange(Corr9, Corr10, Corr11, Corr12)
 ```{r}
 An9 = lm(HData$FDiff ~ HData$Anth)
 anova(An9)
+summary(An9)$r.squared
 
 An10 = lm(HData$FDiff ~ HData$Chl)
 anova(An10)
+summary(An10)$r.squared
 
 An11 = lm(HData$FDiff ~ HData$Flav)
 anova(An11)
+summary(An11)$r.squared
 
 An12 = lm(HData$FDiff ~ HData$NBI)
 anova(An12)
+summary(An12)$r.squared
 ```
 
 #### Height and Flowering
@@ -2020,13 +2079,13 @@ ggplot(Flower) + aes(x = Flower, y = FDiff) + geom_boxplot(fill = "dodgerblue1",
 
 FH8 = lm(Flower$F8 ~ Flower$Flower)
 anova(FH8)
-summary(FH8)
+summary(FH8)$r.squared
 
 FH9 = lm(Flower$F9 ~ Flower$Flower)
 anova(FH9)
-summary(FH9)
+summary(FH9)$r.squared
 
 FD = lm(Flower$FDiff ~ Flower$Flower)
 anova(FD)
-summary(FD)
+summary(FD)$r.squared
 ```
