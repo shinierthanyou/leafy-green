@@ -1,0 +1,119 @@
+---
+title: "Summary"
+author: "Melissa Taane"
+date: "7/12/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(xlsx)
+library(ggplot2)
+library(gplots)
+library(gridExtra)
+library(corrplot)
+library(dplyr)
+library(png)
+library(grid)
+library(heatmaply)
+```
+
+
+```{r data read and controlled}
+#Import and Arrange Data
+
+Data <- read.xlsx(file = "Entire.xlsx", sheetName = "Sheet1")
+F1 = Data[c(34:1846),]
+F1 = F1[-c(13)]
+
+#Assign Description
+
+F1$Height08 = as.character(F1$Height08)
+F1$Height08 = as.numeric(F1$Height08)
+F1$Height09 = as.character(F1$Height09)
+F1$Height09 = as.numeric(F1$Height09)
+F1$Row = as.factor(F1$Row)
+F1$Column = as.factor(F1$Column)
+F1$Tree.ID = as.factor(F1$Tree.ID)
+F1$Height = as.factor(F1$Height)
+
+#Overall Means
+
+F1$MAnth = mean(F1$Anth, na.rm = T)
+F1$MChl = mean(F1$Chl, na.rm = T)
+F1$MFlav = mean(F1$Flav, na.rm = T)
+F1$M18 = mean(F1$Height08, na.rm = T)
+F1$M19 = mean(F1$Height09, na.rm = T)
+
+#Leaf Height Chemical Mean 
+
+LM = group_by(F1, Height)
+LM = summarise(LM, LMAnth = mean(Anth, na.rm = T), LMChl = mean(Chl, na.rm =T), LMFlav = mean(Flav,na.rm = T))
+
+#Row Mean
+
+RM = group_by(F1, Row)
+RM = summarise(RM, RAnth = mean(Anth, na.rm = T), RChl = mean(Chl, na.rm =T), RFlav = mean(Flav,na.rm = T), R18 = mean(Height08, na.rm = T), R19 = mean(Height09, na.rm =T ))
+
+#Column Mean
+
+CM = group_by(F1, Column)
+CM = summarise(CM, CAnth = mean(Anth, na.rm = T), CChl = mean(Chl, na.rm =T), CFlav = mean(Flav,na.rm = T), C18 = mean(Height08, na.rm = T), C19 = mean(Height09, na.rm =T))
+
+#Merge Means Data
+
+F1 = merge(F1, LM, by.x = "Height", all = TRUE)
+F1 = merge(F1, RM, by.x = "Row", all = TRUE)
+F1 = merge(F1, CM, by.x = "Column", all = TRUE)
+
+#Leaf Height Chemical Mean Control
+
+F1$LAnth= F1$LMAnth - F1$MAnth
+F1$LChl = F1$LMChl - F1$MChl
+F1$LFlav = F1$LMFlav - F1$MFlav
+
+#Row Means Control
+
+F1$RMAnth = F1$RAnth - F1$MAnth
+F1$RMChl = F1$RChl - F1$MChl
+F1$RMFlav = F1$RFlav - F1$MFlav
+F1$RM18 = F1$R18 - F1$M18
+F1$RM19 = F1$R19 - F1$M19
+
+#Column Means Control
+
+F1$CMAnth = F1$CAnth - F1$MAnth
+F1$CMChl = F1$CChl - F1$MChl
+F1$CMFlav = F1$CFlav - F1$MFlav
+F1$CM18 = F1$C18 - F1$M18
+F1$CM19 = F1$C19 - F1$M19
+
+#Adding Control Values
+F1$FAnth = F1$Anth - F1$MAnth + F1$LAnth + F1$RMAnth + F1$CMAnth
+F1$FChl = F1$Chl - F1$MChl + F1$LChl + F1$RMChl + F1$CMChl
+F1$FFlav = F1$Flav - F1$MFlav + F1$LFlav + F1$RMFlav + F1$CMFlav
+F1$F18 = F1$Height08 - F1$M18 + F1$RM18 + F1$CM18
+F1$F19 = F1$Height09 - F1$M19  + F1$RM19 + F1$CM19
+
+#Height Differences Between 2018 and 2019
+
+F1$HDiff = F1$F19 - F1$F18
+
+```
+
+```{r Row plots}
+ggplot(F1) + aes(x = Row, y = FAnth) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Anth") + xlab("Row") + ggtitle("Anthocyanin by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")
+
+ggplot(F1) + aes(x = Row, y = FChl) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Chl") + xlab("Row") + ggtitle("Chlorophyll by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")
+
+ggplot(F1) + aes(x = Row, y = FFlav) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Flav") + xlab("Row") + ggtitle("Flavonol by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")
+
+ggplot(F1) + aes(x = Row, y = F18) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height") + xlab("Row") + ggtitle("Height Measures by Row 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")
+
+ggplot(F1) + aes(x = Row, y = F19) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height)") + xlab("Row") + ggtitle("Height Measures by Row 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")
+
+ggplot(F1) + aes(x = Row, y = HDiff) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Height)") + xlab("Row") + ggtitle("Height Difference Between Years by Row 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")
+
+```
+
+

@@ -2061,9 +2061,9 @@ An12 = lm(HData$FDiff ~ HData$NBI)
 anova(An12)
 An12R = summary(An12)$r.squared
 
-RSquared = c(An10R,An11R,An12R)
-Year = c("2018","2019","Difference")
-cbind(Year,RSquared14)
+#RSquared = c(An10R,An11R,An12R)
+#Year = c("2018","2019","Difference")
+#cbind(Year,RSquared14)
 ```
 
 #### Height and Flowering
