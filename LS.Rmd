@@ -1203,3 +1203,18 @@ p.value = c(0.1567851 ,0.9173242,0.1170596)
 str(summary(FD))
 summary(FD)$sigma
 ```
+
+
+```{r}
+
+F1$Height08 = as.character(F1$Height08)
+F1$Height08 = as.numeric(F1$Height08)
+F1$Height09 = as.character(F1$Height09)
+F1$Height09 = as.numeric(F1$Height09)
+F1$Row = as.factor(F1$Row)
+F1$Column = as.factor(F1$Column)
+F1$Tree.ID = as.factor(F1$Tree.ID)
+F1$Height = as.factor(F1$Height)
+
+
+```
