@@ -153,6 +153,7 @@ AP33 <-ggplot(Tree) +aes(AnthT) +geom_histogram(aes(y=..density..), alpha=0.5, p
 modA1 = lm(F1$Anth5 ~ F1$Tree.ID)
 anova(modA1)
 plot(modA1)
+summary(modA1)
 ```
 
 + R.squared
@@ -181,6 +182,7 @@ CP33 <-ggplot(Tree) +aes(ChlT) +geom_histogram(aes(y=..density..), alpha=0.5, po
 modC1 = lm(F1$Chl5 ~ F1$Tree.ID)
 anova(modC1)
 plot(modC1)
+summary(modC1)
 ```
 
 + R.squared
@@ -209,6 +211,7 @@ FP33 <-ggplot(Tree) +aes(FlavT) +geom_histogram(aes(y=..density..), alpha=0.5, p
 modF1 = lm(F1$Flav5 ~ F1$Tree.ID)
 anova(modF1)
 plot(modF1)
+summary(modF1)
 ```
 
 + R.squared
@@ -236,6 +239,7 @@ H18P33 <-ggplot(Tree) +aes(H18T) +geom_histogram(aes(y=..density..), alpha=0.5, 
 mod181 = lm(F1$H185 ~ F1$Tree.ID)
 anova(mod181)
 plot(mod181)
+summary(mod181)
 ```
 
 + R.squared
@@ -264,6 +268,7 @@ H19P33 <-ggplot(Tree) +aes(H19T) +geom_histogram(aes(y=..density..), alpha=0.5, 
 mod191 = lm(F1$H195 ~ F1$Tree.ID)
 anova(mod191)
 plot(mod191)
+summary(mod191)
 ```
 
 + R.squared
@@ -292,6 +297,7 @@ HDP33 <-ggplot(Tree) +aes(HDT) +geom_histogram(aes(y=..density..), alpha=0.5, po
 modHD1 = lm(F1$HD5 ~ F1$Tree.ID)
 anova(modHD1)
 plot(modHD1)
+summary(modHD1)
 ```
 
 + R.squared
@@ -333,6 +339,9 @@ modA2 = lm(F1$Anth5 ~ F1$Height)
 anova(modA2)
 plot(modA2)
 summary(modA2)
+cor.test(F1$Height, F1$Anth5, method= "spearman")
+
+confint(modA2)
 ```
 
 + R.squared Collection Height
@@ -348,6 +357,8 @@ modA22 = lm(HH$Anth ~ HM$Anth)
 anova(modA22)
 plot(modA22)
 summary(modA22)
+
+confint(modA22)
 ```
 
 + R.squared Anthocyanin High vs Mid Heights
@@ -362,6 +373,8 @@ summary(modA22)$r.squared
 modA23 = lm(HL$Anth ~ HM$Anth)
 anova(modA23)
 plot(modA23)
+
+confint(modA23)
 ```
 
 + R.squared Anthocyanin Low vs Mid Heights
@@ -376,6 +389,8 @@ summary(modA23)$r.squared
 modA24 = lm(HH$Anth ~ HL$Anth)
 anova(modA24)
 plot(modA24)
+
+confint(modA24)
 ```
 
 + R.squared Anthocyanin High vs Low Heights
@@ -404,6 +419,8 @@ grid.arrange(CP42,CP43,CP44, ncol = 2)
 modC2 = lm(F1$Chl5 ~ F1$Height)
 anova(modC2)
 plot(modC2)
+
+confint(modC2)
 ```
 
 + R.squared Collection Height
@@ -418,6 +435,8 @@ summary(modC2)$r.squared
 modC22 = lm(HH$Chl ~ HM$Chl)
 anova(modC22)
 plot(modC22)
+
+confint(modC22)
 ```
 
 + R.squared Chlorophyll High vs Mid Heights
@@ -432,6 +451,8 @@ summary(modC22)$r.squared
 modC23 = lm(HL$Chl ~ HM$Chl)
 anova(modC23)
 plot(modC23)
+
+confint(modC23)
 ```
 
 + R.squared Chlorophyll Low vs Mid Heights
@@ -446,6 +467,8 @@ summary(modC23)$r.squared
 modC24 = lm(HH$Chl ~ HL$Chl)
 anova(modC24)
 plot(modC24)
+
+confint(modC24)
 ```
 
 + R.squared Chlorophyll High vs Low Heights
@@ -474,6 +497,8 @@ grid.arrange(FP42,FP43,FP44, ncol = 2)
 modF2 = lm(F1$Flav5 ~ F1$Height)
 anova(modF2)
 plot(modF2)
+
+confint(modF2)
 ```
 
 + R.squared Collection Height
@@ -488,6 +513,8 @@ summary(modF2)$r.squared
 modF22 = lm(HH$Flav ~ HM$Flav)
 anova(modF22)
 plot(modF22)
+
+confint(modF22)
 ```
 
 + R.squared Flavonol High vs Mid Heights
@@ -547,6 +574,10 @@ modA3 = lm(F1$Anth5 ~ F1$Row)
 anova(modA3)
 plot(modA3)
 summary(modA3)
+
+mean(F1$Anth5, na.rm = T)
+
+confint(modA3)
 ```
 
 + R.squared
@@ -619,6 +650,11 @@ mod183 = lm(F1$H185 ~ F1$Row)
 anova(mod183)
 plot(mod183)
 summary(mod183)
+plot(F1$H185, F1$Row)
+F1$Row2 = as.character(F1$Row)
+F1$Row2 = as.numeric(F1$Row2)
+class(F1$Row2)
+cor.test(F1$Anth5,F1$Row2, method= "spearman")
 ```
 
 + R.squared
@@ -631,9 +667,7 @@ summary(mod183)$r.squared
 
 ```{r}
 
-H9P1 = ggplot(F1) + aes(x = Row, y = H195) + geom_boxplot(fill = "dodgerblue1") + ylab("Height)") + xlab("Row") + ggtitle("Height Measures by Row 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red");H9P1
-
-H9P12 <-ggplot(R) +aes(x = Row, y = H19R) + geom_point() +geom_hline(yintercept = mean(F1$H195, na.rm = T), colour = "dodgerblue1")+ ylab("Height") + xlab("Row") + ggtitle("Height Row Means 2019")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));H9P12
+H9P1 = ggplot(F1) + aes(x = Row, y = H195) + geom_boxplot(fill = "dodgerblue1") + ylab("Height)") + xlab("Row") + ggtitle("Height Measures by Row 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")+stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=2);H9P1
 ```
 
 + ANOVA
@@ -643,6 +677,11 @@ mod193 = lm(F1$H195 ~ F1$Row)
 anova(mod193)
 plot(mod193)
 summary(mod193)
+
+confint(mod193)
+plot(confint(mod193))
+
+
 ```
 
 + R.squared
@@ -666,6 +705,8 @@ HDP12 <-ggplot(R) +aes(x = Row, y = HDR) + geom_point() +geom_hline(yintercept =
 modHD3 = lm(F1$HD5 ~ F1$Row)
 anova(modHD3)
 plot(modHD3)
+
+confint(modHD3)
 ```
 
 +R.squared
