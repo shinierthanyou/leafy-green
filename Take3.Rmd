@@ -147,21 +147,6 @@ AP32 <-ggplot(Tree) +aes(x = Tree.ID, y = AnthT) + geom_point() +geom_hline(yint
 AP33 <-ggplot(Tree) +aes(AnthT) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Anthocyanin") + ggtitle("Anthocyanin Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));AP33
 ```
 
-+ ANOVA
-
-```{r}
-modA1 = lm(F1$Anth5 ~ F1$Tree.ID)
-anova(modA1)
-plot(modA1)
-summary(modA1)
-```
-
-+ R.squared
-
-```{r}
-summary(modA1)$r.squared
-```
-
 ### Chlorophyll
 
 ```{r Tree Chl}
@@ -174,21 +159,6 @@ CP3 = ggplot(F1) + aes(x = Tree.ID, y = Chl5) + geom_boxplot(fill = "dodgerblue1
 CP32 <-ggplot(Tree) +aes(x = Tree.ID, y = ChlT) + geom_point() +geom_hline(yintercept = mean(F1$Chl5, na.rm = T), colour = "dodgerblue1")+ ylab("Chlorophyll") + xlab("Tree.ID") + ggtitle("Chlorophyll Tree Means")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));CP32
 
 CP33 <-ggplot(Tree) +aes(ChlT) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll Distribution of F1 Trees After Correction") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));CP33
-```
-
-+ ANOVA
-
-```{r}
-modC1 = lm(F1$Chl5 ~ F1$Tree.ID)
-anova(modC1)
-plot(modC1)
-summary(modC1)
-```
-
-+ R.squared
-
-```{r}
-summary(modC1)$r.squared
 ```
 
 ### Flavonol
@@ -205,21 +175,6 @@ FP32 <-ggplot(Tree) +aes(x = Tree.ID, y = FlavT) + geom_point() +geom_hline(yint
 FP33 <-ggplot(Tree) +aes(FlavT) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol Distribution of F1 Trees After Correction") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));FP33
 ```
 
-+ ANOVA
-
-```{r}
-modF1 = lm(F1$Flav5 ~ F1$Tree.ID)
-anova(modF1)
-plot(modF1)
-summary(modF1)
-```
-
-+ R.squared
-
-```{r}
-summary(modF1)$r.squared
-```
-
 ### Height 2018
 
 ```{r Tree Height 2018}
@@ -231,21 +186,6 @@ H18P3 = ggplot(F1) + aes(x = Tree.ID, y = H185) + geom_boxplot(fill = "dodgerblu
 H18P32 <-ggplot(Tree) +aes(x = Tree.ID, y = H18T) + geom_point() +geom_hline(yintercept = mean(F1$H185, na.rm = T), colour = "dodgerblue1")+ ylab("Height") + xlab("Tree.ID") + ggtitle("2018 Tree Height Means")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));H18P32
 
 H18P33 <-ggplot(Tree) +aes(H18T) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height") + ggtitle("2018 Height Distribution F1 Trees After Correction") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));H18P33
-```
-
-+ ANOVA
-
-```{r}
-mod181 = lm(F1$H185 ~ F1$Tree.ID)
-anova(mod181)
-plot(mod181)
-summary(mod181)
-```
-
-+ R.squared
-
-```{r}
-summary(mod181)$r.squared
 ```
 
 ### Height 2019
@@ -262,21 +202,6 @@ H19P32 <-ggplot(Tree) +aes(x = Tree.ID, y = H19T) + geom_point() +geom_hline(yin
 H19P33 <-ggplot(Tree) +aes(H19T) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Flavonol") + ggtitle("2019 Heights of F1 Trees After Correction") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));H19P33
 ```
 
-+ ANOVA
-
-```{r}
-mod191 = lm(F1$H195 ~ F1$Tree.ID)
-anova(mod191)
-plot(mod191)
-summary(mod191)
-```
-
-+ R.squared
-
-```{r}
-summary(mod191)$r.squared
-```
-
 ### Height Difference 2018-2019
 
 ```{r Tree Height Diff}
@@ -291,22 +216,8 @@ HDP32 <-ggplot(Tree) +aes(x = Tree.ID, y = HDT) + geom_point() +geom_hline(yinte
 HDP33 <-ggplot(Tree) +aes(HDT) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height") + ggtitle("Height Distribution of Tree Differences 2018-19 After Correction") +theme_bw() +theme(plot.title = element_text(hjust = 0.5));HDP33
 ```
 
-+ Anova
-
-```{r}
-modHD1 = lm(F1$HD5 ~ F1$Tree.ID)
-anova(modHD1)
-plot(modHD1)
-summary(modHD1)
-```
-
-+ R.squared
-
-```{r}
-summary(modHD1)$r.squared
-```
-
 ## Leaf Height Plots
+
 ```{r}
 #Subset Leaf Height
 HWT = group_by(F1, Height, Tree.ID)
@@ -319,7 +230,11 @@ HH = HWT[HH,]
 HL = HWT$Height == "L"
 HL = HWT[HL,]
 ```
+
+
 ### Anthocyanin
+
+
 ```{r Anth Leaf plots}
 AP4 = ggplot(data = subset(F1, !is.na(Height))) + aes(x =Height, y = Anth5) + geom_boxplot(fill = "dodgerblue1", size = 1) + ylab("Flav") + xlab("Height") + ggtitle("Anthocyanin by Collection Height") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")+stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=3);AP4
 
@@ -339,7 +254,6 @@ modA2 = lm(F1$Anth5 ~ F1$Height)
 anova(modA2)
 plot(modA2)
 summary(modA2)
-cor.test(F1$Height, F1$Anth5, method= "spearman")
 
 confint(modA2)
 ```
@@ -350,53 +264,12 @@ confint(modA2)
 summary(modA2)$r.squared
 ```
 
-+ ANOVA Anthocyanin High vs Mid Heights
++ Spearman Comparing Height Levels
 
 ```{r}
-modA22 = lm(HH$Anth ~ HM$Anth)
-anova(modA22)
-plot(modA22)
-summary(modA22)
-
-confint(modA22)
-```
-
-+ R.squared Anthocyanin High vs Mid Heights
-
-```{r}
-summary(modA22)$r.squared
-```
-
-+ ANOVA Anthocyanin Low vs Mid Heights
-
-```{r}
-modA23 = lm(HL$Anth ~ HM$Anth)
-anova(modA23)
-plot(modA23)
-
-confint(modA23)
-```
-
-+ R.squared Anthocyanin Low vs Mid Heights
-
-```{r}
-summary(modA23)$r.squared
-```
-
-+ ANOVA Anthocyanin High vs Low Heights
-
-```{r}
-modA24 = lm(HH$Anth ~ HL$Anth)
-anova(modA24)
-plot(modA24)
-
-confint(modA24)
-```
-
-+ R.squared Anthocyanin High vs Low Heights
-
-```{r}
-summary(modA24)$r.squared
+cor.test(HM$Anth, HH$Anth, method = "spearman")
+cor.test(HH$Anth, HL$Anth, method = "spearman")
+cor.test(HM$Anth, HL$Anth, method = "spearman")
 ```
 
 ### Chlorophyll
@@ -429,52 +302,12 @@ confint(modC2)
 summary(modC2)$r.squared
 ```
 
-+ ANOVA Chlorophyll High vs Mid Heights
++ Spearman Comparing Height Levels
 
 ```{r}
-modC22 = lm(HH$Chl ~ HM$Chl)
-anova(modC22)
-plot(modC22)
-
-confint(modC22)
-```
-
-+ R.squared Chlorophyll High vs Mid Heights
-
-```{r}
-summary(modC22)$r.squared
-```
-
-+ ANOVA Chlorophyll Low vs Mid Heights
-
-```{r}
-modC23 = lm(HL$Chl ~ HM$Chl)
-anova(modC23)
-plot(modC23)
-
-confint(modC23)
-```
-
-+ R.squared Chlorophyll Low vs Mid Heights
-
-```{r}
-summary(modC23)$r.squared
-```
-
-+ ANOVA Chlorophyll High vs Low Heights
-
-```{r}
-modC24 = lm(HH$Chl ~ HL$Chl)
-anova(modC24)
-plot(modC24)
-
-confint(modC24)
-```
-
-+ R.squared Chlorophyll High vs Low Heights
-
-```{r}
-summary(modC24)$r.squared
+cor.test(HM$Chl, HH$Chl, method = "spearman")
+cor.test(HH$Chl, HL$Chl, method = "spearman")
+cor.test(HM$Chl, HL$Chl, method = "spearman")
 ```
 
 ### Flavonol
@@ -507,48 +340,13 @@ confint(modF2)
 summary(modF2)$r.squared
 ```
 
-+ ANOVA Flavonol High vs Mid Heights
+
++ Spearman Comparing Height Levels
 
 ```{r}
-modF22 = lm(HH$Flav ~ HM$Flav)
-anova(modF22)
-plot(modF22)
-
-confint(modF22)
-```
-
-+ R.squared Flavonol High vs Mid Heights
-
-```{r}
-summary(modF22)$r.squared
-```
-
-+ ANOVA Flavonol Low vs Mid Heights
-
-```{r}
-modF23 = lm(HL$Flav ~ HM$Flav)
-anova(modF23)
-plot(modF23)
-```
-
-+ R.squared Flavonol Low vs Mid Heights
-
-```{r}
-summary(modF23)$r.squared
-```
-
-+ ANOVA Flavonol High vs Low Heights
-
-```{r}
-modF24 = lm(HH$Flav ~ HL$Flav)
-anova(modF24)
-plot(modF24)
-```
-
-+ R.squared Flavonol High vs Low Heights
-
-```{r}
-summary(modF24)$r.squared
+cor.test(HM$Flav, HH$Flav, method = "spearman")
+cor.test(HH$Flav, HL$Flav, method = "spearman")
+cor.test(HM$Flav, HL$Flav, method = "spearman")
 ```
 
 ## Row Plots
@@ -556,15 +354,17 @@ summary(modF24)$r.squared
 ```{r Row plots}
 R = group_by(F1, Row)
 R = summarise(R, AnthR = mean(Anth5, na.rm = T), ChlR = mean(Chl5, na.rm =T), FlavR = mean(Flav5,na.rm = T), H18R = mean(H185, na.rm = T), H19R = mean(H195, na.rm =T), HDR = mean(HD5, na.rm =T))
+
+lDf <- split(R, R$Row)
+View(lDf)
+lDf$
 ```
 
 ### Anthocyanin
 
 ```{r}
 #Anthocyanin
-AP1 = ggplot(F1) + aes(x = Row, y = Anth5) + geom_boxplot(fill = "dodgerblue1") + ylab("Anth") + xlab("Row") + ggtitle("Anthocyanin by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red");AP1
-
-AP12 <-ggplot(R) +aes(x = Row, y = AnthR) + geom_point() +geom_hline(yintercept = mean(F1$Anth5, na.rm = T), colour = "dodgerblue1")+ ylab("Anthocyanin") + xlab("Row") + ggtitle("Anthocyanin Row Means")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));AP12
+AP1 = ggplot(F1) + aes(x = Row, y = Anth5) + geom_boxplot(fill = "dodgerblue1") + ylab("Anth") + xlab("Row") + ggtitle("Anthocyanin by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")+stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=2);AP1
 ```
 
 + ANOVA
@@ -574,8 +374,6 @@ modA3 = lm(F1$Anth5 ~ F1$Row)
 anova(modA3)
 plot(modA3)
 summary(modA3)
-
-mean(F1$Anth5, na.rm = T)
 
 confint(modA3)
 ```
@@ -590,9 +388,7 @@ summary(modA3)$r.squared
 
 ```{r}
 #Chlorophyll
-CP1 = ggplot(F1) + aes(x = Row, y = Chl5) + geom_boxplot(fill = "dodgerblue1") + ylab("Chl") + xlab("Row") + ggtitle("Chlorophyll by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red");CP1
-
-CP12 <-ggplot(R) +aes(x = Row, y = ChlR) + geom_point() +geom_hline(yintercept = mean(F1$Chl5, na.rm = T), colour = "dodgerblue1")+ ylab("Chlorophyll") + xlab("Row") + ggtitle("Chlorophyll Row Means")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));CP12
+CP1 = ggplot(F1) + aes(x = Row, y = Chl5) + geom_boxplot(fill = "dodgerblue1") + ylab("Chl") + xlab("Row") + ggtitle("Chlorophyll by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")+stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=2);CP1
 ```
 
 + ANOVA
@@ -614,9 +410,8 @@ summary(modC3)$r.squared
 
 ```{r}
 #Flavonol
-FP1 = ggplot(F1) + aes(x = Row, y = Flav5) + geom_boxplot(fill = "dodgerblue1") + ylab("Flav") + xlab("Row") + ggtitle("Flavonol by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red");FP1
+FP1 = ggplot(F1) + aes(x = Row, y = Flav5) + geom_boxplot(fill = "dodgerblue1") + ylab("Flav") + xlab("Row") + ggtitle("Flavonol by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")+stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=2);FP1
 
-FP12 <-ggplot(R) +aes(x = Row, y = FlavR) + geom_point() +geom_hline(yintercept = mean(F1$Flav5, na.rm = T), colour = "dodgerblue1")+ ylab("Flavonol") + xlab("Row") + ggtitle("Flavonol Row Means")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));FP12
 ```
 
 + ANOVA
@@ -638,9 +433,7 @@ summary(modF3)$r.squared
 
 ```{r}
 #2018 Heights
-H8P1 = ggplot(F1) + aes(x = Row, y = H185) + geom_boxplot(fill = "dodgerblue1") + ylab("Height") + xlab("Row") + ggtitle("Height Measures by Row 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red");H8P1
-
-H8P12 <-ggplot(R) +aes(x = Row, y = H18R) + geom_point() +geom_hline(yintercept = mean(F1$H185, na.rm = T), colour = "dodgerblue1")+ ylab("Height") + xlab("Row") + ggtitle("Height Row Means 2018")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));H8P12
+H8P1 = ggplot(F1) + aes(x = Row, y = H185) + geom_boxplot(fill = "dodgerblue1") + ylab("Height") + xlab("Row") + ggtitle("Height Measures by Row 2018") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red") +stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=2);H8P1
 ```
 
 + ANOVA
@@ -650,11 +443,8 @@ mod183 = lm(F1$H185 ~ F1$Row)
 anova(mod183)
 plot(mod183)
 summary(mod183)
-plot(F1$H185, F1$Row)
-F1$Row2 = as.character(F1$Row)
-F1$Row2 = as.numeric(F1$Row2)
-class(F1$Row2)
-cor.test(F1$Anth5,F1$Row2, method= "spearman")
+
+confint(mod183)
 ```
 
 + R.squared
@@ -679,9 +469,6 @@ plot(mod193)
 summary(mod193)
 
 confint(mod193)
-plot(confint(mod193))
-
-
 ```
 
 + R.squared
@@ -694,9 +481,7 @@ summary(mod193)$r.squared
 
 ```{r}
 #2018-19 Height Difference
-HDP1 = ggplot(F1) + aes(x = Row, y = HD5) + geom_boxplot(fill = "dodgerblue1") + ylab("Height)") + xlab("Row") + ggtitle("Height Difference Between Years by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red");HDP1
-
-HDP12 <-ggplot(R) +aes(x = Row, y = HDR) + geom_point() +geom_hline(yintercept = mean(F1$HD5, na.rm = T), colour = "dodgerblue1")+ ylab("Height") + xlab("Row") + ggtitle("Height Difference 2018-19")+theme_bw()+theme(plot.title = element_text(hjust = 0.5));HDP12
+HDP1 = ggplot(F1) + aes(x = Row, y = HD5) + geom_boxplot(fill = "dodgerblue1") + ylab("Height)") + xlab("Row") + ggtitle("Height Difference Between Years by Row") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+geom_hline(yintercept = 0, colour = "red")+stat_summary(fun.y=mean, colour="gray90", geom="point", shape=18, size=2);HDP1
 ```
 
 + ANOVA
@@ -706,7 +491,7 @@ modHD3 = lm(F1$HD5 ~ F1$Row)
 anova(modHD3)
 plot(modHD3)
 
-confint(modHD3)
+confint(modHD3,1:25)
 ```
 
 +R.squared
