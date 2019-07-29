@@ -292,8 +292,10 @@ grid.arrange(CP42,CP43,CP44, ncol = 2)
 modC2 = lm(F1$Chl5 ~ F1$Height)
 anova(modC2)
 plot(modC2)
+summary(modC2)
 
 confint(modC2)
+
 ```
 
 + R.squared Collection Height
@@ -330,6 +332,7 @@ grid.arrange(FP42,FP43,FP44, ncol = 2)
 modF2 = lm(F1$Flav5 ~ F1$Height)
 anova(modF2)
 plot(modF2)
+summary(modF2)
 
 confint(modF2)
 ```
