@@ -84,25 +84,40 @@ Replicates were taken by re-measuring a single leaf sample taken from each tree,
 ```{r replicate means}
 #Anthocyanin
 RepAnth = summary(Dup$Anth)
+RepAnth$SD = sd(Dup$Anth)
+RepAnth = as.data.frame(RepAnth)
+RepAnth$Measure = "Anth"
 
 #Chlorophyll
 RepChl = summary(Dup$Chl)
+RepChl$SD = sd(Dup$Chl)
+RepChl = as.data.frame(RepChl)
+RepChl$Measure = "Chl"
+
 
 #Flavanoid
 RepFlav = summary(Dup$Flav)
+RepFlav$SD = sd(Dup$Flav)
+RepFlav = as.data.frame(RepFlav)
+RepFlav$Measure = "Flav"
 
 #NBI
 RepNBI =summary(Dup$NBI)
+RepNBI$SD = sd(Dup$NBI)
+RepNBI = as.data.frame(RepNBI)
+RepNBI$Measure = "NBI"
 
-as.table(rbind(RepAnth,RepChl,RepFlav,RepNBI))
+
+RepMeasure = rbind(RepAnth,RepChl,RepFlav,RepNBI)
+RepMeasure[c(8,1:7)]
 ```
 
 ### Replicate Group means
 
 ```{r}
 Dup2 = group_by(Dup,Rep.)
-Dup2 = summarise(Dup2, Anth = mean(Anth, na.rm = T),Chl = mean(Chl, na.rm = T), Flav = mean(Flav,na.rm = T), NBI = mean(NBI, na.rm = T))
-head(Dup2)
+Dup2 = summarise(Dup2, Anth_mean = mean(Anth, na.rm = T), Anth_sd = sd(Anth, na.rm = T), Chl_mean = mean(Chl, na.rm = T), Chl_sd = sd(Chl, na.rm=T ), Flav_mean = mean(Flav,na.rm = T), Flav_sd = sd(Flav, na.rm = T), NBI_mean = mean(NBI, na.rm = T), NBI_sd = sd(NBI, na.rm = T))
+Dup2
 ```
 
 ### Anthocyanin Replicate Plots
@@ -503,6 +518,7 @@ FAF = lm(F1$Flav ~ F1$Tree.ID)
 anova(FAF)
 summary(FAF)$r.squared
 ```
+
 
 ### Nitrogen Overview
 
