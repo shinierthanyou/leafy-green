@@ -1,0 +1,200 @@
+---
+title: "QTL Analysis"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F,cache = F)
+library(xlsx)
+library(ggplot2)
+library(gplots)
+library(gridExtra)
+library(corrplot)
+library(dplyr)
+library(png)
+library(grid)
+library(heatmaply)
+library(qtl)
+
+```
+
+Read Data and subset into groups
+
+```{r}
+CData = read.xlsx("Full.xlsx", sheetName = "Full")
+
+#subset offspring
+OffData = subset(CData, Tree.ID != "CG" & Tree.ID != "EC201" & Tree.ID != "EC103")
+```
+
+Anthocyanin
+
+```{r}
+Row_Anth = lm(OffData$Anth ~ OffData$Row)
+anova(Row_Anth)
+
+Col_Anth = lm(OffData$Anth ~ OffData$Column)
+anova(Col_Anth)
+
+Height_Anth = lm(OffData$Anth ~ OffData$Height)
+anova(Height_Anth)
+
+Day_Anth = lm(OffData$Anth ~ OffData$Collection.Day)
+anova(Day_Anth)
+
+Flower_Anth = lm(OffData$Anth ~ OffData$Flower)
+anova(Flower_Anth)
+```
+
+
+Chlorophyll
+
+```{r}
+Row_Chl = lm(OffData$Chl ~ OffData$Row)
+anova(Row_Chl)
+
+Col_Chl = lm(OffData$Chl ~ OffData$Column)
+anova(Col_Chl)
+
+Height_Chl = lm(OffData$Chl ~ OffData$Height)
+anova(Height_Chl)
+
+Day_Chl = lm(OffData$Chl ~ OffData$Collection.Day)
+anova(Day_Chl)
+
+Flower_Chl = lm(OffData$Chl ~ OffData$Flower)
+anova(Flower_Chl)
+
+
+```
+
+
+Flavonol
+
+```{r}
+Row_Flav = lm(OffData$Flav ~ OffData$Row)
+anova(Row_Flav)
+
+Col_Flav = lm(OffData$Flav ~ OffData$Column)
+anova(Col_Flav)
+
+Height_Flav = lm(OffData$Flav ~ OffData$Height)
+anova(Height_Flav)
+
+Day_Flav = lm(OffData$Flav ~ OffData$Collection.Day)
+anova(Day_Flav)
+
+Flower_Flav = lm(OffData$Flav ~ OffData$Flower)
+anova(Flower_Flav)
+
+```
+
+
+ 
+
+
+```{r}
+F12 <-group_by(OffData,Row)
+F12 <- summarise(F12, Mean_Row_Chl = mean(Chl,na.rm=T), Mean_Row_Anth = mean(Anth, na.rm=T), Mean_Row_Flav = mean(Flav,na.rm =T))
+
+Data2 = merge(OffData,F12, by = "Row")
+
+F13 <-group_by(OffData,Column)
+F13 <- summarise(F13, Mean_Col_Anth = mean(Anth,na.rm =T), Mean_Col_Chl = mean(Chl,na.rm =T), Mean_Col_Flav = mean(Flav,na.rm =T))
+
+Data2 = merge(Data2,F13, by = "Column")
+
+F14 <-group_by(OffData,Height)
+F14 <- summarise(F14, Mean_Height_Anth = mean(Anth, na.rm=T), Mean_Height_Chl = mean(Chl, na.rm=T), Mean_Height_Flav = mean(Flav,na.rm =T))
+
+Data2 = merge(Data2,F14, by = "Height")
+
+F15 <-group_by(OffData,Collection.Day)
+F15 <- summarise(F15, Mean_ClD_Anth= mean(Anth,na.rm =T), Mean_ClD_Chl = mean(Chl,na.rm=T), Mean_ClD_Flav = mean(Flav,na.rm =T))
+
+Data2 = merge(Data2,F15, by = "Collection.Day")
+
+Data2$Chl_Mean = mean(Data2$Chl)
+Data2$Anth_Mean = mean(Data2$Anth)
+Data2$Flav_Mean = mean(Data2$Flav)
+
+
+#Anth Sigficiant - Row, Height
+Data2$Adj_Anth = Data2$Anth - Data2$Anth_Mean - Data2$Mean_Row_Anth - Data2$Mean_Height_Anth
+
+mean(OffData$Anth)
+mean(Data2$Adj_Anth)
+
+#Chl Sigficiant - Row, Collection Day
+
+Data2$Adj_Chl = Data2$Chl - Data2$Chl_Mean - Data2$Mean_Row_Chl - Data2$Mean_ClD_Chl - Data2$Mean_Col_Chl
+
+mean(Data2$Chl)
+mean(Data2$Adj_Chl)
+
+#Flav Sigficiant - Row, Column, Height, Collection Day, Flowering
+
+Data2$Adj_Flav = Data2$Flav - Data2$Flav_Mean - Data2$Mean_Row_Flav - Data2$Mean_Col_Flav - Data2$Mean_Height_Flav - Data2$Mean_ClD_Flav
+
+mean(Data2$Flav)
+mean(Data2$Adj_Flav)
+
+```
+
+
+```{r}
+Row_Adj_Anth = lm(Data2$Adj_Anth ~ Data2$Row)
+anova(Row_Adj_Anth)
+
+Col_Adj_Anth = lm(Data2$Adj_Anth ~ Data2$Column)
+anova(Col_Adj_Anth)
+
+Height_Adj_Anth = lm(Data2$Adj_Anth ~ Data2$Height)
+anova(Height_Adj_Anth)
+
+Day_Adj_Anth = lm(Data2$Adj_Anth ~ Data2$Collection.Day)
+anova(Day_Adj_Anth)
+
+Flower_Adj_Anth = lm(Data2$Adj_Anth ~ Data2$Flower)
+anova(Flower_Adj_Anth)
+```
+
+```{r}
+Row_Adj_Chl = lm(Data2$Adj_Chl ~ Data2$Row)
+anova(Row_Adj_Chl)
+
+Col_Adj_Chl = lm(Data2$Adj_Chl ~ Data2$Column)
+anova(Col_Adj_Chl)
+
+Height_Adj_Chl = lm(Data2$Adj_Chl ~ Data2$Height)
+anova(Height_Adj_Chl)
+
+Day_Adj_Chl = lm(Data2$Adj_Chl ~ Data2$Collection.Day)
+anova(Day_Adj_Chl)
+
+Flower_Adj_Chl = lm(Data2$Adj_Chl ~ Data2$Flower)
+anova(Flower_Adj_Chl)
+```
+
+```{r}
+Row_Adj_Flav = lm(Data2$Adj_Flav ~ Data2$Row)
+anova(Row_Adj_Flav)
+
+Col_Adj_Flav = lm(Data2$Adj_Flav ~ Data2$Column)
+anova(Col_Adj_Flav)
+
+Height_Adj_Flav = lm(Data2$Adj_Flav ~ Data2$Height)
+anova(Height_Adj_Flav)
+
+Day_Adj_Flav = lm(Data2$Adj_Flav ~ Data2$Collection.Day)
+anova(Day_Adj_Flav)
+
+Flower_Adj_Flav = lm(Data2$Adj_Flav ~ Data2$Flower)
+anova(Flower_Adj_Flav)
+```
+
+```{r}
+
+
+
+```
