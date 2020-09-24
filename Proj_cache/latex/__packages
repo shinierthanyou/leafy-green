@@ -1,0 +1,12 @@
+base
+xlsx
+ggplot2
+gplots
+gridExtra
+corrplot
+dplyr
+png
+plotly
+viridisLite
+viridis
+heatmaply
