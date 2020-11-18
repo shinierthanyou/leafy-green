@@ -25,3 +25,9 @@ stringr
 forcats
 broom
 nadiv
+glmnet
+lattice
+caret
+ggcorrplot
+factoextra
+fpc

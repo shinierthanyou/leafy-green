@@ -16,18 +16,15 @@ setwd("c://Biometrics//Palmerston North//David Change//2018-04 Spatial effect an
 library(xlsx)
 library(ggplot2)
 library(dplyr)
-library(asreml)
-library(asremlPlus)
+#library(asreml)
+#library(asremlPlus)
 library(nadiv)
 library(gridExtra)
 library(knitr)
-library(gridExtra)
 library(grid)
 library(reshape2)
 library(gplots)
 library(sommer)
-
-install.packages("asreml","asremlPlus","nadiv","sommer")
 
 ##### Setup option #####
 my_theme <- theme_bw()+theme(panel.grid = element_blank())
@@ -122,11 +119,13 @@ ggplot(data=data_D,aes(x=Height,group=pruning,fill=pruning))+
   geom_density(alpha=0.5)
 Covarrubias-Pazaran G. 2016. Genome assisted prediction of quantitative traits using the R package sommer. PLoS ONE 11(6):1-15.
 
-mix1 <-  mmer2(Height~pruning,
-              random=~g(id)+ Rowf + Treef + spl2D(Row,Tree),
-              rcov=~units,
-              G= list(id=A), silent=TRUE,
-              data=data_D)
+mix1 <- sommer::mmer(fixed=Height~pruning,
+                      
+                      random=~vs(id, Gu=A)+ Rowf + Treef + spl2D(Row,Tree),
+                      
+                      rcov=~units,
+                      
+                      data=data_D)
 summary(mix1)
 plot(mix1)
 fittedvals <- spatPlots(mix1,row = "Row", range = "Tree")

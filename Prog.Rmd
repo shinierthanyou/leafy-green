@@ -1,0 +1,154 @@
+---
+title: "PJ Code"
+output: html_notebook
+---
+
+## Library Set up
+
+```{r}
+library(data.table)
+library(ggplot2)
+library(sommer)
+library(gplots)
+library(xlsx)
+library(plyr)
+
+options( stringsAsFactors=F,
+         max.print = 1000,
+         scipen=8,
+         digits=4)
+```
+
+### Phenotype data read and manipulation 
+
+```{r}
+Data <- read.xlsx(file = "Entire.xlsx", sheetName = "Sheet1",startRow = 1, as.data.frame = T)
+data_D3 = subset(Data,Allocation == "F1")
+str(data_D3)
+
+data_D3$Tree = as.numeric(data_D3$Row)
+data_D3$Row = as.numeric(data_D3$Column)
+
+data_D3 <- transform(data_D3, Treeb = substr(Tree.ID, 2,6))
+data_D3$Treee = "1"
+data_D3$Tree.ID = paste0(data_D3$Treee, sep = "", data_D3$Treeb)
+
+Comb = ddply(data_D3, .(Tree.ID), summarize, Anth = mean(Anth, na.rm = T),  Chl = mean(Chl, na.rm = T), Flav = mean(Flav, na.rm = T))
+
+data_D3 <- data_D3[,c(1,4,8,16)]
+
+data_D3 = merge(data_D3,Comb, by = "Tree.ID")
+
+data_D3 = distinct(data_D3)
+data_D3 = data_D3[!is.na(data_D3$Chl),]
+
+#remove last two columns(unrequired I guess)
+
+str(data_D3)
+
+#Rename to fit into code, and factors
+data_D3$id <- data_D3$Tree.ID
+data_D3$Rowf <- as.factor(data_D3$Row)
+data_D3$Treef <- as.factor(data_D3$Tree)
+
+
+```
+
+### SNP data read and manipulation
+
+```{r}
+# stringsAsFactors = FALSE, prevent importing as factors 
+# check.names = FALSE, prevent R from adding extra values to names
+# na.strings = "--", converts given na into NA
+snp_D3 <- read.csv("EC103xEC201_GBS_40clusters_abxaa.csv",header=T,stringsAsFactors = FALSE, check.names = FALSE, na.strings = "--")
+
+# Allocating numeric value to markers
+snp_D3[snp_D3=="aa"] <- 0
+snp_D3[snp_D3=="ab"] <- 1
+snp_D3[snp_D3=="bb"] <- 2
+
+# Remove Tree ID
+snp_D3 <- snp_D3[,-1]
+
+# Transpose, turn into a matrix
+snp_M3 <- t(as.matrix(sapply(snp_D3,as.numeric)))
+
+#Select snps from individuals present in the data_D3 matrix
+snp_M3 <- snp_M3[row.names(snp_M3) %in% data_D3$id,]
+data_D3 <- data_D3[data_D3$id %in% row.names(snp_M3),]
+
+#Create an A matrix (Additive relationship) and view top 10 rows and columns
+A2 <-  A.mat(snp_M3[])
+A2[1:10,1:10]
+
+#create a heatmap of relationships (maybe use another heatmap style this one bit clunky)
+colfunc <- colorRampPalette(c("steelblue4","springgreen","yellow"))
+heatmap.2(A2[1:100,1:100], col = colfunc(100),Colv = "Rowv",revC=TRUE)
+```
+
+### Heatmap of Height Values with physical layout 
+
+```{r}
+#plot physical height distribution on the ground
+ggplot(data=data_D3,aes(x=Row,y=Tree,fill=Chl))+
+  geom_tile()+  
+  scale_fill_gradientn(colours = terrain.colors(10))
+```
+### Plots of heights comparing pruning groups
+
+```{r}
+#plot count
+ggplot(data=data_D3,aes(x=Height,group=pruning,fill=pruning))+
+  geom_histogram(alpha=0.5)
+
+#plot density
+ggplot(data=data_D3,aes(x=Height,group=pruning,fill=pruning))+
+  geom_density(alpha=0.5)
+```
+mmer2_result <- mmer2(y ~ fixed_effect1 + fixed_effect2, random=~g(id1)+g(id2),G=list(id1=GRM1, id2=GRM2),rcov=~units, silent=TRUE, data=data,constraint=FALSE)
+
+mmer_result <- mmer(y ~ fixed_effect1 + fixed_effect2, random=~vm(id1, Gu=GRM1)+vm(id2, Gu=GRM2),rcov=~units, silent=TRUE, data=data)
+
+```{r}
+# mmer linear mixed model fit with fixed effects and random effects. 
+# spl2D fits 2D spline
+
+mix13 <- mmer(fixed= Anth~1,
+                      random =~vs(id, Gu=A2)
+                      + Rowf
+                      + Treef
+                      + spl2D(Row,Tree),
+                      rcov=~units,
+                      data=data_D3)
+
+summary(mix13)
+```
+
+
+```{r}
+fittedvals <- spatPlots(object = mix13, by= id)
+
+vm0 <- gstat::variogram(mix12,Treef,Rowf)
+plot(vm0$F1)
+
+plot(data_D3$Height,mix12$fitted.y)
+
+data_D3$Height_pred <- mix12$u.hat$`g(id)`$fitted.y
+
+
+ggplot(data_D3,aes(x=Height,y=Height_pred,color=pruning))+
+  geom_point()+labs(x="Observed tree height",y="Predicted Relative tree height")
+
+```
+
+## Read Data into Workspace
+
+```{r}
+corr_D2 <- read.xlsx("Similarity of individuals Joinmap calculated.xlsx",sheetIndex = 2,startRow = 1)
+str(corr_D2)
+```
+
+## Potentially useful 
+
+https://cran.r-project.org/web/packages/sommer/vignettes/v1.sommer.quick.start.pdf
+
