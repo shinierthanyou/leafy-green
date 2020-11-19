@@ -12,6 +12,7 @@ library(sommer)
 library(gplots)
 library(xlsx)
 library(plyr)
+library(dplyr)
 
 options( stringsAsFactors=F,
          max.print = 1000,
@@ -51,6 +52,10 @@ data_D3$id <- data_D3$Tree.ID
 data_D3$Rowf <- as.factor(data_D3$Row)
 data_D3$Treef <- as.factor(data_D3$Tree)
 
+# Add pruning information
+data_D2 <- read.xlsx("Code Peter Jaksons/Height phenotype 20 April 2018.xlsx",sheetName = "Phenotypes April 2018",startRow = 1, as.data.frame = T)
+D3 = data_D2[c(1,5)]
+data_D3 = merge(data_D3, D3, by.x = "id", by.y = "NA.")
 
 ```
 
@@ -98,57 +103,82 @@ ggplot(data=data_D3,aes(x=Row,y=Tree,fill=Chl))+
 
 ```{r}
 #plot count
-ggplot(data=data_D3,aes(x=Height,group=pruning,fill=pruning))+
+ggplot(data=data_D3,aes(x=Anth,group=pruning,fill=pruning))+
+  geom_histogram(alpha=0.5)
+
+ggplot(data=data_D3,aes(x=Flav,group=pruning,fill=pruning))+
+  geom_histogram(alpha=0.5)
+
+ggplot(data=data_D3,aes(x=Chl,group=pruning,fill=pruning))+
   geom_histogram(alpha=0.5)
 
 #plot density
-ggplot(data=data_D3,aes(x=Height,group=pruning,fill=pruning))+
+ggplot(data=data_D3,aes(x=Anth,group=pruning,fill=pruning))+
   geom_density(alpha=0.5)
-```
-mmer2_result <- mmer2(y ~ fixed_effect1 + fixed_effect2, random=~g(id1)+g(id2),G=list(id1=GRM1, id2=GRM2),rcov=~units, silent=TRUE, data=data,constraint=FALSE)
 
-mmer_result <- mmer(y ~ fixed_effect1 + fixed_effect2, random=~vm(id1, Gu=GRM1)+vm(id2, Gu=GRM2),rcov=~units, silent=TRUE, data=data)
+ggplot(data=data_D3,aes(x=Chl,group=pruning,fill=pruning))+
+  geom_density(alpha=0.5)
+
+ggplot(data=data_D3,aes(x=Flav,group=pruning,fill=pruning))+
+  geom_density(alpha=0.5)
+
+
+```
+### Running mmer analyses on each chemical measure. 
 
 ```{r}
 # mmer linear mixed model fit with fixed effects and random effects. 
 # spl2D fits 2D spline
-
-mix13 <- mmer(fixed= Anth~1,
+# Flavonol
+mix132 <- mmer(fixed= Anth~1,
                       random =~vs(id, Gu=A2)
+                      + pruning
                       + Rowf
                       + Treef
                       + spl2D(Row,Tree),
                       rcov=~units,
                       data=data_D3)
 
-summary(mix13)
+summary(mix132)
 ```
-
 
 ```{r}
-fittedvals <- spatPlots(object = mix13, by= id)
+# mmer linear mixed model fit with fixed effects and random effects. 
+# spl2D fits 2D spline
+# Flavonol
+mix142 <- mmer(fixed= Chl~1,
+                      random =~vs(id, Gu=A2)
+                      + pruning
+                      + Rowf
+                      + Treef
+                      + spl2D(Row,Tree),
+                      rcov=~units,
+                      data=data_D3)
 
-vm0 <- gstat::variogram(mix12,Treef,Rowf)
-plot(vm0$F1)
-
-plot(data_D3$Height,mix12$fitted.y)
-
-data_D3$Height_pred <- mix12$u.hat$`g(id)`$fitted.y
-
-
-ggplot(data_D3,aes(x=Height,y=Height_pred,color=pruning))+
-  geom_point()+labs(x="Observed tree height",y="Predicted Relative tree height")
-
+summary(mix142)
+mix142$U$chl
 ```
-
-## Read Data into Workspace
 
 ```{r}
-corr_D2 <- read.xlsx("Similarity of individuals Joinmap calculated.xlsx",sheetIndex = 2,startRow = 1)
-str(corr_D2)
+# mmer linear mixed model fit with fixed effects and random effects. 
+# spl2D fits 2D spline
+# Flavonol
+mix152 <- mmer(fixed= Flav~1,
+                      random =~vs(id, Gu=A2)
+                      +pruning
+                      + Rowf
+                      + Treef
+                      + spl2D(Row,Tree),
+                      rcov=~units,
+                      data=data_D3)
+
+summary(mix152)
 ```
 
-## Potentially useful 
+```{r}
+data_D3$AdjAnth = mix132$U$'u:id'$Anth
+data_D3$AdjChl = mix142$U$'u:id'$Chl
+data_D3$AdjFlav = mix152$U$'u:id'$Flav
 
-https://cran.r-project.org/web/packages/sommer/vignettes/v1.sommer.quick.start.pdf
+```
 
