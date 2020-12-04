@@ -1,0 +1,134 @@
+---
+title: "Replicate Analysis"
+author: "Melissa Taane"
+date: "12/1/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,cache = TRUE, message = FALSE, warning = FALSE)
+library(xlsx)
+library(ggplot2)
+library(gplots)
+library(gridExtra)
+library(corrplot)
+library(plyr)
+library(dplyr)
+library(png)
+library(grid)
+library(heatmaply)
+library(lme4)
+library(MCMCglmm)
+library(tidyverse)
+library(broom)
+library(nadiv)
+library("glmnet") 
+library("caret")
+library("ggcorrplot")
+library(factoextra)
+library(fpc)
+```
+
+#### Background
+
+The point of the replicate process was to establish how reliable the results were from the dualex. A leaf from each tree was measured twice, having been removed between measurements. 
+The distribution of chemicals within a given leaf can be variable, thus it would be unlikely to replicate each measurement exactly as the dualex will measure a different part of the leaf. 
+
+[Overview]
+
+[Anthocyanin]
+
+[Chlorophyll]
+
+[Flavonol]
+
+
+```{r data read and organisation}
+# Read in data, organise data
+
+Rep <-read.xlsx("/powerplant/workspace/cfpmjt/leafy-green-master/Full.xlsx", sheetName ="Dup")
+
+Rep1 = subset(Rep, Rep. == "Y1")
+Rep2 = subset(Rep, Rep. == "Y2")
+
+colnames(Rep1) <- paste("Rep1", colnames(Rep1 ), sep = "_")
+colnames(Rep2) <- paste("Rep2", colnames(Rep2), sep = "_")
+
+Rep3 = merge(Rep1,Rep2, by.x = c("Rep1_Tree.ID","Rep1_Height","Rep1_group"),by.y=  c("Rep2_Tree.ID","Rep2_Height","Rep2_group"))
+```
+
+### Overview
+
+#### Plots of Replicate Chemical Distribution
+
+
+```{r}
+plot1 = ggplot(Rep, aes(Rep., Anth)) +geom_boxplot(fill = "turquoise1") + ggtitle("Anthocyanin")+ stat_summary(fun.y=mean, colour="black", geom="point", shape=23, size=3, fill = "white")+ geom_jitter(shape=21, position=position_jitter(0.2), fill = "orchid1")+theme_bw() +ylab("Anthocyanin (Au)") +xlab("Replicate")
+
+plot2 = ggplot(Rep, aes(Rep., Chl)) +geom_boxplot(fill = "turquoise1") + ggtitle("Chlorphyll")+ stat_summary(fun.y=mean, colour="black", geom="point", shape=23, size=3, fill = "white")+ geom_jitter(shape=21, position=position_jitter(0.2), fill = "orchid1")+theme_bw() +ylab("Chlorophyll (g/cm2)")+xlab("Replicate")
+
+plot3 = ggplot(Rep, aes(Rep., Flav)) +geom_boxplot(fill = "turquoise1") + ggtitle("Flavonol")+ stat_summary(fun.y=mean, colour="black", geom="point", shape=23, size=3, fill = "white")+ geom_jitter(shape=21, position=position_jitter(0.2), fill = "orchid1")+theme_bw() +ylab("Flavonol (Au)")+xlab("Replicate")
+
+grid.arrange(plot1,plot2,plot3,ncol=3)
+
+```
+
+#### Data
+
+```{r data summary}
+Rep1Anth = summary(Rep1$Rep1_Anth)
+Rep2Anth = summary(Rep2$Rep2_Anth)
+Rep1Chl = summary(Rep1$Rep1_Chl)
+Rep2Chl = summary(Rep2$Rep2_Chl)
+Rep1Flav = summary(Rep1$Rep1_Flav)
+Rep2Flav = summary(Rep2$Rep2_Flav)
+
+as.table(rbind(Rep1Anth,Rep2Anth,Rep1Chl,Rep2Chl,Rep1Flav,Rep2Flav))
+```
+
+#### Anthocyanin
+
+```{r anthocyanin plots}
+# dotplot
+ggplot(Rep3) + aes(x = Rep1_Anth, y = Rep2_Anth) + geom_point(shape = 21, fill = "turquoise1") + ylab("Replicate 2") + xlab("Replicate 1") + ggtitle("Replicate Anthocyanin (Au) Measures") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_smooth(method='lm', colour = "orchid1")
+
+# boxplot
+ggplot(Rep, aes(Rep.,Anth)) +geom_violin(fill = "turquoise1") + ggtitle("Anthocyanin Measurements Distributions for Replicates")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Anthocyanin (Au)") +xlab("Replicate")+theme_bw() +ylim(0.05,0.26)
+
+# anova
+Anthmod = lm(Rep$Anth ~ Rep$Rep.)
+anova(Anthmod)
+```
+
+#### Chlorophyll
+
+```{r chlorophyll plots}
+# dotplot
+ggplot(Rep3) + aes(x = Rep1_Chl, y = Rep2_Chl) + geom_point(shape = 21, fill = "turquoise1") + ylab("Replicate 2") + xlab("Replicate 1") + ggtitle("Replicate Chlorophyll(g/cm2) Measures") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_smooth(method='lm', colour = "orchid1")
+
+# boxplot
+ggplot(Rep, aes(Rep.,Chl)) +geom_violin(fill = "turquoise1") + ggtitle("Chlorophyll Measurements Distributions for Replicates")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Chlorophyll (g/cm2)") +xlab("Replicate")+theme_bw() 
+
+# anova
+Chlmod = lm(Rep$Chl ~ Rep$Rep.)
+anova(Chlmod)
+```
+
+#### Flavonol
+
+```{r flavonol plots}
+# dotplot
+ggplot(Rep3) + aes(x = Rep1_Flav, y = Rep2_Flav) + geom_point(shape = 21, fill = "turquoise1") + ylab("Replicate 2") + xlab("Replicate 1") + ggtitle("Replicate Flavonol (Au) Measures") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_smooth(method='lm', colour = "orchid1")
+
+# boxplot
+ggplot(Rep, aes(Rep.,Flav)) +geom_violin(fill = "turquoise1") + ggtitle("Flavonol Measurements Distributions for Replicates")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Flavonol (Au)") +xlab("Replicate")+theme_bw()
+
+# anova
+Flavmod = lm(Rep$Flav ~ Rep$Rep.)
+anova(Flavmod)
+```
+
+
+
+
+

@@ -1,0 +1,500 @@
+---
+title: "Environmental Adjustments"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,cache = TRUE, message = FALSE, warning = FALSE, error = FALSE)
+
+library(data.table)
+library(ggplot2)
+library(sommer)
+library(gplots)
+library(xlsx)
+library(plyr)
+library(dplyr)
+library(lme4)
+library(plotly)
+library(gridExtra)
+
+options(stringsAsFactors=F,
+         max.print = 1000,
+         scipen=8,
+         digits=4)
+```
+
+[Phenotype data read and manipulation F1]
+
+[Parental Adjustments]
+
+[Post Adjustment Plots]
+
+
+### Phenotype data read and manipulation F1
+
+```{r DataRead}
+Data <- read.xlsx(file = "/powerplant/workspace/cfpmjt/leafy-green-master/Entire.xlsx", sheetName = "Sheet1",startRow = 1, as.data.frame = T)
+```
+
+```{r DataArrangement}
+data_D3 = subset(Data,Allocation == "F1")
+head(data_D3)
+
+data_D3$Tree = as.numeric(data_D3$Row)
+data_D3$Row = as.numeric(data_D3$Column)
+
+data_D3 <- transform(data_D3, Treeb = substr(Tree.ID, 2,6))
+data_D3$Treee = "1"
+data_D3$Tree.ID = paste0(data_D3$Treee, sep = "", data_D3$Treeb)
+
+data_D3 <- data_D3[c(1,4,7,10:12,16)]
+
+data_D3 = distinct(data_D3)
+data_D3 = data_D3[!is.na(data_D3$Chl),]
+
+#Rename to fit into code, and factors
+data_D3$id <- data_D3$Tree.ID
+data_D3$Rowf <- as.factor(data_D3$Row)
+data_D3$Treef <- as.factor(data_D3$Tree)
+
+# Add pruning information
+data_D2 <- read.xlsx("/powerplant/workspace/cfpmjt/leafy-green-master/Code Peter Jaksons/Height phenotype 20 April 2018.xlsx",sheetName = "Phenotypes April 2018",startRow = 1, as.data.frame = T)
+D3 = data_D2[c(1,5)]
+data_D3 = merge(data_D3, D3, by.x = "id", by.y = "NA.")
+
+data_D3$measure = c(1:nrow(data_D3))
+
+```
+
+### SNP data read and manipulation
+
+```{r SNP Read}
+# stringsAsFactors = FALSE, prevent importing as factors 
+# check.names = FALSE, prevent R from adding extra values to names
+# na.strings = "--", converts given na into NA
+snp_D3 <- read.csv("/powerplant/workspace/cfpmjt/leafy-green-master/Code Peter Jaksons/EC103xEC201_GBS_40clusters_abxaa.csv",header=T,stringsAsFactors = FALSE, check.names = FALSE, na.strings = "--")
+
+# Allocating numeric value to markers
+snp_D3[snp_D3=="aa"] <- 0
+snp_D3[snp_D3=="ab"] <- 1
+snp_D3[snp_D3=="bb"] <- 2
+
+# Remove Tree ID
+snp_D3 <- snp_D3[,-1]
+
+# Transpose, turn into a matrix
+snp_M3 <- t(as.matrix(sapply(snp_D3,as.numeric)))
+
+#Select snps from individuals present in the data_D3 matrix
+snp_M3 <- snp_M3[row.names(snp_M3) %in% data_D3$id,]
+data_D3 <- data_D3[data_D3$id %in% row.names(snp_M3),]
+
+#Create an A matrix (Additive relationship) and view top 10 rows and columns
+A2 <-  A.mat(snp_M3[])
+A2[1:5,1:5]
+```
+
+#### Additive Relationship Matrix
+
+```{r Additive Matrix}
+#create a heatmap of relationships (maybe use another heatmap style this one bit clunky)
+colfunc <- colorRampPalette(c("steelblue4","springgreen","yellow"))
+heatmap.2(A2[1:100,1:100], col = colfunc(100),Colv = "Rowv",revC=TRUE)
+```
+
+### Heatmaps of Positional Chemical Measures
+
+#### Anthocyanin
+
+```{r Anthocyanin Heatmap}
+#plot physical height distribution on the ground
+ggplot(data=data_D3,aes(x=Row,y=Tree,fill=Anth))+
+  geom_tile()+  
+  scale_fill_gradientn(colours = terrain.colors(10))
+```
+
+#### Chlorophyll
+
+```{r Chlorophyll Heatmap}
+ggplot(data=data_D3,aes(x=Row,y=Tree,fill=Chl))+
+  geom_tile()+  
+  scale_fill_gradientn(colours = terrain.colors(10))
+```
+
+#### Flavonol
+
+```{r Flavonol Heatmap}
+ggplot(data=data_D3,aes(x=Row,y=Tree,fill=Flav))+
+  geom_tile()+  
+  scale_fill_gradientn(colours = terrain.colors(10))
+```
+
+### Plots of heights comparing pruning groups
+
+#### Anthocyanin
+
+```{r Anthocyanin Pruning Effects}
+#plot count
+Anthplot4 = ggplot(data=data_D3,aes(x=Anth,group=pruning,fill=pruning))+
+  geom_histogram(alpha=0.5, binwidth = 0.01)
+
+Anthplot5 = ggplot(data=data_D3,aes(x=Anth,group=pruning,fill=pruning))+
+  geom_density(alpha=0.5)
+
+grid.arrange(Anthplot4,Anthplot5,ncol = 2)
+```
+
+#### Chlorophyll
+
+```{r Chlorophyll Pruning Effects}
+Chlplot4 = ggplot(data=data_D3,aes(x=Chl,group=pruning,fill=pruning))+
+  geom_histogram(alpha=0.5, binwidth = 2)
+
+Chlplot5 = ggplot(data=data_D3,aes(x=Chl,group=pruning,fill=pruning))+
+  geom_density(alpha=0.5)
+
+grid.arrange(Chlplot4,Chlplot5,ncol = 2)
+```
+
+#### Flavonol
+
+```{r Flavonol Pruning Effects}
+Anthplot4 = ggplot(data=data_D3,aes(x=Flav,group=pruning,fill=pruning))+
+  geom_histogram(alpha=0.5, binwidth = 0.05)
+
+Anthplot5 = ggplot(data=data_D3,aes(x=Flav,group=pruning,fill=pruning))+
+  geom_density(alpha=0.5)
+
+grid.arrange(Anthplot4,Anthplot5,ncol =2 )
+
+```
+
+
+### Running mmer analyses on F1 and plotting adjusted results on a positional heatmap
+
+#### Anthocyanin
+
+```{r Anthmmer}
+# mmer linear mixed model fit with fixed effects and random effects. 
+mix132 <- mmer(fixed= Anth~1,
+                      random =~vs(id, Gu=A2)
+                      + pruning
+                      + Height
+                      + Rowf
+                      + Treef
+                      + spl2D(Row,Tree),
+                      rcov=~units,
+                      data=data_D3)
+
+plotty132 <- spatPlots(mix132,row = "Row", range = "Tree")
+id = unlist(plotty132$id)
+measure = unlist(plotty132$measure)
+AnthAdj = unlist(plotty132$predicted.value.Anth)
+AnthAdj = as.data.frame(cbind(id,AnthAdj,measure))
+
+FData = merge(data_D3, AnthAdj, by = c("id","measure"))
+FData = distinct(FData)
+```
+
+#### Chlorphyll 
+
+```{r Chlmmer}
+mix133 <- mmer(fixed= Chl~1,
+                      random =~vs(id, Gu=A2)
+                      + pruning
+                      + Height
+                      + Rowf
+                      + Treef
+                      + spl2D(Row,Tree),
+                      rcov=~units,
+                      data=data_D3)
+
+plotty133 <- spatPlots(mix133,row = "Row", range = "Tree")
+id = unlist(plotty133$id)
+measure = unlist(plotty133$measure)
+ChlAdj = unlist(plotty133$predicted.value.Chl)
+ChlAdj = as.data.frame(cbind(id,ChlAdj,measure))
+
+FData = merge(FData, ChlAdj, by = c("id","measure"))
+```
+
+#### Flavonol
+
+```{r Flavmmer}
+mix134 <- mmer(fixed= Flav~1,
+                      random =~vs(id, Gu=A2)
+                      + pruning
+                      + Height
+                      + Rowf
+                      + Treef
+                      + spl2D(Row,Tree),
+                      rcov=~units,
+                      data=data_D3)
+
+plotty134 <- spatPlots(mix134,row = "Row", range = "Tree")
+id = unlist(plotty134$id)
+measure = unlist(plotty134$measure)
+FlavAdj = unlist(plotty134$predicted.value.Flav)
+FlavAdj = as.data.frame(cbind(id,FlavAdj,measure))
+
+FData = merge(FData, FlavAdj, by = c("id","measure"))
+```
+
+```{r Combine Adj values to dataset}
+Comb = ddply(FData, .(Tree.ID), summarize, Anth = mean(Anth, na.rm = T),  Chl = mean(Chl, na.rm = T), Flav = mean(Flav, na.rm = T))
+
+FData$AnthAdj = as.numeric(FData$AnthAdj)
+FData$ChlAdj = as.numeric(FData$ChlAdj)
+FData$FlavAdj = as.numeric(FData$FlavAdj)
+
+
+Comb2 = ddply(FData, .(Tree.ID), summarize, AnthAdj = mean(AnthAdj, na.rm = T),  ChlAdj = mean(ChlAdj, na.rm = T), FlavAdj = mean(FlavAdj, na.rm = T))
+
+
+Comb3 = merge(Comb,Comb2, by = "Tree.ID")
+
+FData2 = FData[c(1,3,4,9:12)]
+FData2 = merge(FData2,Comb3, by = "Tree.ID")
+FData2 = distinct(FData2)
+
+#write.csv(FData2,"/powerplant/workspace/cfpmjt/leafy-green-master/Keep Tidy Plz/Adjusted Data2.csv")
+```
+
+
+#### Parental Adjustments
+
+```{r Parent subset}
+PData = subset(Data, Allocation != "F1")
+
+PData$Tree = as.numeric(PData$Row)
+PData$Row = as.numeric(PData$Column)
+
+#Comb = ddply(PData, .(Tree.ID), summarize, Anth = mean(Anth, na.rm = T),  Chl = mean(Chl, na.rm = T), Flav = mean(Flav, na.rm = T))
+
+PData <- PData[c(1,4,7,10:12,16)]
+
+#PData = merge(PData,Comb, by = "Tree.ID")
+
+PData = distinct(PData)
+PData = PData[!is.na(PData$Chl),]
+
+#remove last two columns(unrequired I guess)
+
+str(PData)
+
+#Rename to fit into code, and factors
+PData$id <- PData$Tree.ID
+PData$Rowf <- as.factor(PData$Row)
+PData$Treef <- as.factor(PData$Tree)
+
+
+PData$measure = c(1:nrow(PData))
+```
+
+#### Anthocyanin
+
+```{r Panthmmer}
+# mmer linear mixed model fit with fixed effects and random effects. 
+# spl2D fits 2D spline
+# Anthonol
+mix11 <- mmer(fixed= Anth~1,
+                      random =~id
+                      + Height,
+                      rcov=~units,
+                      data=PData)
+```
+
+
+```{r Panthplot, include=FALSE}
+plotty11 <- spatPlots(mix11,row = "Row", range = "Tree")
+```
+
+
+```{r anthcomb}
+id = unlist(plotty11$id)
+measure = unlist(plotty11$measure)
+AnthAdj = unlist(plotty11$predicted.value.Anth)
+AnthAdj = as.data.frame(cbind(id,AnthAdj,measure))
+
+FData3 = merge(PData, AnthAdj, by = c("id","measure"))
+```
+
+#### Chlorophyll
+
+```{r Pchlmmer}
+mix13 <- mmer(fixed= Chl~1,
+                      random =~id
+                      + Height,
+                      rcov=~units,
+                      data=PData)
+```
+
+
+```{r Pchlplot, include=FALSE }
+plotty13 <- spatPlots(mix13,row = "Row", range = "Tree")
+```
+
+
+```{r}
+id = unlist(plotty13$id)
+measure = unlist(plotty13$measure)
+ChlAdj = unlist(plotty13$predicted.value.Chl)
+ChlAdj = as.data.frame(cbind(id,ChlAdj,measure))
+
+FData3 = merge(FData3, ChlAdj, by = c("id","measure"))
+```
+
+#### Flavonol
+
+```{r Pflavmmer}
+mix12 <- mmer(fixed= Flav~1,
+                      random =~id
+                      + Height,
+                      rcov=~units,
+                      data=PData)
+```
+
+
+```{r Pflavplot, include=FALSE}
+plotty12 <- spatPlots(mix12,row = "Row", range = "Tree")
+```
+
+
+```{r}
+id = unlist(plotty12$id)
+measure = unlist(plotty12$measure)
+FlavAdj = unlist(plotty12$predicted.value.Flav)
+FlavAdj = as.data.frame(cbind(id,FlavAdj,measure))
+
+FData3 = merge(FData3, FlavAdj, by = c("id","measure"))
+```
+
+
+```{r tidy Parent data}
+Comb4 = ddply(FData3, .(Tree.ID), summarize, Anth = mean(Anth, na.rm = T),  Chl = mean(Chl, na.rm = T), Flav = mean(Flav, na.rm = T))
+
+FData3$AnthAdj = as.numeric(FData3$AnthAdj)
+FData3$ChlAdj = as.numeric(FData3$ChlAdj)
+FData3$FlavAdj = as.numeric(FData3$FlavAdj)
+
+Comb5 = ddply(FData3, .(Tree.ID), summarize, AnthAdj = mean(AnthAdj, na.rm = T),  ChlAdj = mean(ChlAdj, na.rm = T), FlavAdj = mean(FlavAdj, na.rm = T))
+
+Comb6 = merge(Comb4,Comb5, by = "Tree.ID")
+
+FData4 = FData3[c(1,3,4,9:11)]
+FData4 = merge(FData4,Comb6, by = "Tree.ID")
+FData4 = distinct(FData4)
+```
+
+```{r combine F1, parents and outgroup}
+FData5 = FData2[-c(7)]
+
+FData5$Allocation = "F1"
+
+FData4$Allocation = c("CG","EC103","EC201")
+
+FFData = rbind(FData4,FData5)
+
+#write.csv(FFData,"/powerplant/workspace/cfpmjt/leafy-green-master/Tidy/Adjusted Data.csv")
+```
+
+#### Post Adjustment Plots
+
+```{r Adjustment data summary}
+D_data = FFData
+
+Anth <- summary(D_data$Anth)
+AnthAdj <-summary(D_data$AnthAdj)
+Chl <- summary(D_data$Chl)
+ChlAdj <-summary(D_data$ChlAdj)
+Flav <- summary(D_data$Flav)
+FlavAdj <-summary(D_data$FlavAdj)
+
+
+
+as.table(rbind(Anth,AnthAdj,Chl,ChlAdj,Flav,FlavAdj))
+
+```
+
+### Anthocyanin Distribution Before and After Adjustments
+
+```{r adj anthocyanin plots}
+ggplot(D_data) + aes(x = Anth, y = AnthAdj) + geom_point(shape = 21, fill = "turquoise1") + ylab("Adjusted") + xlab("Raw") + ggtitle("Adjusted vs Raw Anthocyanin (Au)") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_smooth(method='lm')
+
+Anth1 <- ggplot(D_data) +aes(Anth) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1", binwidth = 0.001 )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Anthocyanin (Au)") + ggtitle("Before") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)) +xlim(0.05,0.16) +ylim(0,80)
+
+Anth2 <- ggplot(D_data) +aes(AnthAdj) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1", binwidth = 0.001 )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Anthocyanin (Au)") + ggtitle("After") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))+xlim(0.05,0.16)+ylim(0,80)
+
+grid.arrange(Anth1,Anth2, ncol = 1)
+```
+
+### Chlorophyll Distribution Before and After Adjustments
+
+```{r adj chlorophyll plots}
+ggplot(D_data) + aes(x = Chl, y = ChlAdj) + geom_point(shape = 21, fill = "turquoise1") + ylab("Adjusted") + xlab("Raw") + ggtitle("Adjusted vs Raw Chlorophyll (Au)") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_smooth(method='lm')
+
+Chl1 <- ggplot(D_data) +aes(Chl) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1", binwidth = 0.25 )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Chlorophyll (g/cm2)") + ggtitle("Before") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)) +xlim(24,50) +ylim(0,0.3)
+
+Chl2 <- ggplot(D_data) +aes(ChlAdj) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1", binwidth = 0.25 )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Chlorophyll (g/cm2)") + ggtitle("After") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)) +xlim(24,50)+ylim(0,0.3)
+
+grid.arrange(Chl1,Chl2, ncol = 1)
+```
+
+### Flavonol Distribution Before and After Adjustments
+
+```{r adj flavonol plots}
+ggplot(D_data) + aes(x = Flav, y = FlavAdj) + geom_point(shape = 21, fill = "turquoise1") + ylab("Adjusted") + xlab("Raw") + ggtitle("Adjusted vs Raw Flavonols (Au)") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_smooth(method='lm')
+
+Flav1 <- ggplot(D_data) +aes(Flav) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1",binwidth = 0.01 )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Flavonol (Au)") + ggtitle("Before") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)) +xlim(1.5,2.4) +ylim(0,8)
+
+Flav2 <- ggplot(D_data) +aes(FlavAdj) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1",binwidth = 0.01  )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Flavonol (Au)") + ggtitle("After") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))+xlim(1.5,2.4)+ylim(0,8)
+
+grid.arrange(Flav1,Flav2, ncol = 1)
+```
+
+## Comparison of Allocations
+
+Allocation is the grouping of trees in the dataset, F1 refers to the cross of the parents EC103 and EC201. CG is an outgroup of Crimson Glory
+
+
+### Before and After Plots Comparison Between Allocations
+
+#### Anthocyanin
+
+
+```{r anth allocation plots}
+Anthplot = ggplot(D_data, aes(Allocation,Anth)) +geom_violin(fill = "turquoise1") + ggtitle("Before")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Anthocyanin (Au)") +xlab("Allocation")+theme_bw() +ylim(0.05,0.26)
+
+Anthplot2 = ggplot(D_data, aes(Allocation,AnthAdj)) +geom_violin(fill = "turquoise1") + ggtitle("After")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Anthocyanin (Au)") +xlab("Allocation")+theme_bw() +ylim(0.05,0.26)
+
+grid.arrange(Anthplot,Anthplot2, ncol = 2)
+```
+
+#### Chlorophyll
+
+```{r chl allocation plots}
+Chlplot = ggplot(D_data, aes(Allocation,Chl)) +geom_violin(fill = "turquoise1") + ggtitle("Before")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Chlorophyll (g/cm2)") +xlab("Allocation")+theme_bw()+ylim(23,53)
+
+Chlplot2 = ggplot(D_data, aes(Allocation,ChlAdj)) +geom_violin(fill = "turquoise1") + ggtitle("After")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Chlorophyll (g/cm2)") +xlab("Allocation")+theme_bw()+ylim(23,53)
+
+grid.arrange(Chlplot,Chlplot2,ncol = 2 )
+```
+
+#### Flavonol
+
+```{r flav allocation plots}
+Flavplot = ggplot(D_data, aes(Allocation,Flav)) +geom_violin(fill = "turquoise1") + ggtitle("Before")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Flavonol (Au)") +xlab("Allocation")+theme_bw()+ylim(1.5,2.5)
+
+Flavplot2 = ggplot(D_data, aes(Allocation,FlavAdj)) +geom_violin(fill = "turquoise1") + ggtitle("After")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Flavonol (Au)") +xlab("Allocation")+theme_bw()+ylim(1.5,2.5)
+
+grid.arrange(Flavplot,Flavplot2,ncol = 2)
+```
+
+```{r}
+grid.arrange(Anthplot,Anthplot2,Chlplot,Chlplot2,Flavplot,Flavplot2, ncol = 2)
+```
+

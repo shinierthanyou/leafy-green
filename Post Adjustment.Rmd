@@ -1,0 +1,117 @@
+---
+title: "S2"
+author: "Melissa Taane"
+date: "11/25/2020"
+output: html_document
+---
+
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,cache = TRUE,message = FALSE, warning = FALSE)
+
+library(ggplot2)
+library(gridExtra)
+```
+
+```{r}
+D_data = read.csv("/powerplant/workspace/cfpmjt/leafy-green-master/Keep Tidy Plz/Adjusted Data2.csv")
+```
+
+## Comparison of Chemical Measures Before and After Adjustments
+
+### Data Summary
+
+```{r}
+
+Anth <- summary(D_data$Anth)
+AnthAdj <-summary(D_data$AnthAdj)
+Chl <- summary(D_data$Chl)
+ChlAdj <-summary(D_data$ChlAdj)
+Flav <- summary(D_data$Flav)
+FlavAdj <-summary(D_data$FlavAdj)
+
+
+
+as.table(rbind(Anth,AnthAdj,Chl,ChlAdj,Flav,FlavAdj))
+
+```
+
+
+### Before and After plots of leaf chemical adjustments
+
+```{r}
+ggplot(D_data) + aes(x = Anth, y = AnthAdj) + geom_point(shape = 21, fill = "turquoise1") + ylab("Adjusted") + xlab("Raw") + ggtitle("Adjusted vs Raw Anthocyanin (Au)") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_smooth(method='lm')
+
+ggplot(D_data) + aes(x = Chl, y = ChlAdj) + geom_point(shape = 21, fill = "turquoise1") + ylab("Adjusted") + xlab("Raw") + ggtitle("Adjusted vs Raw Chlorophyll (Au)") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_smooth(method='lm')
+
+ggplot(D_data) + aes(x = Flav, y = FlavAdj) + geom_point(shape = 21, fill = "turquoise1") + ylab("Adjusted") + xlab("Raw") + ggtitle("Adjusted vs Raw Flavonols (Au)") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_smooth(method='lm')
+```
+
+### Anthocyanin Distribution Before and After Adjustments
+
+```{r}
+Anth1 <- ggplot(D_data) +aes(Anth) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1", binwidth = 0.001 )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Anthocyanin (Au)") + ggtitle("Before") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)) +xlim(0.05,0.16) +ylim(0,80)
+
+Anth2 <- ggplot(D_data) +aes(AnthAdj) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1", binwidth = 0.001 )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Anthocyanin (Au)") + ggtitle("After") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))+xlim(0.05,0.16)+ylim(0,80)
+
+grid.arrange(Anth1,Anth2, ncol = 1)
+```
+
+### Chlorophyll Distribution Before and After Adjustments
+
+```{r}
+Chl1 <- ggplot(D_data) +aes(Chl) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1", binwidth = 0.25 )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Chlorophyll (g/cm2)") + ggtitle("Before") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)) +xlim(24,50) +ylim(0,0.3)
+
+Chl2 <- ggplot(D_data) +aes(ChlAdj) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1", binwidth = 0.25 )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Chlorophyll (g/cm2)") + ggtitle("After") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)) +xlim(24,50)+ylim(0,0.3)
+
+grid.arrange(Chl1,Chl2, ncol = 1)
+```
+
+### Flavonol Distribution Before and After Adjustments
+
+
+```{r}
+
+Flav1 <- ggplot(D_data) +aes(Flav) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1",binwidth = 0.01 )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Flavonol (Au)") + ggtitle("Before") +theme_bw() +theme(plot.title = element_text(hjust = 0.5)) +xlim(1.5,2.4) +ylim(0,8)
+
+Flav2 <- ggplot(D_data) +aes(FlavAdj) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1",binwidth = 0.01  )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Flavonol (Au)") + ggtitle("After") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))+xlim(1.5,2.4)+ylim(0,8)
+
+grid.arrange(Flav1,Flav2, ncol = 1)
+```
+
+## Comparison of Allocations
+
+Allocation is the grouping of trees in the dataset, F1 refers to the cross of the parents EC103 and EC201. CG is an outgroup of Crimson Glory
+
+
+### Before and After Plots Comparison Between Allocations
+
+```{r}
+Anthplot = ggplot(D_data, aes(Allocation,Anth)) +geom_violin(fill = "turquoise1") + ggtitle("Before")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Anthocyanin (Au)") +xlab("Allocation")+theme_bw() +ylim(0.05,0.26)
+
+Anthplot2 = ggplot(D_data, aes(Allocation,AnthAdj)) +geom_violin(fill = "turquoise1") + ggtitle("After")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Anthocyanin (Au)") +xlab("Allocation")+theme_bw() +ylim(0.05,0.26)
+
+grid.arrange(Anthplot,Anthplot2, ncol = 2)
+```
+
+
+```{r}
+Chlplot = ggplot(D_data, aes(Allocation,Chl)) +geom_violin(fill = "turquoise1") + ggtitle("Before")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Chlorophyll (g/cm2)") +xlab("Allocation")+theme_bw()+ylim(23,53)
+
+Chlplot2 = ggplot(D_data, aes(Allocation,ChlAdj)) +geom_violin(fill = "turquoise1") + ggtitle("After")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Chlorophyll (g/cm2)") +xlab("Allocation")+theme_bw()+ylim(23,53)
+
+grid.arrange(Chlplot,Chlplot2,ncol = 2 )
+```
+
+
+```{r}
+Flavplot = ggplot(D_data, aes(Allocation,Flav)) +geom_violin(fill = "turquoise1") + ggtitle("Before")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Flavonol (Au)") +xlab("Allocation")+theme_bw()+ylim(1.5,2.5)
+
+Flavplot2 = ggplot(D_data, aes(Allocation,FlavAdj)) +geom_violin(fill = "turquoise1") + ggtitle("After")+ stat_summary(fun=mean, colour="black",fill = "orchid1", geom="point", shape=23, size=3) +ylab("Flavonol (Au)") +xlab("Allocation")+theme_bw()+ylim(1.5,2.5)
+
+grid.arrange(Flavplot,Flavplot2,ncol = 2)
+```
+
+
+
+
+
