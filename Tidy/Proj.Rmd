@@ -1,0 +1,804 @@
+---
+title: "Proj"
+output:
+  html_document:
+    toc: TRUE
+  word_document: 
+    reference_docx: Proj.docx
+  pdf_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,cache = TRUE,message = FALSE, warning = FALSE)
+library(xlsx)
+library(ggplot2)
+library(gplots)
+library(gridExtra)
+library(corrplot)
+library(plyr)
+library(dplyr)
+library(png)
+library(grid)
+library(heatmaply)
+library(lme4)
+library(MCMCglmm)
+library(tidyverse)
+library(broom)
+library(nadiv)
+library("glmnet") 
+library("caret")
+library("ggcorrplot")
+library(factoextra)
+library(fpc)
+```
+
+[Mānuka Background]
+
+[Methods]
+
+[Replicate Analysis]
+
+[Overview of all groups]
+
+[Parent Trees]
+
+### F1 Analysis
+
+[F1 Analysis]
+[Row, Column and Height effects]
+
+#### Mānuka Background
+
+Mānuka background(cultural,uses,industry)
+
+Experimental Cross Design
+
+Two east cape parents, F1 cross siblings 
+
+#### Methods
+
+Two parental trees from the East Cape region of New Zealand were bred together to produce a full sibling F1 generation, all of which are located at Plant and Food Research in Palmerston North. All of the trees have undergone full genome sequences and markers developed and mapped. 
+
+
+#### F1 Layout
+
+Map indicates the layout of the F1 generation resulting from a cross between EC201 and EC103 parents. Column 1 is approximately lengthways facing north.
+
+!["Map of F1 Trees"](Capture.png)
+
+#### Height Diagram
+
+Diagram indicates the areas of leaf collection regarding height.
+Each Tree generally had 10 leaves collected (some trees have been sampled more than once), leaves were selected from low, mid and high points of the tree. The first leaf sampled from each tree was measured twice for replication comparison.
+
+!["Diagram of leaf collection levels"](Tree.png)
+
+
+#### Import and Arrange Data
+
+Dualex was used to measure transmittance through all samples included in this dataset, more information on how this works can be found in Clara Rey Caramés, 2015. 
+
+
+"Full.xlsx
+
++ Surface content of chlorophyll in $g/cm^2$ (Chl) 
+
++ Epidermal Flavoid content in absorbance units(Au); Flavonol(Flav) and Anthocyanin(Anth) 
+
++ Nitrogen Balance Index status is calculated using Chlorophyll and Flavonol values automatically (NBI)
+
+It also contains information about the block position, the leaf height information, and presense or absence of flowering
+
+Sheet "Dup" contains only the replicated samples 
+
+```{r data read and controlled, include=FALSE}
+#Import and subset data
+
+Data <- read.xlsx(file = "Entire.xlsx", sheetName = "Sheet1")
+F1 = subset(Data,Allocation == "F1")
+
+Dup <-read.xlsx("Full.xlsx", sheetName ="Dup")
+
+F1$H19 = as.numeric(F1$Height09)
+F1$H18 = F1$Height08
+```
+
+
+
+
+#### Replicate Analysis
+
+Replicates exist in two groups; first leaf measurement (Y1), and the second leaf measurement (Y2). The second measurement was taken after removing the leaf following the first reading, to help establish the presence of any bias introduced by the Dualex.
+
+
+
+
+#### Replicate Plots and Data Overview Plots of replicate measure disitributions, medians (lines), means (empty diamonds)
+
+```{r replicate plots}
+
+AnthDup = ggplot(Dup) + aes(x = Rep., y = Anth) + geom_boxplot(fill = "dodgerblue1") + ylab("Anthocyanin (Au)") + xlab("Replicate") + ggtitle("Anthocyanin") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(Dup$Anth, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)
+
+AnthDup2 = ggplot(Dup) + aes(x = Rep., y = Anth) + geom_point(fill = "dodgerblue1") + ylab("Anthocyanin (Au)") + xlab("Replicate") + ggtitle("Anthocyanin") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(Dup$Anth, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)
+
+ChlDup = ggplot(Dup) + aes(x = Rep., y = Chl) + geom_boxplot(fill = "dodgerblue1") + ylab("Chlophyll (g/cm2)") + xlab("Replicate") + ggtitle("Chlorophyll") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(Dup$Chl, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point",shape=23,fill = "white",color = "black", size=3)
+
+FlavDup = ggplot(Dup) + aes(x = Rep., y = Flav) + geom_boxplot(fill = "dodgerblue1") + ylab("Flavonol (Au)") + xlab("Replicate") + ggtitle("Flavonol") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(Dup$Flav, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)
+
+grid.arrange(AnthDup, ChlDup, FlavDup, ncol = 2)
+```
+
+
+
+
+#### Data Distribution of replicates
+
+```{r replicate data distribution}
+ddply(Dup, .(Rep.), summarize , AnthMean = mean(Anth, na.rm = T), AnthSD = sd(Anth, na.rm = T), ChlMean = mean(Chl, na.rm = T),ChlSD = sd(Chl, na.rm = T), FlavMean = mean(Flav, na.rm = T), FlavSD= sd(Flav, na.rm = T))
+```
+
+#### Replicate ANOVAs
+
+```{r replicate anovas}
+DAnthMod = lm(Dup$Anth ~ Dup$Rep. )
+anova(DAnthMod)
+
+DChlMod = lm(Dup$Chl ~ Dup$Rep. )
+anova(DChlMod)
+
+DFlavMod = lm(Dup$Flav ~ Dup$Rep. )
+anova(DFlavMod)
+```
+
+The replicate data and ANOVAs appear to support the reliability of the dualex, thus we can confidently continue our analysis with some outlier removal.
+
+
+
+#### Overview of all groups 
+
+
+```{r overall plots}
+AnthRaw = ggplot(Data) + aes(x = Allocation, y = Anth) + geom_boxplot(fill = "dodgerblue1") + ylab("Anthocyanin") + xlab("Allocation") + ggtitle("Raw Anth Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5)) + stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)
+
+ChlRaw = ggplot(Data) + aes(x = Allocation, y = Chl) + geom_boxplot(fill = "dodgerblue1") + ylab("Chlorophyll") + xlab("Allocation") + ggtitle("Raw Chl Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)
+
+FlavRaw = ggplot(Data) + aes(x = Allocation, y = Flav) + geom_boxplot(fill = "dodgerblue1") + ylab("Flavonol") + xlab("Allocation") + ggtitle("Raw Flav Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)
+
+grid.arrange(AnthRaw,ChlRaw,FlavRaw, ncol = 2)
+```
+As expected we have a large distribution contained within the F1 group. Parental samples indicate they are fairly similiar which could prove to complicate our analysis. The Crimson Glory outgroup appears distinctive from the parental trees and sometimes seems to correlate with the F1 population. 
+
+
+
+#### Data Summary
+
+```{r}
+ddply(Data, .(Allocation), summarize , AnthMean = mean(Anth, na.rm = T), AnthSD = sd(Anth, na.rm = T), ChlMean = mean(Chl, na.rm = T),ChlSD = sd(Chl, na.rm = T), FlavMean = mean(Flav, na.rm = T), FlavSD= sd(Flav, na.rm = T))
+```
+
+Anthocyanin
+Crimson Glory(CG) outgroup apparent, F1 population more similar to parental trees.
+
+Chlorophyll
+F1 very diverse, overlaps with both parent trees and outgroup, more similar median and distrubtion to outgroup. 
+
+Flavonol 
+F1 overlaps with parents and outgroup, slightly more similar to parental trees. 
+
+
+
+#### Allocation Anovas and parental comparison
+
+```{r allocation anovas}
+modA = lm(Data$Anth ~ Data$Allocation)
+anova(modA)
+
+modB = lm(Data$Chl ~ Data$Allocation)
+anova(modB)
+
+modC = lm(Data$Flav ~ Data$Allocation)
+anova(modC)
+```
+#### Parent Trees
+
+```{r parent comparison}
+
+Parent = subset(Data, Allocation == "EC201" | Allocation =="EC103")
+
+modD = lm(Parent$Anth ~ Parent$Tree.ID)
+anova(modD)
+
+modE = lm(Parent$Chl ~ Parent$Tree.ID)
+anova(modE)
+
+modF = lm(Parent$Flav ~ Parent$Tree.ID)
+anova(modF)
+
+```
+
+```{r parent replicate plots}
+PRep = ggplot(Parent) + aes(x = Rep., y = Flav) + geom_boxplot(fill = "dodgerblue1") + ylab("Flavonol") + xlab("Allocation") + ggtitle("Raw Flav Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)
+
+
+modG = lm(Parent$Anth ~ Parent$Tree.ID)
+anova(modG)
+
+#modH = lm(Parent$Height08 ~ Parent$Anth)
+#anova(modH)
+```
+
+
+It appears as if there is no statistical difference between the parents, which may complicate or prevent the analysis. 
+
+#### F1 Analysis
+
+#### Unadjusted F1 chemical distributions
+
+```{r}
+AnthRawF1 = ggplot(F1) +aes(Anth) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3")+ geom_vline(xintercept=mean(F1$Anth), lwd=1, linetype=3, color="black") + ylab("Frequency") + xlab("Anthocyanin (Au)") + ggtitle("Anthocyanin") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+ChlRawF1 =  ggplot(F1) +aes(Chl) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Chlorophyll") + ggtitle("Chlorophyll Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+FlavRawF1 = ggplot(F1) +aes(Flav) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Flavonol") + ggtitle("Flavonol Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+H08RawF1 = ggplot(F1) +aes(H18) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height18") + ggtitle("Height18 Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+H09RawF1 =  ggplot(F1) +aes(H19) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Height19") + ggtitle("Height19 Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Add height change
+F1$Growth = F1$H19 - F1$H18
+
+GrowthRawF1 =  ggplot(F1) +aes(Growth) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("Growth") + ggtitle("Growth Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+
+grid.arrange(AnthRawF1,ChlRawF1,FlavRawF1, H08RawF1, H09RawF1, GrowthRawF1, ncol = 2)
+```
+
+Anothcyanin 
+left bias, long tail 
+
+Chlorophyll 
+right bias, truncated 
+
+Flavonol 
+typical bell curve with slightly long tails both directions
+
+Height 2018
+lumpy normal disitribution
+
+Height 2019
+appears to be two overlapping distribitiuons, maybe 3
+
+Growth 
+maybe 3 overlapping populations 
+
+
+
+
+#### Row Comparisons
+
+```{r}
+AnthRowRaw = ggplot(F1) + aes(x = Row, y = Anth) + geom_boxplot(fill = "dodgerblue1") + ylab("Anthocyanin") + xlab("Row") + ggtitle("Raw Anth Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Anth, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1) +ylim(-0.05,0.5)
+
+ChlRowRaw = ggplot(F1) + aes(x = Row, y = Chl) + geom_boxplot(fill = "dodgerblue1") + ylab("Chlorophyll") + xlab("Row") + ggtitle("Raw Chl Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Chl, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1)+ylim(-10,70)
+
+FlavRowRaw = ggplot(F1) + aes(x = Row, y = Flav) + geom_boxplot(fill = "dodgerblue1") + ylab("Flavonol") + xlab("Row") + ggtitle("Raw Flav Au") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Flav, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1)+ylim(0.5,3)
+
+H08RowRaw = ggplot(F1) + aes(x = Row, y = H18) + geom_boxplot(fill = "dodgerblue1") + ylab("Height18") + xlab("Row") + ggtitle("Raw 2018 Height") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$H18, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1) +ylim(50,300)
+
+H09RowRaw = ggplot(F1) + aes(x = Row, y = H19) + geom_boxplot(fill = "dodgerblue1") + ylab("Height19") + xlab("Row") + ggtitle("Raw 2019 Height") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(as.numeric(F1$H19), na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1)+ylim(150,315)
+
+GrowthRowRaw = ggplot(F1) + aes(x = Row, y = Growth) + geom_boxplot(fill = "dodgerblue1") + ylab("Growth") + xlab("Row") + ggtitle("Raw Growth Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Growth, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1) +ylim(-5,150)
+
+grid.arrange(AnthRowRaw,ChlRowRaw,FlavRowRaw,H08RowRaw,H09RowRaw,GrowthRowRaw, ncol =2)
+```
+
+#### Column Comparisons
+
+
+```{r}
+AnthColumnRaw = ggplot(F1) + aes(x = as.factor(Column), y = Anth) + geom_boxplot(fill = "dodgerblue1") + ylab("Anthocyanin") + xlab("Column") + ggtitle("Raw Anth Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Anth, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3) +ylim(-0.05,0.5)
+
+ChlColumnRaw = ggplot(F1) + aes(x = as.factor(Column), y = Chl) + geom_boxplot(fill = "dodgerblue1") + ylab("Chlorophyll") + xlab("Column") + ggtitle("Raw Chl Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Chl, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3) +ylim(-10,70)
+
+FlavColumnRaw = ggplot(F1) + aes(x = as.factor(Column), y = Flav) + geom_boxplot(fill = "dodgerblue1") + ylab("Flavonol") + xlab("Column") + ggtitle("Raw Flav Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Flav, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(0.5,3)
+
+H08ColumnRaw = ggplot(F1) + aes(x = as.factor(Column), y = H18) + geom_boxplot(fill = "dodgerblue1") + ylab("Height18") + xlab("Column") + ggtitle("Raw H08 Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$H18, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(50,300)
+
+H09ColumnRaw = ggplot(F1) + aes(x = as.factor(Column), y = H19) + geom_boxplot(fill = "dodgerblue1") + ylab("Height cm") + xlab("Column") + ggtitle("Raw Height 2019") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(as.numeric(F1$H19), na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(150,315)
+
+GrowthColumnRaw = ggplot(F1) + aes(x = as.factor(Column), y = Growth) + geom_boxplot(fill = "dodgerblue1") + ylab("Growth cm") + xlab("Column") + ggtitle("Raw Height Difference 2018-19") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(as.numeric(F1$Growth), na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(-5,150)
+
+grid.arrange(AnthColumnRaw,ChlColumnRaw,FlavColumnRaw,H08ColumnRaw,H09ColumnRaw,GrowthColumnRaw, ncol =2)
+```
+
+#### Row v Column Heatmaps 
+
+```{r}
+F1$Row = as.numeric(F1$Row)
+
+AnthRawMap = ggplot(F1, aes(Column,as.numeric(Row), fill=Anth)) + 
+  geom_tile()+ylab("Row")
+
+ChlRawMap = ggplot(F1, aes(Column,as.numeric(Row), fill=Chl)) + 
+  geom_tile()+ylab("Row")
+
+FlavRawMap = ggplot(F1, aes(Column,as.numeric(Row), fill=Flav)) + 
+  geom_tile()+ylab("Row")
+
+H18RawMap = ggplot(F1, aes(Column,as.numeric(Row), fill=H18)) + 
+  geom_tile()+ylab("Row")
+
+H19RawMap = ggplot(F1, aes(Column,as.numeric(Row), fill= H19)) + 
+  geom_tile()+ylab("Row")
+
+GrowthRawMap = ggplot(F1, aes(Column,as.numeric(Row), fill= Growth)) + 
+  geom_tile()+ylab("Row")
+
+grid.arrange(AnthRawMap,ChlRawMap,FlavRawMap, H18RawMap,H19RawMap,GrowthRawMap, ncol =2)
+```
+
+
+#### Height Plots
+
+```{r}
+height = F1[!is.na(F1$Height),]
+
+AnthHeightRaw = ggplot(height) + aes(x = as.factor(Height), y = Anth) + geom_boxplot(fill = "dodgerblue1") + ylab("Anthocyanin") + xlab("Height") + ggtitle("Raw Anth Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(height$Anth, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(-0.05,0.5)
+
+ChlHeightRaw = ggplot(height) + aes(x = as.factor(Height), y = Chl) + geom_boxplot(fill = "dodgerblue1") + ylab("Chlorophyll") + xlab("Height") + ggtitle("Raw Chl Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(height$Chl, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(-10,70)
+
+FlavHeightRaw = ggplot(height) + aes(x = as.factor(Height), y = Flav) + geom_boxplot(fill = "dodgerblue1") + ylab("Flavonol") + xlab("Height") + ggtitle("Raw Flav Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(height$Flav, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(0.5,3)
+
+grid.arrange(AnthHeightRaw,ChlHeightRaw,FlavHeightRaw, ncol =2)
+```
+
+#### ANOVAs comparing Height, Row and Columns for each chemical 
+
+```{r}
+Mod1 = lm(F1$Anth ~ F1$Row+F1$Column+F1$Height)
+anova(Mod1)
+
+Mod01 = lm(F1$Anth ~ F1$Row+F1$Height)
+anova(Mod01)
+
+Mod2 = lm(F1$Chl ~ F1$Row+F1$Column+F1$Height)
+anova(Mod2)
+
+Mod02 = lm(F1$Chl ~ F1$Row)
+anova(Mod02)
+
+Mod3 = lm(F1$Flav ~ F1$Row+F1$Column+F1$Height)
+anova(Mod3)
+
+Mod4 = lm(F1$H18 ~ F1$Row+F1$Column)
+anova(Mod4)
+
+Mod5 = lm(as.numeric(F1$H19) ~ F1$Row+F1$Column)
+anova(Mod5)
+
+Mod6 = lm(as.numeric(F1$Growth) ~ F1$Row+F1$Column)
+anova(Mod6)
+```
+Anthocyanin 
+Significant Row and Height effects
+
+Chlorophyll
+Significant Row effect
+
+Flavonol
+Significant row,column and height effects
+
+Height 2018
+Very Significant effect of row and column
+
+Height 2019 
+Very Significant effect of row and column
+
+Growth difference (Height 2019- Height 2018)
+Very Significant effect of row and column - need to double check might be from later in analysis 
+
+#### Adjusting Row, Column and Height measures
+
+```{r}
+F1$H19 = as.numeric(F1$H19)
+F1$H18 = as.numeric(F1$H18)
+F1$Row = as.numeric(F1$Row)
+
+RowMeans = ddply(F1, .(Row), summarize,  AnthRowMeans = mean(Anth, na.rm = T),ChlRowMeans = mean(Chl, na.rm = T),FlavRowMeans = mean(Flav, na.rm = T),H18RowMeans = mean(H18, na.rm = T), H19RowMeans = mean(H19, na.rm = T))
+
+F1 = merge(F1,RowMeans, by = "Row", all = T)
+
+ColMeans = ddply(F1, .(Column), summarize,AnthColMeans = mean(Anth, na.rm = T),ChlColMeans = mean(Chl, na.rm = T),FlavColMeans = mean(Flav, na.rm = T),H18ColMeans = mean(H18, na.rm = T), H19ColMeans = mean(H19, na.rm = T))
+
+F1 = merge(F1,ColMeans, by = "Column", all = T)
+
+HeightMeans = ddply(height, .(Height), summarize,AnthHeightMeans = mean(Anth, na.rm = T),ChlHeightMeans = mean(Chl, na.rm = T),FlavHeightMeans = mean(Flav, na.rm = T))
+
+F1 = merge(F1,HeightMeans, by = "Height", all = T)
+
+#removing Anthocyanin outliers
+OBA <-boxplot(F1$Anth,range = 3.5, plot = F)$out
+OA = F1[which(F1$Anth %in% OBA),];OA
+F1 <- F1[-which(F1$Anth %in% OBA),]
+
+#Adjust Anthocyanin - Row and Height Effects
+F1$AdjAnth = F1$Anth -(F1$AnthRowMeans - mean(F1$Anth, na.rm = T)) - (F1$AnthHeightMeans - mean(F1$Anth, na.rm = T))
+
+#Adjust Chorophyll - Row effects only 
+F1$AdjChl = F1$Chl -  (F1$ChlRowMeans - mean(F1$Chl, na.rm = T))- (F1$ChlColMeans - mean(F1$Chl, na.rm = T))
+
+#Adjust Flavonol - Column, Row and Height effects
+F1$AdjFlav = F1$Flav -  (F1$FlavRowMeans - mean(F1$Flav, na.rm = T)) - (F1$FlavColMeans - mean(F1$Flav, na.rm = T))- (F1$FlavHeightMeans - mean(F1$Flav, na.rm = T))
+
+#Adjust Height 2018 - Column and Row Effects
+F1$AdjH18 = F1$H18 -  (F1$H18RowMeans - mean(F1$H18, na.rm = T)) - (F1$H18ColMeans - mean(F1$H18, na.rm = T))
+
+#Adjust Height 2019 - Column and Row Effects
+F1$AdjH19 = F1$H19 -(F1$H19RowMeans - mean(F1$H19, na.rm = T)) - (F1$H19ColMeans - mean(F1$H19, na.rm = T))
+
+```
+
+```{r}
+F1$Height = as.factor(F1$Height)
+
+Mod7 = lm(F1$AdjAnth ~ F1$Row + +F1$Colum + F1$Height)
+anova(Mod7)
+
+Mod8 = lm(F1$AdjChl ~ F1$Row + F1$Column+ F1$Height)
+anova(Mod8)
+
+Mod9 = lm(F1$AdjFlav ~ F1$Row+F1$Column+ F1$Height)
+anova(Mod9)
+
+Mod10 = lm(F1$AdjH18 ~ F1$Row+F1$Column)
+anova(Mod10)
+
+Mod11 = lm(F1$AdjH19 ~ F1$Row+F1$Column)
+anova(Mod11)
+
+F1$Growth = F1$AdjH19 - F1$AdjH18
+
+Mod12 = lm(as.numeric(F1$Growth) ~ F1$Row+F1$Column)
+anova(Mod12)
+```
+
+2018 and 2019 heights continue to require adjustment for row and column
+
+Adjust height row and column effects
+
+
+```{r}
+
+RowMeans2 = ddply(F1, .(Row), summarize ,H18RowMeans2 = mean(AdjH18, na.rm = T), H19RowMeans2 = mean(AdjH19, na.rm = T))
+
+F1 = merge(F1,RowMeans2, by = "Row")
+
+ColMeans2 = ddply(F1, .(Column), summarize, H18ColMeans2 = mean(AdjH18, na.rm = T), H19ColMeans2 = mean(AdjH19, na.rm = T))
+
+F1 = merge(F1,ColMeans2, by = "Column")
+
+F1$AdjH182 = F1$AdjH18 -  (F1$H18RowMeans2 - mean(F1$AdjH18, na.rm = T)) - (F1$H18ColMeans2 - mean(F1$AdjH18, na.rm = T))
+
+F1$AdjH192 = F1$AdjH19 -(F1$H19RowMeans2 - mean(F1$AdjH19, na.rm = T)) - (F1$H19ColMeans2 - mean(F1$AdjH19, na.rm = T))
+
+Mod13 = lm(F1$AdjH182 ~ F1$Row+F1$Column)
+anova(Mod13)
+
+Mod14 = lm(F1$AdjH192 ~ F1$Row+F1$Column)
+anova(Mod14)
+
+F1$Growth = F1$AdjH192 - F1$AdjH182
+
+Mod15 = lm(as.numeric(F1$Growth) ~ F1$Row+F1$Column)
+anova(Mod15)
+```
+still column effects for height 2018 and 2019
+
+```{r}
+
+ColMeans3 = ddply(F1, .(Column), summarize, H18ColMeans3 = mean(AdjH182, na.rm = T),  H19ColMeans3 = mean(AdjH192, na.rm = T))
+
+F1 = merge(F1,ColMeans3, by = "Column")
+
+F1$AdjH183 = F1$AdjH182 - (F1$H18ColMeans3 - mean(F1$AdjH182, na.rm = T))
+
+Mod16 = lm(F1$AdjH183 ~ F1$Row+F1$Column)
+anova(Mod16)
+
+F1$AdjH193 = F1$AdjH192 - (F1$H19ColMeans3 - mean(F1$AdjH192, na.rm = T))
+
+Mod17 = lm(F1$AdjH193 ~ F1$Row+F1$Column)
+anova(Mod17)
+
+F1$Growth2 = F1$AdjH193 - F1$AdjH182
+
+Mod18 = lm(F1$Growth2 ~ F1$Row+F1$Column)
+anova(Mod18)
+```
+
+Adjust Column effects for Growth
+
+
+```{r}
+ColMeans4 = ddply(F1, .(Column), summarize, GrowthColMeans = mean(Growth2, na.rm = T))
+
+F1 = merge(F1,ColMeans4, by = "Column")
+
+F1$Growth3 = F1$Growth2 - (F1$GrowthColMeans - mean(F1$Growth2, na.rm = T))
+
+Mod19 = lm(F1$Growth3 ~ F1$Row+F1$Column)
+anova(Mod19)
+
+
+```
+Measure distributions, comparison of before and after data adjustments 
+
+```{r message = FALSE, warning = FALSE}
+AnthF1 = ggplot(F1) +aes(AdjAnth) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3")+ geom_vline(xintercept=mean(F1$Anth), lwd=1, linetype=3, color="black") + ylab("Frequency") + xlab("AdjAnthocyanin") + ggtitle("Anthocyanin Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+ChlF1 =  ggplot(F1) +aes(AdjChl) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("AdjChlorophyll") + ggtitle("Chlorophyll Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+FlavF1 = ggplot(F1) +aes(AdjFlav) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("AdjFlavonol") + ggtitle("Flavonol Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+H08F1 = ggplot(F1) +aes(AdjH182) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("AdjHeight18") + ggtitle("Height18 Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+H09F1 =  ggplot(F1) +aes(AdjH193) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("AdjHeight19") + ggtitle("Height19 Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+#Add height change
+
+GrowthF1 =  ggplot(F1) +aes(Growth3) +geom_histogram(aes(y=..density..), alpha=0.5, position="identity",colour = "turquoise3",fill ="turquoise1" )+ geom_density(alpha=.2,colour = "orchid1",fill = "orchid3") + ylab("Frequency") + xlab("AdjGrowth") + ggtitle("Growth Distribution of F1 Trees") +theme_bw() +theme(plot.title = element_text(hjust = 0.5))
+
+
+grid.arrange(AnthF1,AnthRawF1,ChlF1,ChlRawF1,FlavF1,FlavRawF1,ncol = 2)
+grid.arrange(H08F1,H08RawF1,H09F1,H09RawF1,GrowthF1,GrowthRawF1,ncol = 2)
+```
+
+Measure comparisons for Rows before and after data adjustment 
+
+```{r}
+F1$Row = as.factor(F1$Row)
+
+AnthRow = ggplot(F1) + aes(x = Row, y = AdjAnth) + geom_boxplot(fill = "dodgerblue1") + ylab("Anthocyanin") + xlab("Row") + ggtitle("Adj Anth Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Anth, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1)+ylim(-0.05,0.5)+ylim(-0.05,0.5)
+
+ChlRow = ggplot(F1) + aes(x = Row, y = AdjChl) + geom_boxplot(fill = "dodgerblue1") + ylab("Chlorophyll") + xlab("Row") + ggtitle("Adj Chl Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Chl, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1)+ylim(-10,70)
+
+FlavRow = ggplot(F1) + aes(x = Row, y = AdjFlav) + geom_boxplot(fill = "dodgerblue1") + ylab("Flavonol") + xlab("Row") + ggtitle("Adj Flav Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Flav, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1)+ylim(0.5,3)
+
+H08Row = ggplot(F1) + aes(x = Row, y = AdjH182) + geom_boxplot(fill = "dodgerblue1") + ylab("Height18") + xlab("Row") + ggtitle("Adj H18 Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$AdjH182, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1)+ylim(50,300)
+
+H09Row = ggplot(F1) + aes(x = Row, y = AdjH193) + geom_boxplot(fill = "dodgerblue1") + ylab("Height19") + xlab("Row") + ggtitle("Adj H19 Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$AdjH19, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1)+ylim(150,315)
+
+GrowthRow = ggplot(F1) + aes(x = Row, y = Growth3) + geom_boxplot(fill = "dodgerblue1") + ylab("Growth") + xlab("Row") + ggtitle("Adj Growth Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Growth3, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=1)+ylim(-5,150)
+
+grid.arrange(AnthRow,AnthRowRaw,ChlRow,ChlRowRaw,FlavRow,FlavRowRaw,ncol =2)
+
+grid.arrange(H08Row,H08RowRaw, H09Row,H09RowRaw,GrowthRow,GrowthRowRaw,ncol=2)
+```
+
+Measure comparisons for Columns before and after adjustment 
+
+```{r}
+AnthColumn = ggplot(F1) + aes(x = as.factor(Column), y = AdjAnth) + geom_boxplot(fill = "dodgerblue1") + ylab("Anthocyanin") + xlab("Column") + ggtitle("Adj Anth Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Anth, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(-0.05,0.5)
+
+ChlColumn = ggplot(F1) + aes(x = as.factor(Column), y = AdjChl) + geom_boxplot(fill = "dodgerblue1") + ylab("Chlorophyll") + xlab("Column") + ggtitle("Adj Chl Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Chl, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(-10,70)
+
+FlavColumn = ggplot(F1) + aes(x = as.factor(Column), y = AdjFlav) + geom_boxplot(fill = "dodgerblue1") + ylab("Flavonol") + xlab("Column") + ggtitle("Adj Flav Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$Flav, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(0.5,3)
+
+H08Column = ggplot(F1) + aes(x = as.factor(Column), y = AdjH182) + geom_boxplot(fill = "dodgerblue1") + ylab("Height18") + xlab("Column") + ggtitle("Adj H18 Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$AdjH182, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(80,300)
+
+H09Column = ggplot(F1) + aes(x = as.factor(Column), y = as.numeric(AdjH193)) + geom_boxplot(fill = "dodgerblue1") + ylab("Height19") + xlab("Column") + ggtitle("Adj H19 Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(F1$AdjH193, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(150,315)
+
+GrowthColumn2 = ggplot(F1) + aes(x = as.factor(Column), y = Growth3) + geom_boxplot(fill = "dodgerblue1") + ylab("Growth") + xlab("Column") + ggtitle("Adj Growth Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(as.numeric(F1$Growth3), na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(-5,150)
+
+grid.arrange(AnthColumn,AnthColumnRaw,ChlColumn,ChlColumnRaw,FlavColumn,FlavColumnRaw, ncol =2)
+
+grid.arrange(H08Column,H08ColumnRaw,H09Column,H09ColumnRaw,GrowthColumn2,GrowthColumnRaw,ncol =2)
+```
+Comparison of measurement heatmaps before and after adjustment 
+
+
+```{r}
+AnthMap = ggplot(F1, aes(Column,as.numeric(Row), fill=AdjAnth)) + 
+  geom_tile()+ylab("Row")
+
+ChlMap = ggplot(F1, aes(Column,as.numeric(Row), fill=AdjChl)) + 
+  geom_tile()+ylab("Row")
+
+FlavMap = ggplot(F1, aes(Column,as.numeric(Row), fill=AdjFlav)) + 
+  geom_tile()+ylab("Row")
+
+H18Map = ggplot(F1, aes(Column,as.numeric(Row), fill=AdjH182)) + 
+  geom_tile()+ylab("Row")
+
+H19Map = ggplot(F1, aes(Column,as.numeric(Row), fill= AdjH193)) + 
+  geom_tile()+ylab("Row")
+
+GrowthMap = ggplot(F1, aes(Column,as.numeric(Row), fill= Growth3)) + 
+  geom_tile() +ylab("Row")
+
+grid.arrange(AnthMap,AnthRawMap,ChlMap,ChlRawMap,FlavMap,FlavRawMap, ncol =2)
+grid.arrange( H18Map,H18RawMap,H19Map,H19RawMap,GrowthMap,GrowthRawMap,ncol=2 )
+```
+
+
+Comparisons for height differences before and after data adjustment 
+
+```{r}
+height2 = F1[!is.na(F1$Height),]
+
+
+AnthHeight = ggplot(height2) + aes(x = as.factor(Height), y = AdjAnth) + geom_boxplot(fill = "dodgerblue1") + ylab("Anthocyanin") + xlab("Height") + ggtitle("Adj Anth Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(height$Anth, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(-0.05,0.5)
+
+ChlHeight = ggplot(height2) + aes(x = as.factor(Height), y = AdjChl) + geom_boxplot(fill = "dodgerblue1") + ylab("Chlorophyll") + xlab("Height") + ggtitle("Adj Chl Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(height$Chl, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(-10,70)
+
+FlavHeight = ggplot(height2) + aes(x = as.factor(Height), y = AdjFlav) + geom_boxplot(fill = "dodgerblue1") + ylab("Flavonol") + xlab("Height") + ggtitle("Adj Flav Measure") +theme_bw()+theme(plot.title = element_text(hjust = 0.5))+ geom_hline(yintercept = mean(height$Flav, na.rm = T), color = "blueviolet")+ stat_summary(fun=mean, colour="black", geom="point", shape=23,fill = "white",color = "black", size=3)+ylim(0.5,3)
+
+grid.arrange(AnthHeight,AnthHeightRaw,ChlHeight,ChlHeightRaw,FlavHeight,FlavHeightRaw, ncol =2)
+```
+
+```{r}
+F2 = F1
+F2 = ddply(F1, .(Tree.ID), summarize, Anth = mean(AdjAnth, na.rm = T),  Chl = mean(AdjChl, na.rm = T), Flav = mean(AdjFlav, na.rm = T))
+Comb = merge(F2,Parent, all = TRUE)
+Comb = ddply(Comb, .(Tree.ID), summarize, Anth = mean(Anth, na.rm = T),  Chl = mean(Chl, na.rm = T), Flav = mean(Flav, na.rm = T))
+Comb6 = F2[!is.na(F2$Anth),]
+Comb = Comb6 %>%
+    `rownames<-`(.[,1])
+Comb <- Comb[c(2:4)]
+
+Comb2 = scale(Comb)
+
+
+```
+
+```{r}
+km <- kmeans(Comb2, centers = 3, nstart = 25) 
+fviz_cluster(km, data = Comb)
+```
+
+
+
+```{r}
+Comb3 = Comb
+rownames(Comb3) <- c(1:nrow(Comb3))
+
+set.seed(220)  # Setting seed 
+Dbscan_cl <- dbscan(Comb3, eps = 0.45, MinPts = 3) 
+Dbscan_cl 
+Dbscan_cl$cluster
+
+ClustTab = table(Dbscan_cl$cluster, Comb6$Tree.ID) 
+
+plot(Dbscan_cl, Comb6, main = "DBScan")
+```
+
+```{r}
+ClustTab = as.data.frame(ClustTab)
+ClustTab = subset(ClustTab, Freq != 0 )
+ClustTab = subset(ClustTab, Var1 != 0 )
+names(ClustTab)[names(ClustTab) == "Var1"] <- "DB_Scluster"
+
+ClustTab2 = as.data.frame(km$cluster)
+ClustTab2$Var2 = row.names(ClustTab2)
+names(ClustTab2)[names(ClustTab2) == "km$cluster"] <- "KM_cluster"
+
+Clusttab3 = merge(ClustTab,ClustTab2, by = "Var2")
+
+ggplot(Clusttab3) +aes(DB_Scluster,KM_cluster) +geom_point()+ geom_smooth(method='lm')
+
+#Pred = lm(Clusttab3$DB_Scluster ~ Clusttab3$KM_cluster)
+#anova(Pred)
+
+Clusttab3$DB_Scluster = as.numeric(Clusttab3$DB_Scluster)
+Clusttab3$KM_cluster = as.numeric(Clusttab3$KM_cluster)
+```
+
+
+```{r}
+
+# Finding distance matrix 
+distance_mat <- dist(Comb6, method = 'euclidean') 
+  
+# Fitting Hierarchical clustering Model  
+# to training dataset 
+set.seed(240)  # Setting seed 
+Hierar_cl <- hclust(distance_mat, method = "average") 
+  
+# Plotting dendrogram 
+HPlot = plot(Hierar_cl) 
+  
+# Choosing no. of clusters 
+# Cutting tree by height 
+abline(h = 110, col = "green") 
+  
+# Cutting tree by no. of clusters 
+fit <- cutree(Hierar_cl, k = 3 ) 
+table(fit) 
+
+  
+plot(Hierar_cl) 
+rect.hclust(Hierar_cl, k = 3, border = "green") 
+
+seeds_df_cl <- mutate(Comb6, cluster = fit)
+
+#remove outgroup
+
+Comb7 = subset(seeds_df_cl,cluster != 3)
+
+
+Comb7 =  Comb7[c(1:4)]
+# Finding distance matrix 
+
+
+distance_mat <- dist(Comb7, method = 'euclidean') 
+  
+# Fitting Hierarchical clustering Model  
+# to training dataset 
+set.seed(240)  # Setting seed 
+Hierar_cl <- hclust(distance_mat, method = "average") 
+  
+# Plotting dendrogram 
+HPlot = plot(Hierar_cl) 
+  
+# Choosing no. of clusters 
+# Cutting tree by height 
+abline(h = 110, col = "green") 
+  
+# Cutting tree by no. of clusters 
+fit <- cutree(Hierar_cl, k = 3 ) 
+table(fit) 
+
+  
+plot(Hierar_cl) 
+rect.hclust(Hierar_cl, k = 3, border = "green") 
+
+seeds_df_cl <- mutate(Comb7, cluster = fit)
+count(seeds_df_cl,cluster)
+
+```
+
+```{r}
+names(seeds_df_cl)[names(seeds_df_cl) == "cluster"] <- "H_cluster"
+seeds_df_cl$H_cluster = as.numeric(seeds_df_cl$H_cluster)
+
+tab3 = merge(Clusttab3,seeds_df_cl, by.x = "Var2",by.y = "Tree.ID")
+
+corr = tab3[c("DB_Scluster","KM_cluster","H_cluster")]
+round(cor(corr), 1)
+
+ggcorrplot(corr)
+
+moddd = lm(tab3$DB_Scluster ~ tab3$KM_cluster + tab3$H_cluster)
+anova(moddd)
+
+ggplot(tab3) +aes(DB_Scluster,KM_cluster) +geom_point()+ geom_smooth(method='lm')
+ggplot(tab3) +aes(DB_Scluster,H_cluster) +geom_point()+ geom_smooth(method='lm')
+ggplot(tab3) +aes(H_cluster,KM_cluster) +geom_point()+ geom_smooth(method='lm')
+```
+
+
+
+
+rownames(tab3) <- NULL
+tab3$Tree.ID = tab3$Var2
+
+Map = read.csv("EC103xEC201_GBS_40clusters_abxaa.csv")
+Map = t(Map)
+Map = as.data.frame(Map)
+Map$Tree.ID = row.names(Map)
+rownames(Map) <- NULL
+Map <- transform(Map, Tree = substr(Tree.ID, 3,6))
+Map$Treee = "I"
+Map$Tree.ID = paste0(Map$Treee, sep = "",Map$Tree)
+
+Map = merge(Map,tab3, by = "Tree.ID", all = TRUE)
+
+Map[is.na(Map[c()])] <- 0
+plz = lm(Map$DB_Scluster ~ Map$V1 + Map$V2 + Map$V3 + Map$V4 + Map$V5 + Map$V6)
+
+anova(plz)
+
+plot(Map$DB_Scluster ~ Map$V1)
+
