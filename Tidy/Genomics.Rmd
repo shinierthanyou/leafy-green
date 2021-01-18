@@ -1,0 +1,34 @@
+---
+title: "Genomics"
+author: "Melissa Taane"
+date: "1/18/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+library(seqinr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Hi Melissa,
+
+I do not have any file making the link between the 40 clusters (pre assembly into 11 chromosomes) and the 11 chromosomes, at least nothing that says position 1 in scaffold 0 is position xx bp in chr Y. 
+However here is some useful information: /output/genomic/plant/Leptospermum/scoparium/CrimsonGlory/Genome/Assembly_Phase_genomics_08_11_2017
+The fasta file in this directory contains the sequence of all 40 clusters. They can be searched by blast against the final genome assembly (which is here /output/genomic/plant/Leptospermum/scoparium/CrimsonGlory/Genome_v0.2). The good news is that not all SNP markers need to be search by blast. I suggest we should look for one SNP at each end of the 40 scaffolds, blast them against the 11 chromosomes and record their location. Then all the other SNPs in between these two flanking SNPs can be calculated by substracting the difference in position with the 40 clusters. 
+Clear as mud. 
+
+David
+
+
+/output/genomic/plant/Leptospermum/scoparium/CrimsonGlory/Genome/Assembly_Phase_genomics_08_11_2017
+
+/output/genomic/plant/Leptospermum/scoparium/CrimsonGlory/Genome_v0.2
+
+```{r}
+Data = read.fasta("/powerplant/output/genomic/plant/Leptospermum/scoparium/CrimsonGlory/Genome/Assembly_Phase_genomics_08_11_2017/Ls_aligned.fasta")
+
+Data2 = read.csv("~/leafy-green/Code Peter Jaksons/EC103xEC201_GBS_40clusters_abxaa.csv")
+```
+
