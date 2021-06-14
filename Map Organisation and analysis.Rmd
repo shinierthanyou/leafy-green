@@ -1,0 +1,99 @@
+---
+title: "QTL Analysis"
+author: "Melissa Taane"
+date: "4/30/2021"
+output: html_document
+---
+
+
+http://htmlpreview.github.io/?https://github.com/augusto-garcia/onemap/blob/master/inst/doc/Outcrossing_Populations.html
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+#library(fullsibQTL)
+library(onemap)
+```
+
+After onemap map has been set up (onemap file setup.R)
+We need to organise our data into useable maps for further QTL analysis
+
+```{r, eval=FALSE}
+
+# Import the onemap object from earlier
+fs_data <- read_onemap(dir="/powerplant/workspace/cfpmjt/leafy-green-master/Tidy", inputfile = "onemapsetup.raw")
+
+# Overview of data tells us cross type, number of individuals and markers, as well as whether chromosome and position information is available
+# and finally how many phenotypic data points we are missing
+fs_data
+
+# Gives a visual overview of the marker types in our dataset
+plot(fs_data)
+
+# We can filter out markers by percentage of them missing - but this function appears to be missing?
+# filtered <-(fs_data, threshold = 0.25)
+
+# Markers are put into bins based on their genotypic information (i.e. no recombination events occur between them)
+# the exact = FALSE argument ensures we select more complete markers from each bin
+bins <- find_bins(fs_data, exact = FALSE)
+
+# shows us the resulting bin data
+bins
+
+# Creation of a new onemap object with redundant markers removed
+bins_example <- create_data_bins(fs_data, bins)
+
+# Resulting bins
+bins_example
+
+# Testing the expected segregation of specific marker(s). Uses chi-squared test according to mendelian segregation.
+test_segregation_of_a_marker(bins_example, 4)
+
+# Test the segregation patterns of all markers
+segreg_test <- test_segregation(bins_example)
+
+# View all markers segregation test results
+print(segreg_test)
+
+# Plot the marker segregation test results
+plot(segreg_test)
+
+# Select markers from the segregation test with distortion
+dist <- select_segreg(segreg_test, distorted = TRUE, numbers = TRUE)
+
+# plot distorted markers
+plot(dist)
+
+# Select markers from the segregation test without distortion (it is useful to use this, can replace distorted markers later)
+no_dist <- select_segreg(segreg_test, distorted = FALSE, numbers = TRUE)
+
+# plot non-distorted markers
+plot(no_dist)
+
+#Calculate recombination fractions between markers
+twopts <- rf_2pts(bins_example)
+
+# gives us the number of chromosomes
+unique(bins_example$CHROM)
+
+# assigning markers to linkage groups
+mark_no_dist <- make_seq(twopts, c(no_dist))
+
+# Grouping markers with their chromosome information
+CHR_mks <- group_seq(input.2pts = twopts, seqs = "CHROM", unlink.mks = mark_no_dist, repeated = FALSE)
+
+saveRDS(CHR_mks, file ="CHRmks.RDS")
+
+
+# Detailed output on marker chromsome info
+CHR_mks
+
+# look for repeated markers
+CHR_mks$repeated
+
+# The bit that takes forever, need some parallelisation going on here, but is old! wtf. 
+CHR1_frame <- mds_onemap(CHR_mks$sequences$CHR1, mds.seq = TRUE)
+
+# Next step likely used up too much memory
+write_onemap_raw(CHR_mks, file.name = "processed_map.raw")
+```
